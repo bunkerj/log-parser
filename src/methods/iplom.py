@@ -1,5 +1,8 @@
 from src.methods.log_parser import LogParser
-from src.utils import print_items
+from src.utils import print_items, get_n_sorted
+from src.helpers.mapping_finder import MappingFinder
+from src.constants import MAP
+from copy import copy
 
 
 class Iplom(LogParser):
@@ -15,7 +18,7 @@ class Iplom(LogParser):
         """
         self.count_partitions = self._get_token_count_partitions()
         self.position_partitions = self._get_token_position_partitions()
-        # Partition by search for bijection
+        self.bijection_partitions = self._get_bijection_partitions()
         # Discover cluster templates
 
     def print_count_partition(self):
@@ -67,12 +70,13 @@ class Iplom(LogParser):
         total_position_partitions = {count: {} for count in self.count_partitions}
         for count in self.count_partitions:
             log_indices = self.count_partitions[count]
-            least_unique_token_index = self._get_least_unique_token_index(log_indices)
+            tokenized_log_entries = self._get_tokenized_log_entries_from_indices(log_indices)
+            least_unique_token_index = self._get_least_unique_token_index(tokenized_log_entries)
             total_position_partitions[count] = \
-                self._get_positions_partitions(least_unique_token_index, log_indices)
+                self._get_position_partitions(least_unique_token_index, log_indices)
         return total_position_partitions
 
-    def _get_positions_partitions(self, least_unique_token_index, log_indices):
+    def _get_position_partitions(self, least_unique_token_index, log_indices):
         """
         Returns a dict where the key corresponds to the token while
         the value is a list of log entry indices.
@@ -86,13 +90,13 @@ class Iplom(LogParser):
             positions_partitions[token].append(log_idx)
         return positions_partitions
 
-    def _get_least_unique_token_index(self, log_indices):
+    def _get_least_unique_token_index(self, tokenized_log_entries):
         """
         Returns: (1) the index corresponding to the token position with the least
         number of unique tokens as well as (2) the set of corresponding tokens.
         """
-        self._validate_tokenized_log_entries_length(log_indices)
-        unique_tokens = self._get_unique_tokens(log_indices)
+        self._validate_tokenized_log_entries_length(tokenized_log_entries)
+        unique_tokens = self._get_unique_tokens(tokenized_log_entries)
         least_unique_col_idx = None
         least_unique_col_count = None
         for idx in unique_tokens:
@@ -102,33 +106,118 @@ class Iplom(LogParser):
                 least_unique_col_count = count
         return least_unique_col_idx
 
-    def _get_unique_tokens(self, tokenized_log_indices):
+    def _get_unique_tokens(self, tokenized_log_entries):
         """
         Returns a dict where the key is the token position and the value is a set of unique tokens.
         """
         unique_tokens = {}
-        for log_idx in tokenized_log_indices:
-            log_entry = self.tokenized_log_entries[log_idx]
+        for log_entry in tokenized_log_entries:
             for token_idx in range(len(log_entry)):
                 if token_idx not in unique_tokens:
                     unique_tokens[token_idx] = set()
                 unique_tokens[token_idx].add(log_entry[token_idx])
         return unique_tokens
 
-    def _validate_tokenized_log_entries_length(self, tokenized_log_indices):
+    def _validate_tokenized_log_entries_length(self, tokenized_log_entries):
         """
         Check if logs all have the same token length.
         """
-        for log_idx in tokenized_log_indices:
-            ref_log_idx = tokenized_log_indices[0]
-            expected_length = len(self.tokenized_log_entries[ref_log_idx])
-            actual_length = len(self.tokenized_log_entries[log_idx])
+        for log_entry in tokenized_log_entries:
+            ref_log_entry = tokenized_log_entries[0]
+            expected_length = len(ref_log_entry)
+            actual_length = len(log_entry)
             if expected_length != actual_length:
                 error_message = 'IPLoM: Invalid log entry length ---> Expected: {} / Actual: {}'
                 raise Exception(error_message.format(expected_length, actual_length))
 
-    def _partition_by_bijection_search(self):
-        pass
+    def _get_bijection_partitions(self):
+        partition_counter = 0
+        bijection_partitions = {}
+        for count in self.position_partitions:
+            for position in self.position_partitions[count]:
+                partition_log_indices = self.position_partitions[count][position]
+                p_in = copy(self._get_tokenized_log_entries_from_indices(partition_log_indices))
+                p1, p2 = self._determineP1andP2(p_in)
+                p1_token_mapping = self._get_token_mapping(p_in, p1, p2)
+                p2_token_mapping = self._get_token_mapping(p_in, p2, p1)
+                mapping_finder = MappingFinder(p1_token_mapping, p2_token_mapping)
+                for token in p1_token_mapping:
+                    mapping_finder.update_relevant_token_sets(token)
+                    domain_token_set = mapping_finder.domain_set
+                    codomain_token_set = mapping_finder.codomain_set
+                    map_type = self._get_map_type(domain_token_set, codomain_token_set)
+                    if map_type == MAP.ONE_TO_ONE:
+                        split_pos = p1
+                    elif map_type == MAP.ONE_TO_MANY:
+                        s_temp = codomain_token_set
+                        split_rank = self._get_rank_positions(s_temp)
+                        if split_rank == 1:
+                            split_pos = p1
+                        else:
+                            split_pos = p2
+                    elif map_type == MAP.MANY_TO_ONE:
+                        s_temp = domain_token_set
+                        split_rank = self._get_rank_positions(s_temp)
+                        if split_rank == 2:
+                            split_pos = p2
+                        else:
+                            split_pos = p1
+                    else:
+                        if len(self.position_partitions[count]) > 1:
+                            continue
+                        else:
+                            s_temp1 = domain_token_set
+                            s_temp2 = codomain_token_set
+                            if len(s_temp1) < len(s_temp2):
+                                split_pos = p1
+                            else:
+                                split_pos = p2
+                    bijection_partitions[count][position][partition_counter] = \
+                        self._extract_partitions(p_in, split_pos, domain_token_set, codomain_token_set)
+                    if len(p_in) == 0:
+                        break
+        return bijection_partitions
+
+    def _determineP1andP2(self, tokenized_log_entries):
+        """
+        Return the two most frequent token positions.
+        """
+        unique_tokens = self._get_unique_tokens(tokenized_log_entries)
+        count_per_token_idx = [(len(unique_tokens[token_idx]), token_idx) for token_idx in unique_tokens]
+        counts = get_n_sorted(2, count_per_token_idx, key=lambda x: x[0], get_max=True)
+        return sorted(count[1] for count in counts)
+
+    def _get_token_mapping(self, p_in, domain_idx, codomain_idx):
+        """
+        Return mapping between tokens in domain to tokens in codomain.
+        """
+        token_mapping = {}
+        for log_entry in p_in:
+            domain_token = log_entry[domain_idx]
+            codomain_token = log_entry[codomain_idx]
+            if domain_token not in token_mapping:
+                token_mapping[domain_token] = set()
+            token_mapping[domain_token].add(codomain_token)
+        return token_mapping
+
+    def _get_map_type(self, domain_token_set, codomain_token_set):
+        """
+        Returns the map type given the associated token sets for a particular token.
+        """
+        if len(domain_token_set) == len(codomain_token_set) == 1:
+            return MAP.ONE_TO_ONE
+        elif len(domain_token_set) == 1 and len(codomain_token_set) > 1:
+            return MAP.ONE_TO_MANY
+        elif len(domain_token_set) > 1 and len(codomain_token_set) == 1:
+            return MAP.MANY_TO_ONE
+        else:
+            return MAP.MANY_TO_MANY
+
+    def _get_rank_positions(self, s_temp):
+        return {}
+
+    def _extract_partitions(self, p_in, split_pos, domain_token_set, codomain_token_set):
+        return {}
 
     def _extract_templates(self):
         pass
