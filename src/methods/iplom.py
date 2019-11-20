@@ -6,13 +6,17 @@ from copy import deepcopy
 
 
 class Iplom(LogParser):
-    def __init__(self, log_file_path, lower_bound, upper_bound):
+    def __init__(self, log_file_path, file_threshold, partition_threshold,
+                 lower_bound, upper_bound, goodness_threshold):
         super().__init__(log_file_path)
         self.count_partitions = {}
         self.position_partitions = {}
         self.bijection_partitions = {}
+        self.file_threshold = file_threshold
+        self.partition_threshold = partition_threshold
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
+        self.goodness_threshold = goodness_threshold
 
     def parse(self):
         """
@@ -110,7 +114,8 @@ class Iplom(LogParser):
 
     def _get_unique_tokens(self, tokenized_log_entries):
         """
-        Returns a dict where the key is the token position and the value is a set of unique tokens.
+        Returns a dict where the key is the token position
+        and the value is a set of unique tokens.
         """
         unique_tokens = {}
         for log_entry in tokenized_log_entries:
@@ -133,11 +138,20 @@ class Iplom(LogParser):
                 raise Exception(error_message.format(expected_length, actual_length))
 
     def _get_bijection_partitions(self):
+        """
+        Returns a nested dict where keys are count, position token, and partition index.
+        """
         bijection_partitions = self._initialize_bijection_partitions()
         for count in self.position_partitions:
             for position_token in self.position_partitions[count]:
                 partition_log_indices = deepcopy(self.position_partitions[count][position_token])
                 p_in = deepcopy(self._get_tokenized_log_entries_from_indices(partition_log_indices))
+
+                # Check for goodness threshold and token entry size
+                partition_goodness = self._get_partition_goodness(p_in)
+                if partition_goodness > self.goodness_threshold or len(p_in[0]) < 2:
+                    bijection_partitions[count][position_token][0] = partition_log_indices
+                    continue
 
                 p1, p2 = self._determineP1andP2(p_in)
                 tmp_partitions = {p1: {}, p2: {}}
@@ -209,6 +223,26 @@ class Iplom(LogParser):
         return {c: {p: {} for p in self.position_partitions[c]}
                 for c in self.position_partitions}
 
+    def _get_partition_goodness(self, p_in):
+        if len(p_in) == 0:
+            raise Exception('Partition cannot be empty')
+
+        count_1 = 0
+        token_count = len(p_in[0])
+        for token_idx in range(token_count):
+            reference_token = None
+            is_unique = True
+            for log_entry in p_in:
+                if reference_token is None:
+                    reference_token = log_entry[token_idx]
+                elif reference_token != log_entry[token_idx]:
+                    is_unique = False
+                    break
+            if is_unique:
+                count_1 += 1
+
+        return count_1 / token_count
+
     def _determineP1andP2(self, tokenized_log_entries):
         """
         Return the two most frequent token positions.
@@ -245,16 +279,22 @@ class Iplom(LogParser):
             return MAP.MANY_TO_MANY
 
     def _get_rank_positions(self, p_in, token_idx, s_temp, is_one_to_m):
-        line_count = 0
-        for log_entry in p_in:
-            if log_entry[token_idx] in s_temp:
-                line_count += 1
-
+        """
+        Returns the split position for 1-M or M-1 scenarios.
+        """
+        line_count = self._get_line_count_at_token_idx(p_in, s_temp, token_idx)
         distance = len(s_temp) / line_count
         if distance < self.lower_bound:
             return 2 if is_one_to_m else 1
         else:
             return 1 if is_one_to_m else 2
+
+    def _get_line_count_at_token_idx(self, p_in, s_temp, token_idx):
+        line_count = 0
+        for log_entry in p_in:
+            if log_entry[token_idx] in s_temp:
+                line_count += 1
+        return line_count
 
     def _extract_templates(self):
         pass
