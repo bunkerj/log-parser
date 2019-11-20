@@ -2,7 +2,7 @@ from src.methods.log_parser import LogParser
 from src.utils import print_items, get_n_sorted
 from src.helpers.mapping_finder import MappingFinder
 from src.constants import MAP
-from copy import copy
+from copy import deepcopy
 
 
 class Iplom(LogParser):
@@ -131,32 +131,34 @@ class Iplom(LogParser):
                 raise Exception(error_message.format(expected_length, actual_length))
 
     def _get_bijection_partitions(self):
-        partition_counter = 0
-        bijection_partitions = {}
+        bijection_partitions = self._initialize_bijection_partitions()
         for count in self.position_partitions:
-            for position in self.position_partitions[count]:
-                partition_log_indices = self.position_partitions[count][position]
-                p_in = copy(self._get_tokenized_log_entries_from_indices(partition_log_indices))
+            for position_token in self.position_partitions[count]:
+                partition_log_indices = deepcopy(self.position_partitions[count][position_token])
+                p_in = deepcopy(self._get_tokenized_log_entries_from_indices(partition_log_indices))
+
                 p1, p2 = self._determineP1andP2(p_in)
+                tmp_partitions = {p1: {}, p2: {}}
                 p1_token_mapping = self._get_token_mapping(p_in, p1, p2)
                 p2_token_mapping = self._get_token_mapping(p_in, p2, p1)
+
                 mapping_finder = MappingFinder(p1_token_mapping, p2_token_mapping)
+
                 for token in p1_token_mapping:
                     mapping_finder.update_relevant_token_sets(token)
-                    domain_token_set = mapping_finder.domain_set
-                    codomain_token_set = mapping_finder.codomain_set
-                    map_type = self._get_map_type(domain_token_set, codomain_token_set)
+                    token_sets = {p1: mapping_finder.domain_set, p2: mapping_finder.codomain_set}
+                    map_type = self._get_map_type(token_sets[p1], token_sets[p2])
                     if map_type == MAP.ONE_TO_ONE:
                         split_pos = p1
                     elif map_type == MAP.ONE_TO_MANY:
-                        s_temp = codomain_token_set
+                        s_temp = token_sets[p2]
                         split_rank = self._get_rank_positions(s_temp)
                         if split_rank == 1:
                             split_pos = p1
                         else:
                             split_pos = p2
                     elif map_type == MAP.MANY_TO_ONE:
-                        s_temp = domain_token_set
+                        s_temp = token_sets[p1]
                         split_rank = self._get_rank_positions(s_temp)
                         if split_rank == 2:
                             split_pos = p2
@@ -166,17 +168,44 @@ class Iplom(LogParser):
                         if len(self.position_partitions[count]) > 1:
                             continue
                         else:
-                            s_temp1 = domain_token_set
-                            s_temp2 = codomain_token_set
+                            s_temp1 = token_sets[p1]
+                            s_temp2 = token_sets[p2]
                             if len(s_temp1) < len(s_temp2):
                                 split_pos = p1
                             else:
                                 split_pos = p2
-                    bijection_partitions[count][position][partition_counter] = \
-                        self._extract_partitions(p_in, split_pos, domain_token_set, codomain_token_set)
+
+                    # Split into new partitions based on split_pos
+                    for idx, tokenized_log_entry in enumerate(p_in):
+                        if tokenized_log_entry[p1] == token:
+                            split_token = tokenized_log_entry[split_pos]
+                            if split_token not in tmp_partitions[split_pos]:
+                                tmp_partitions[split_pos][split_token] = []
+                            tmp_partitions[split_pos][split_token].append(partition_log_indices[idx])
+                            partition_log_indices.pop(idx)
+                            p_in.pop(idx)
+
                     if len(p_in) == 0:
                         break
+
+                # Add new partitions in tmp_partitions to bijection_partitions
+                partition_idx = 0
+                for split_pos in tmp_partitions:
+                    for split_token in tmp_partitions[split_pos]:
+                        bijection_partitions[count][position_token][partition_idx] \
+                            = tmp_partitions[split_pos][split_token]
+                        partition_idx += 1
+
+                # Create a new partition with the remaining lines (from M-M relationships)
+                # TODO: Split disjoint M-M groups
+                if len(p_in) > 0:
+                    bijection_partitions[count][position_token][partition_idx] = partition_log_indices
+
         return bijection_partitions
+
+    def _initialize_bijection_partitions(self):
+        return {c: {p: {} for p in self.position_partitions[c]}
+                for c in self.position_partitions}
 
     def _determineP1andP2(self, tokenized_log_entries):
         """
@@ -214,9 +243,6 @@ class Iplom(LogParser):
             return MAP.MANY_TO_MANY
 
     def _get_rank_positions(self, s_temp):
-        return {}
-
-    def _extract_partitions(self, p_in, split_pos, domain_token_set, codomain_token_set):
         return {}
 
     def _extract_templates(self):
