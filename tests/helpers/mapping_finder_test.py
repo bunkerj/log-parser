@@ -38,8 +38,8 @@ expected_results = {
 class TestMappingFinder(unittest.TestCase):
 
     def test_A(self):
+        mapping_finder = MappingFinder(p1_token_mapping, p2_token_mapping)
         for token in p1_token_mapping:
-            mapping_finder = MappingFinder(p1_token_mapping, p2_token_mapping)
             mapping_finder.update_relevant_token_sets(token)
             domain_set = mapping_finder.domain_set
             codomain_set = mapping_finder.codomain_set

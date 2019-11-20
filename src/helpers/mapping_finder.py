@@ -6,6 +6,9 @@ class MappingFinder:
         self.p2_token_mapping = p2_token_mapping
 
     def update_relevant_token_sets(self, token, parent_token=None, is_reversed=False):
+        if parent_token is None:
+            self.domain_set = set()
+            self.codomain_set = set()
         if not is_reversed:
             self.domain_set.add(token)
             for codomain_token in self.p1_token_mapping[token]:
