@@ -6,11 +6,13 @@ from copy import deepcopy
 
 
 class Iplom(LogParser):
-    def __init__(self, log_file_path):
+    def __init__(self, log_file_path, lower_bound, upper_bound):
         super().__init__(log_file_path)
         self.count_partitions = {}
         self.position_partitions = {}
         self.bijection_partitions = {}
+        self.lower_bound = lower_bound
+        self.upper_bound = upper_bound
 
     def parse(self):
         """
@@ -152,14 +154,14 @@ class Iplom(LogParser):
                         split_pos = p1
                     elif map_type == MAP.ONE_TO_MANY:
                         s_temp = token_sets[p2]
-                        split_rank = self._get_rank_positions(s_temp)
+                        split_rank = self._get_rank_positions(p_in, p2, s_temp, True)
                         if split_rank == 1:
                             split_pos = p1
                         else:
                             split_pos = p2
                     elif map_type == MAP.MANY_TO_ONE:
                         s_temp = token_sets[p1]
-                        split_rank = self._get_rank_positions(s_temp)
+                        split_rank = self._get_rank_positions(p_in, p2, s_temp, False)
                         if split_rank == 2:
                             split_pos = p2
                         else:
@@ -242,8 +244,17 @@ class Iplom(LogParser):
         else:
             return MAP.MANY_TO_MANY
 
-    def _get_rank_positions(self, s_temp):
-        return {}
+    def _get_rank_positions(self, p_in, token_idx, s_temp, is_one_to_m):
+        line_count = 0
+        for log_entry in p_in:
+            if log_entry[token_idx] in s_temp:
+                line_count += 1
+
+        distance = len(s_temp) / line_count
+        if distance < self.lower_bound:
+            return 2 if is_one_to_m else 1
+        else:
+            return 1 if is_one_to_m else 2
 
     def _extract_templates(self):
         pass
