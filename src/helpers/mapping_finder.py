@@ -1,9 +1,12 @@
+from copy import deepcopy
+
+
 class MappingFinder:
     def __init__(self, p1_token_mapping, p2_token_mapping):
         self.domain_set = set()
         self.codomain_set = set()
-        self.p1_token_mapping = p1_token_mapping
-        self.p2_token_mapping = p2_token_mapping
+        self.p1_token_mapping = deepcopy(p1_token_mapping)
+        self.p2_token_mapping = deepcopy(p2_token_mapping)
 
     def update_relevant_token_sets(self, token, parent_token=None, is_reversed=False):
         if parent_token is None:
