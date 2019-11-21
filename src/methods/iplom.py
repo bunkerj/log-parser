@@ -10,9 +10,6 @@ class Iplom(LogParser):
     def __init__(self, log_file_path, file_threshold, partition_threshold,
                  lower_bound, upper_bound, goodness_threshold):
         super().__init__(log_file_path)
-        # self.count_partitions = {}
-        # self.position_partitions = {}
-        # self.bijection_partitions = {}
         self.partitions = Partitions()
         self.file_threshold = file_threshold
         self.partition_threshold = partition_threshold
@@ -24,36 +21,16 @@ class Iplom(LogParser):
         """
         Update fields corresponding to the list of templates and their correspondences.
         """
-        # self.count_partitions = self._get_token_count_partitions()
-        # self.position_partitions = self._get_token_position_partitions()
-        # self.bijection_partitions = self._get_bijection_partitions()
-
         self._get_token_count_partitions()
         self._get_token_position_partitions()
         self._get_bijection_partitions()
 
         # Discover cluster templates
 
-    def print_count_partition(self):
-        """
-        Print all log entries grouped by their respective token count.
-        """
-        for count in self.count_partitions:
-            log_indices = self.count_partitions[count]
-            log_entries = self._get_log_entries_from_indices(log_indices)
-            print('Count: {}'.format(count))
+    def print_partitions(self):
+        for partition_item in self.partitions:
+            log_entries = self._get_log_entries_from_indices(partition_item.log_indices)
             print_items(log_entries)
-
-    def print_position_partitions(self):
-        """
-        Print all of the log entries grouped by count and least unique token.
-        """
-        for count in self.position_partitions:
-            subpartitions = self.position_partitions[count]
-            for token in subpartitions:
-                print('Count: {} \t Unique Token: {}'.format(count, token))
-                log_entries = self._get_log_entries_from_indices(subpartitions[token])
-                print_items(log_entries)
 
     def _get_log_entries_from_indices(self, log_indices):
         return [' '.join(tokenized_log_entry) for tokenized_log_entry in
