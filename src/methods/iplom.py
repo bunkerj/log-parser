@@ -19,7 +19,8 @@ class Iplom(LogParser):
 
     def parse(self):
         """
-        Update fields corresponding to the list of templates and their correspondences.
+        Perform 3 partitioning steps followed by template generation.
+        This function will update the partitions and cluster_templates fields.
         """
         self._partition_by_count()
         self._partition_by_position()
@@ -60,14 +61,25 @@ class Iplom(LogParser):
         Split partitions by the least unique token position.
         """
         position_partitions = Partitions()
+        outlier_partition = []
+
         for partition_item in self.partitions:
             log_indices = partition_item.log_indices
             tokenized_log_entries = self._get_tokenized_log_entries_from_indices(log_indices)
             least_unique_token_index = self._get_least_unique_token_index(tokenized_log_entries)
             subpartitions_dict = self._get_position_subpartitions_dict(least_unique_token_index, log_indices)
             for token in subpartitions_dict:
-                partition_step = 1 if len(subpartitions_dict) == 1 else 2
-                position_partitions.add(subpartitions_dict[token], partition_step)
+                subpartition = subpartitions_dict[token]
+                partition_support = len(subpartition) / len(tokenized_log_entries)
+                if partition_support < self.partition_threshold:
+                    outlier_partition = outlier_partition + subpartition
+                else:
+                    partition_step = 1 if len(subpartitions_dict) == 1 else 2
+                    position_partitions.add(subpartition, partition_step)
+
+        if len(outlier_partition) > 0:
+            position_partitions.add(outlier_partition, 2)
+
         self.partitions = position_partitions
 
     def _get_position_subpartitions_dict(self, least_unique_token_index, log_indices):
