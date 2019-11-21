@@ -1,6 +1,7 @@
 from src.methods.log_parser import LogParser
 from src.utils import print_items, get_n_sorted
 from src.helpers.mapping_finder import MappingFinder
+from src.helpers.partitions import Partitions
 from src.constants import MAP
 from copy import deepcopy
 
@@ -9,9 +10,10 @@ class Iplom(LogParser):
     def __init__(self, log_file_path, file_threshold, partition_threshold,
                  lower_bound, upper_bound, goodness_threshold):
         super().__init__(log_file_path)
-        self.count_partitions = {}
-        self.position_partitions = {}
-        self.bijection_partitions = {}
+        # self.count_partitions = {}
+        # self.position_partitions = {}
+        # self.bijection_partitions = {}
+        self.partitions = Partitions()
         self.file_threshold = file_threshold
         self.partition_threshold = partition_threshold
         self.lower_bound = lower_bound
@@ -22,9 +24,14 @@ class Iplom(LogParser):
         """
         Update fields corresponding to the list of templates and their correspondences.
         """
-        self.count_partitions = self._get_token_count_partitions()
-        self.position_partitions = self._get_token_position_partitions()
-        self.bijection_partitions = self._get_bijection_partitions()
+        # self.count_partitions = self._get_token_count_partitions()
+        # self.position_partitions = self._get_token_position_partitions()
+        # self.bijection_partitions = self._get_bijection_partitions()
+
+        self._get_token_count_partitions()
+        self._get_token_position_partitions()
+        self._get_bijection_partitions()
+
         # Discover cluster templates
 
     def print_count_partition(self):
@@ -57,32 +64,37 @@ class Iplom(LogParser):
 
     def _get_token_count_partitions(self):
         """
-        Returns a dict where the key is a count and the value is a
-        list of log entry indices.
+        Split partitions by token count.
         """
-        count_partitions = {}
+        count_dict = {}
         for idx, log_entry in enumerate(self.tokenized_log_entries):
             n = len(log_entry)
-            if n not in count_partitions:
-                count_partitions[n] = []
-            count_partitions[n].append(idx)
-        return count_partitions
+            if n not in count_dict:
+                count_dict[n] = []
+            count_dict[n].append(idx)
+
+        count_partitions = Partitions()
+        for count in count_dict:
+            count_partitions.add(count_dict[count], 1)
+
+        self.partitions = count_partitions
 
     def _get_token_position_partitions(self):
         """
-        Returns a nested dict where the two keys corresponds to the count and
-        token position while the value is a list of log entry indices.
+        Split partitions by the least unique token position.
         """
-        total_position_partitions = {count: {} for count in self.count_partitions}
-        for count in self.count_partitions:
-            log_indices = self.count_partitions[count]
+        position_partitions = Partitions()
+        for partition_item in self.partitions:
+            log_indices = partition_item.log_indices
             tokenized_log_entries = self._get_tokenized_log_entries_from_indices(log_indices)
             least_unique_token_index = self._get_least_unique_token_index(tokenized_log_entries)
-            total_position_partitions[count] = \
-                self._get_position_partitions(least_unique_token_index, log_indices)
-        return total_position_partitions
+            subpartitions_dict = self._get_position_subpartitions_dict(least_unique_token_index, log_indices)
+            for token in subpartitions_dict:
+                partition_step = 1 if len(subpartitions_dict) == 1 else 2
+                position_partitions.add(subpartitions_dict[token], partition_step)
+        self.partitions = position_partitions
 
-    def _get_position_partitions(self, least_unique_token_index, log_indices):
+    def _get_position_subpartitions_dict(self, least_unique_token_index, log_indices):
         """
         Returns a dict where the key corresponds to the token while
         the value is a list of log entry indices.
@@ -139,89 +151,83 @@ class Iplom(LogParser):
 
     def _get_bijection_partitions(self):
         """
-        Returns a nested dict where keys are count, position token, and partition index.
+        Split partitions by seeking mapping relationships.
         """
-        bijection_partitions = self._initialize_bijection_partitions()
-        for count in self.position_partitions:
-            for position_token in self.position_partitions[count]:
-                partition_log_indices = deepcopy(self.position_partitions[count][position_token])
-                p_in = deepcopy(self._get_tokenized_log_entries_from_indices(partition_log_indices))
+        bijection_partitions = Partitions()
+        for partition_item in self.partitions:
+            log_indices = deepcopy(partition_item.log_indices)
+            p_in = deepcopy(self._get_tokenized_log_entries_from_indices(log_indices))
 
-                # Check for goodness threshold and token entry size
-                partition_goodness = self._get_partition_goodness(p_in)
-                if partition_goodness > self.goodness_threshold or len(p_in[0]) < 2:
-                    bijection_partitions[count][position_token][0] = partition_log_indices
-                    continue
+            # Check for goodness threshold and token entry size
+            partition_goodness = self._get_partition_goodness(p_in)
+            if partition_goodness > self.goodness_threshold or len(p_in[0]) < 2:
+                bijection_partitions.add(log_indices, 3)
+                continue
 
-                p1, p2 = self._determineP1andP2(p_in)
-                tmp_partitions = {p1: {}, p2: {}}
-                p1_token_mapping = self._get_token_mapping(p_in, p1, p2)
-                p2_token_mapping = self._get_token_mapping(p_in, p2, p1)
+            p1, p2 = self._determine_p1_and_p2(p_in)
+            tmp_partitions = {p1: {}, p2: {}}
+            p1_token_mapping = self._get_token_mapping(p_in, p1, p2)
+            p2_token_mapping = self._get_token_mapping(p_in, p2, p1)
 
-                mapping_finder = MappingFinder(p1_token_mapping, p2_token_mapping)
+            mapping_finder = MappingFinder(p1_token_mapping, p2_token_mapping)
 
-                for token in p1_token_mapping:
-                    mapping_finder.update_relevant_token_sets(token)
-                    token_sets = {p1: mapping_finder.domain_set, p2: mapping_finder.codomain_set}
-                    map_type = self._get_map_type(token_sets[p1], token_sets[p2])
-                    if map_type == MAP.ONE_TO_ONE:
+            for token in p1_token_mapping:
+                mapping_finder.update_relevant_token_sets(token)
+                token_sets = {p1: mapping_finder.domain_set, p2: mapping_finder.codomain_set}
+                map_type = self._get_map_type(token_sets[p1], token_sets[p2])
+                if map_type == MAP.ONE_TO_ONE:
+                    split_pos = p1
+                elif map_type == MAP.ONE_TO_MANY:
+                    s_temp = token_sets[p2]
+                    split_rank = self._get_rank_positions(p_in, p2, s_temp, True)
+                    if split_rank == 1:
                         split_pos = p1
-                    elif map_type == MAP.ONE_TO_MANY:
-                        s_temp = token_sets[p2]
-                        split_rank = self._get_rank_positions(p_in, p2, s_temp, True)
-                        if split_rank == 1:
-                            split_pos = p1
-                        else:
-                            split_pos = p2
-                    elif map_type == MAP.MANY_TO_ONE:
-                        s_temp = token_sets[p1]
-                        split_rank = self._get_rank_positions(p_in, p2, s_temp, False)
-                        if split_rank == 2:
-                            split_pos = p2
-                        else:
-                            split_pos = p1
                     else:
-                        if len(self.position_partitions[count]) > 1:
-                            continue
+                        split_pos = p2
+                elif map_type == MAP.MANY_TO_ONE:
+                    s_temp = token_sets[p1]
+                    split_rank = self._get_rank_positions(p_in, p2, s_temp, False)
+                    if split_rank == 2:
+                        split_pos = p2
+                    else:
+                        split_pos = p1
+                else:
+                    if partition_item.step == 2:
+                        continue
+                    else:
+                        s_temp1 = token_sets[p1]
+                        s_temp2 = token_sets[p2]
+                        if len(s_temp1) < len(s_temp2):
+                            split_pos = p1
                         else:
-                            s_temp1 = token_sets[p1]
-                            s_temp2 = token_sets[p2]
-                            if len(s_temp1) < len(s_temp2):
-                                split_pos = p1
-                            else:
-                                split_pos = p2
+                            split_pos = p2
 
-                    # Split into new partitions based on split_pos
-                    for idx, tokenized_log_entry in enumerate(p_in):
-                        if tokenized_log_entry[p1] == token:
-                            split_token = tokenized_log_entry[split_pos]
-                            if split_token not in tmp_partitions[split_pos]:
-                                tmp_partitions[split_pos][split_token] = []
-                            tmp_partitions[split_pos][split_token].append(partition_log_indices[idx])
-                            partition_log_indices.pop(idx)
-                            p_in.pop(idx)
+                # Split into new partitions based on split_pos
+                for idx, tokenized_log_entry in enumerate(p_in):
+                    if tokenized_log_entry[p1] == token:
+                        split_token = tokenized_log_entry[split_pos]
+                        if split_token not in tmp_partitions[split_pos]:
+                            tmp_partitions[split_pos][split_token] = []
+                        tmp_partitions[split_pos][split_token].append(log_indices[idx])
+                        log_indices.pop(idx)
+                        p_in.pop(idx)
 
-                    if len(p_in) == 0:
-                        break
+                if len(p_in) == 0:
+                    break
 
-                # Add new partitions in tmp_partitions to bijection_partitions
-                partition_idx = 0
-                for split_pos in tmp_partitions:
-                    for split_token in tmp_partitions[split_pos]:
-                        bijection_partitions[count][position_token][partition_idx] \
-                            = tmp_partitions[split_pos][split_token]
-                        partition_idx += 1
+            # Add new partitions in tmp_partitions to bijection_partitions
+            partition_idx = 0
+            for split_pos in tmp_partitions:
+                for split_token in tmp_partitions[split_pos]:
+                    bijection_partitions.add(tmp_partitions[split_pos][split_token], 3)
+                    partition_idx += 1
 
-                # Create a new partition with the remaining lines (from M-M relationships)
-                # TODO: Split disjoint M-M groups
-                if len(p_in) > 0:
-                    bijection_partitions[count][position_token][partition_idx] = partition_log_indices
+            # Create a new partition with the remaining lines (from M-M relationships)
+            # TODO: Split disjoint M-M groups
+            if len(p_in) > 0:
+                bijection_partitions.add(log_indices, 3)
 
-        return bijection_partitions
-
-    def _initialize_bijection_partitions(self):
-        return {c: {p: {} for p in self.position_partitions[c]}
-                for c in self.position_partitions}
+        self.partitions = bijection_partitions
 
     def _get_partition_goodness(self, p_in):
         if len(p_in) == 0:
@@ -243,7 +249,10 @@ class Iplom(LogParser):
 
         return count_1 / token_count
 
-    def _determineP1andP2(self, tokenized_log_entries):
+    def _prune_partitions(self, partitions):
+        pass
+
+    def _determine_p1_and_p2(self, tokenized_log_entries):
         """
         Return the two most frequent token positions.
         """
