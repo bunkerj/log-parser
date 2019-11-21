@@ -61,7 +61,7 @@ class Iplom(LogParser):
         Split partitions by the least unique token position.
         """
         position_partitions = Partitions()
-        outlier_partition = []
+        outlier_log_indices = []
 
         for partition_item in self.partitions:
             log_indices = partition_item.log_indices
@@ -72,15 +72,16 @@ class Iplom(LogParser):
                 child_partition = child_partitions[token]
                 partition_support = len(child_partition) / len(tokenized_log_entries)
                 if partition_support < self.partition_threshold:
-                    outlier_partition.extend(child_partition)
+                    outlier_log_indices.extend(child_partition)
                 else:
                     partition_step = 1 if len(child_partitions) == 1 else 2
                     position_partitions.add(child_partition, partition_step)
 
-        if len(outlier_partition) > 0:
-            position_partitions.add(outlier_partition, 2)
+        if len(outlier_log_indices) > 0:
+            position_partitions.add(outlier_log_indices, 2)
 
         self.partitions = position_partitions
+        self._prune_partitions()
 
     def _get_position_subpartitions_dict(self, least_unique_token_index, log_indices):
         """
@@ -204,18 +205,18 @@ class Iplom(LogParser):
                     break
 
             # Add new partitions in tmp_partitions to bijection_partitions
-            outlier_partition = []
+            outlier_log_indices = []
             for split_pos in tmp_partitions:
                 for split_token in tmp_partitions[split_pos]:
                     child_partition = tmp_partitions[split_pos][split_token]
                     partition_support = len(child_partition) / len(partition_item.log_indices)
                     if partition_support < self.partition_threshold:
-                        outlier_partition.extend(child_partition)
+                        outlier_log_indices.extend(child_partition)
                     else:
                         bijection_partitions.add(child_partition, 3)
 
-            if len(outlier_partition) > 0:
-                bijection_partitions.add(outlier_partition, 3)
+            if len(outlier_log_indices) > 0:
+                bijection_partitions.add(outlier_log_indices, 3)
 
             # Create a new partition with the remaining lines (from M-M relationships)
             # TODO: Split disjoint M-M groups
@@ -223,6 +224,7 @@ class Iplom(LogParser):
                 bijection_partitions.add(log_indices, 3)
 
         self.partitions = bijection_partitions
+        self._prune_partitions()
 
     def _get_partition_goodness(self, p_in):
         count_1 = 0
@@ -241,9 +243,30 @@ class Iplom(LogParser):
 
         return count_1 / token_count
 
-    def _prune_partitions(self, partitions):
-        # TODO: implement this
-        pass
+    def _prune_partitions(self):
+        """
+        Place all log entries from partitions with a file support
+        less than the threshold into a single partition.
+        """
+        highest_pruned_step = -1
+        pruned_log_indices = []
+        pruned_partitions = Partitions()
+        total_line_count = len(self.tokenized_log_entries)
+
+        for partition_item in self.partitions:
+            log_indices = partition_item.log_indices
+            partition_line_count = len(log_indices)
+            file_support = partition_line_count / total_line_count
+            if file_support < self.file_threshold:
+                highest_pruned_step = max(highest_pruned_step, partition_item.step)
+                pruned_log_indices.extend(log_indices)
+            else:
+                pruned_partitions.add(log_indices, partition_item.step)
+
+        if len(pruned_log_indices) > 1:
+            pruned_partitions.add(pruned_log_indices, highest_pruned_step)
+
+        self.partitions = pruned_partitions
 
     def _determine_p1_and_p2(self, tokenized_log_entries):
         """
