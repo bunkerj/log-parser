@@ -1,5 +1,7 @@
 BGL_FILE_PATH = '../data/BGL/BGL_2k.log'
 
+PLACEHOLDER = '*'
+
 
 class MAP:
     ONE_TO_ONE = 'ONE_TO_ONE'

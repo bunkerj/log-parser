@@ -8,4 +8,5 @@ iplom = Iplom(BGL_FILE_PATH,
               upper_bound=0.9,
               goodness_threshold=0.34)
 
-result = iplom.parse()
+iplom.parse()
+iplom.print_cluster_templates()

@@ -2,7 +2,7 @@ from src.methods.log_parser import LogParser
 from src.utils import print_items, get_n_sorted
 from src.helpers.mapping_finder import MappingFinder
 from src.helpers.partitions import Partitions
-from src.constants import MAP
+from src.constants import MAP, PLACEHOLDER
 from copy import deepcopy
 
 
@@ -21,11 +21,10 @@ class Iplom(LogParser):
         """
         Update fields corresponding to the list of templates and their correspondences.
         """
-        self._get_token_count_partitions()
-        self._get_token_position_partitions()
-        self._get_bijection_partitions()
-
-        # Discover cluster templates
+        self._partition_by_count()
+        self._partition_by_position()
+        self._partition_by_bijections()
+        self._discover_cluster_templates()
 
     def print_partitions(self):
         for partition_item in self.partitions:
@@ -39,7 +38,7 @@ class Iplom(LogParser):
     def _get_tokenized_log_entries_from_indices(self, log_indices):
         return [self.tokenized_log_entries[log_id] for log_id in log_indices]
 
-    def _get_token_count_partitions(self):
+    def _partition_by_count(self):
         """
         Split partitions by token count.
         """
@@ -56,7 +55,7 @@ class Iplom(LogParser):
 
         self.partitions = count_partitions
 
-    def _get_token_position_partitions(self):
+    def _partition_by_position(self):
         """
         Split partitions by the least unique token position.
         """
@@ -126,7 +125,7 @@ class Iplom(LogParser):
                 error_message = 'IPLoM: Invalid log entry length ---> Expected: {} / Actual: {}'
                 raise Exception(error_message.format(expected_length, actual_length))
 
-    def _get_bijection_partitions(self):
+    def _partition_by_bijections(self):
         """
         Split partitions by seeking mapping relationships.
         """
@@ -282,8 +281,42 @@ class Iplom(LogParser):
                 line_count += 1
         return line_count
 
-    def _extract_templates(self):
-        pass
+    def _discover_cluster_templates(self):
+        """
+        Discover all cluster templates from the current partitions.
+        """
+        for partition_item in self.partitions:
+            log_entries = self._get_tokenized_log_entries_from_indices(partition_item.log_indices)
+            constant_token_indices = self._get_constant_token_indices(log_entries)
+            cluster_template_tokens = []
+            for idx in range(len(log_entries[0])):
+                if idx in constant_token_indices:
+                    token = log_entries[0][idx]
+                    cluster_template_tokens.append(token)
+                else:
+                    cluster_template_tokens.append(PLACEHOLDER)
+            cluster_template_string = ' '.join(cluster_template_tokens)
+            self.cluster_templates[cluster_template_string] = log_entries
 
-    def get_templates(self):
-        return self.unique_event_templates
+    def _get_constant_token_indices(self, log_entries):
+        """
+        Get of token indices that represent constant tokens for a given partition.
+        """
+        reference_tokens = log_entries[0]
+        constant_token_indices = set()
+        for idx in range(len(reference_tokens)):
+            is_constant = True
+            for log_entry in log_entries:
+                if log_entry[idx] != reference_tokens[idx]:
+                    is_constant = False
+                    break
+            if is_constant:
+                constant_token_indices.add(idx)
+        return constant_token_indices
+
+    def print_cluster_templates(self):
+        for template in self.cluster_templates:
+            print(template)
+            for log_entry in self.cluster_templates[template]:
+                print(log_entry)
+            print()

@@ -3,8 +3,7 @@ from src.utils import read_file
 
 class LogParser:
     def __init__(self, log_file_path):
-        self.unique_event_templates = []
-        self.event_template_per_entry = []
+        self.cluster_templates = {}
         self.log_file_path = log_file_path
         self.tokenized_log_entries = \
             self._get_tokenized_log_entries_from_file_path(log_file_path)
