@@ -206,9 +206,6 @@ class Iplom(LogParser):
         self.partitions = bijection_partitions
 
     def _get_partition_goodness(self, p_in):
-        if len(p_in) == 0:
-            raise Exception('Partition cannot be empty')
-
         count_1 = 0
         token_count = len(p_in[0])
         for token_idx in range(token_count):

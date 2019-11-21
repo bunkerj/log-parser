@@ -18,5 +18,7 @@ class Partitions:
             raise StopIteration
 
     def add(self, partition, step_num):
+        if len(partition) == 0:
+            raise Exception('Partition cannot be empty')
         partition_item = ParititionItem(partition, step_num)
         self.partition_list.append(partition_item)
