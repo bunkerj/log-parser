@@ -1,4 +1,4 @@
-from src.utils import read_csv
+from src.utils import read_csv, are_lists_equal
 
 
 class Evaluator:
@@ -9,8 +9,24 @@ class Evaluator:
         self.template_parsed = parsed_results
 
     def evaluate(self):
-        # TODO: Implement percentage accuracy measure
-        percentage_accuracy = 0
+        num_correct_lines = 0
+        total_lines = 0
+        matching_templates = self._get_matching_templates()
+        for template in matching_templates:
+            parsed_entry_indices = self.template_parsed[template]
+            truth_entry_indices = self.template_truth[template]
+            line_count = len(parsed_entry_indices)
+            if are_lists_equal(parsed_entry_indices, truth_entry_indices):
+                num_correct_lines += line_count
+            total_lines += line_count
+        return num_correct_lines / total_lines
+
+    def _get_matching_templates(self):
+        matching_templates = set()
+        for template in self.template_parsed:
+            if template in self.template_truth:
+                matching_templates.add(template)
+        return matching_templates
 
     def _get_template_truth(self, raw_truth):
         cluster_templates_truth = {}

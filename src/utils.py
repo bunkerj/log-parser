@@ -20,3 +20,14 @@ def print_items(items):
 
 def get_n_sorted(n, items, key=None, get_max=False):
     return sorted(items, key=key, reverse=get_max)[:n]
+
+
+def are_lists_equal(list1, list2):
+    if len(list1) != len(list2):
+        return False
+    sorted_list1 = sorted(list1)
+    sorted_list2 = sorted(list2)
+    for idx in range(len(sorted_list1)):
+        if sorted_list1[idx] != sorted_list2[idx]:
+            return False
+    return True
