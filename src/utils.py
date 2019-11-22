@@ -1,6 +1,15 @@
-def read_file(file_name):
-    with open(file_name) as f:
+import csv
+
+
+def read_file(file_path):
+    with open(file_path) as f:
         return f.read()
+
+
+def read_csv(file_path):
+    with open(file_path) as f:
+        csv_reader = csv.reader(f, delimiter=',')
+        return list(csv_reader)
 
 
 def print_items(items):
