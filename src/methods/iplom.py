@@ -248,8 +248,8 @@ class Iplom(LogParser):
         Place all log entries from partitions with a file support
         less than the threshold into a single partition.
         """
-        highest_pruned_step = -1
-        pruned_log_indices = []
+        # highest_pruned_step = -1
+        # pruned_log_indices = []
         pruned_partitions = Partitions()
         total_line_count = len(self.tokenized_log_entries)
 
@@ -257,14 +257,17 @@ class Iplom(LogParser):
             log_indices = partition_item.log_indices
             partition_line_count = len(log_indices)
             file_support = partition_line_count / total_line_count
+            # if file_support < self.file_threshold:
+            #     highest_pruned_step = max(highest_pruned_step, partition_item.step)
+            #     pruned_log_indices.extend(log_indices)
+            # else:
+            #     pruned_partitions.add(log_indices, partition_item.step)
+
             if file_support < self.file_threshold:
-                highest_pruned_step = max(highest_pruned_step, partition_item.step)
-                pruned_log_indices.extend(log_indices)
-            else:
                 pruned_partitions.add(log_indices, partition_item.step)
 
-        if len(pruned_log_indices) > 1:
-            pruned_partitions.add(pruned_log_indices, highest_pruned_step)
+        # if len(pruned_log_indices) > 1:
+        #     pruned_partitions.add(pruned_log_indices, highest_pruned_step)
 
         self.partitions = pruned_partitions
 
