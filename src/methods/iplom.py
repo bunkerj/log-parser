@@ -10,7 +10,7 @@ class Iplom(LogParser):
     def __init__(self, log_file_path, file_threshold, partition_threshold,
                  lower_bound, upper_bound, goodness_threshold):
         super().__init__(log_file_path)
-        self.partitions = Partitions()
+        self.partitions = Partitions(self.tokenized_log_entries)
         self.file_threshold = file_threshold
         self.partition_threshold = partition_threshold
         self.lower_bound = lower_bound
@@ -50,7 +50,7 @@ class Iplom(LogParser):
                 count_dict[n] = []
             count_dict[n].append(idx)
 
-        count_partitions = Partitions()
+        count_partitions = Partitions(self.tokenized_log_entries)
         for count in count_dict:
             count_partitions.add(count_dict[count], 1)
 
@@ -60,7 +60,7 @@ class Iplom(LogParser):
         """
         Split partitions by the least unique token position.
         """
-        position_partitions = Partitions()
+        position_partitions = Partitions(self.tokenized_log_entries)
         outlier_log_indices = []
 
         for partition_item in self.partitions:
@@ -102,7 +102,6 @@ class Iplom(LogParser):
         Returns: (1) the index corresponding to the token position with the least
         number of unique tokens as well as (2) the set of corresponding tokens.
         """
-        self._validate_tokenized_log_entries_length(tokenized_log_entries)
         unique_tokens = self._get_unique_tokens(tokenized_log_entries)
         least_unique_col_idx = None
         least_unique_col_count = None
@@ -126,23 +125,11 @@ class Iplom(LogParser):
                 unique_tokens[token_idx].add(log_entry[token_idx])
         return unique_tokens
 
-    def _validate_tokenized_log_entries_length(self, tokenized_log_entries):
-        """
-        Check if logs all have the same token length.
-        """
-        for log_entry in tokenized_log_entries:
-            ref_log_entry = tokenized_log_entries[0]
-            expected_length = len(ref_log_entry)
-            actual_length = len(log_entry)
-            if expected_length != actual_length:
-                error_message = 'IPLoM: Invalid log entry length ---> Expected: {} / Actual: {}'
-                raise Exception(error_message.format(expected_length, actual_length))
-
     def _partition_by_bijections(self):
         """
         Split partitions by seeking bijective relationships.
         """
-        bijection_partitions = Partitions()
+        bijection_partitions = Partitions(self.tokenized_log_entries)
         for partition_item in self.partitions:
             log_indices = deepcopy(partition_item.log_indices)
             p_in = deepcopy(self._get_tokenized_log_entries_from_indices(log_indices))
@@ -250,7 +237,7 @@ class Iplom(LogParser):
         """
         # highest_pruned_step = -1
         # pruned_log_indices = []
-        pruned_partitions = Partitions()
+        pruned_partitions = Partitions(self.tokenized_log_entries)
         total_line_count = len(self.tokenized_log_entries)
 
         for partition_item in self.partitions:
