@@ -1,6 +1,7 @@
 BGL_FILE_PATH = '../data/BGL/BGL_2k.log'
+BGL_STRUCTURED_PATH = '../data/BGL/BGL_2k.log_structured.csv'
 
-PLACEHOLDER = '*'
+PLACEHOLDER = '<*>'
 
 
 class MAP:
