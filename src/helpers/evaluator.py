@@ -12,6 +12,11 @@ class Evaluator:
         num_correct_lines = 0
         total_lines = 0
         matching_templates = self._get_matching_templates()
+
+        if len(matching_templates) == 0:
+            print('Warning: no templates were extracted')
+            return -1
+
         for template in matching_templates:
             parsed_entry_indices = self.template_parsed[template]
             truth_entry_indices = self.template_truth[template]
@@ -19,6 +24,7 @@ class Evaluator:
             if are_lists_equal(parsed_entry_indices, truth_entry_indices):
                 num_correct_lines += line_count
             total_lines += line_count
+
         return num_correct_lines / total_lines
 
     def _get_matching_templates(self):
