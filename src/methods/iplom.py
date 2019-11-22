@@ -332,7 +332,8 @@ class Iplom(LogParser):
         Discover all cluster templates from the current partitions.
         """
         for partition_item in self.partitions:
-            log_entries = self._get_tokenized_log_entries_from_indices(partition_item.log_indices)
+            log_indices = partition_item.log_indices
+            log_entries = self._get_tokenized_log_entries_from_indices(log_indices)
             constant_token_indices = self._get_constant_token_indices(log_entries)
             cluster_template_tokens = []
             for idx in range(len(log_entries[0])):
@@ -342,7 +343,7 @@ class Iplom(LogParser):
                 else:
                     cluster_template_tokens.append(PLACEHOLDER)
             cluster_template_string = ' '.join(cluster_template_tokens)
-            self.cluster_templates[cluster_template_string] = log_entries
+            self.cluster_templates[cluster_template_string] = log_indices
 
     def _get_constant_token_indices(self, log_entries):
         """
