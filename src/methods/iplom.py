@@ -175,7 +175,7 @@ class Iplom(LogParser):
                         split_pos = p2
                 elif map_type == MAP.MANY_TO_ONE:
                     s_temp = token_sets[p1]
-                    split_rank = self._get_rank_positions(p_in, p2, s_temp, False)
+                    split_rank = self._get_rank_positions(p_in, p1, s_temp, False)
                     if split_rank == 2:
                         split_pos = p2
                     else:
