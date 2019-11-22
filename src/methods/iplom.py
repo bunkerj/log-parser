@@ -61,9 +61,9 @@ class Iplom(LogParser):
         Split partitions by the least unique token position.
         """
         position_partitions = Partitions(self.tokenized_log_entries)
-        outlier_log_indices = []
 
         for partition_item in self.partitions:
+            outlier_log_indices = []
             log_indices = partition_item.log_indices
             tokenized_log_entries = self._get_tokenized_log_entries_from_indices(log_indices)
             least_unique_token_index = self._get_least_unique_token_index(tokenized_log_entries)
@@ -77,8 +77,8 @@ class Iplom(LogParser):
                     partition_step = 1 if len(child_partitions) == 1 else 2
                     position_partitions.add(child_partition, partition_step)
 
-        if len(outlier_log_indices) > 0:
-            position_partitions.add(outlier_log_indices, 2)
+            if len(outlier_log_indices) > 0:
+                position_partitions.add(outlier_log_indices, 2)
 
         self.partitions = position_partitions
         self._prune_partitions()
