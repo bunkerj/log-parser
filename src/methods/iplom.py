@@ -351,6 +351,6 @@ class Iplom(LogParser):
     def print_cluster_templates(self):
         for template in self.cluster_templates:
             print(template)
-            for log_entry in self.cluster_templates[template]:
-                print(log_entry)
-            print()
+            log_indices = self.cluster_templates[template]
+            log_entries = self._get_log_entries_from_indices(log_indices)
+            print_items(log_entries)
