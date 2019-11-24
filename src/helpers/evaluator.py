@@ -7,32 +7,26 @@ class Evaluator:
         self.raw_truth = raw_truth
         self.template_truth = self._get_template_truth(raw_truth)
         self.template_parsed = parsed_results
+        self.total_lines = len(raw_truth) - 1
 
     def evaluate(self):
         num_correct_lines = 0
-        total_lines = 0
-        matching_templates = self._get_matching_templates()
-
-        if len(matching_templates) == 0:
-            print('Warning: no templates were extracted')
-            return -1
-
-        for template in matching_templates:
-            parsed_entry_indices = self.template_parsed[template]
-            truth_entry_indices = self.template_truth[template]
-            line_count = len(parsed_entry_indices)
-            if are_lists_equal(parsed_entry_indices, truth_entry_indices):
-                num_correct_lines += line_count
-            total_lines += line_count
-
-        return num_correct_lines / total_lines
-
-    def _get_matching_templates(self):
-        matching_templates = set()
         for template in self.template_parsed:
-            if template in self.template_truth:
-                matching_templates.add(template)
-        return matching_templates
+            parsed_entry_indices = self.template_parsed[template]
+            line_count = len(parsed_entry_indices)
+            truth_templates = self._get_truth_templates(parsed_entry_indices)
+            if len(truth_templates) == 1 and list(truth_templates.values())[0] == line_count:
+                num_correct_lines += line_count
+        return num_correct_lines / self.total_lines
+
+    def _get_truth_templates(self, parsed_entry_indices):
+        truth_templates = {}
+        for idx in parsed_entry_indices:
+            template = self.raw_truth[idx + 1][-1]
+            if template not in truth_templates:
+                truth_templates[template] = 0
+            truth_templates[template] += 1
+        return truth_templates
 
     def _get_template_truth(self, raw_truth):
         cluster_templates_truth = {}
@@ -43,6 +37,3 @@ class Evaluator:
                 cluster_templates_truth[template] = []
             cluster_templates_truth[template].append(entry_id)
         return cluster_templates_truth
-
-    def _get_percentage_accuracy(self):
-        pass
