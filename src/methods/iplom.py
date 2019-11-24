@@ -253,7 +253,7 @@ class Iplom(LogParser):
             # else:
             #     pruned_partitions.add(log_indices, partition_item.step)
 
-            if file_support < self.file_threshold:
+            if file_support >= self.file_threshold:
                 pruned_partitions.add(log_indices, partition_item.step)
 
         # if len(pruned_log_indices) > 1:
