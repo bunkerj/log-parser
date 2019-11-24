@@ -1,9 +1,9 @@
-from src.utils import read_csv, are_lists_equal
+from src.utils import read_csv
 
 
 class Evaluator:
-    def __init__(self, structured_path, parsed_results):
-        raw_truth = read_csv(structured_path)
+    def __init__(self, data_config, parsed_results):
+        raw_truth = read_csv(data_config['path'])
         self.raw_truth = raw_truth
         self.template_truth = self._get_template_truth(raw_truth)
         self.template_parsed = parsed_results

@@ -1,13 +1,23 @@
+import re
 from src.utils import read_csv
+
+SPLIT_REGEX = r'[\s=:,]'
 
 
 class LogParser:
-    def __init__(self, log_file_path):
+    def __init__(self, data_config):
         self.cluster_templates = {}
-        self.log_file_path = log_file_path
-        self.tokenized_log_entries = self._get_tokenized_log_entries(log_file_path)
+        self.regex_list = data_config['regex']
+        self.log_file_path = data_config['path']
+        self.tokenized_log_entries = self._get_tokenized_log_entries(data_config['path'])
 
     def _get_tokenized_log_entries(self, structured_log_file_path):
         raw_log = read_csv(structured_log_file_path)
-        result = [structured_log_line[-3].split(' ') for structured_log_line in raw_log[1:]]
+        result = []
+        for structured_log_line in raw_log[1:]:
+            raw_log_msg = structured_log_line[-3]
+            for currentRex in self.regex_list:
+                raw_log_msg = re.sub(currentRex, '', raw_log_msg)
+            log_entry = list(filter(lambda x: x != '', re.split(SPLIT_REGEX, raw_log_msg)))
+            result.append(log_entry)
         return result
