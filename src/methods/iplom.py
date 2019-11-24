@@ -140,7 +140,7 @@ class Iplom(LogParser):
                 bijection_partitions.add(log_indices, 2)
                 continue
 
-            p1, p2 = self._determine_p1_and_p2(p_in)
+            p1, p2 = self._determine_p1_and_p2(p_in, partition_item.step)
             tmp_partitions = {p1: {}, p2: {}}
             p1_token_mapping = self._get_token_mapping(p_in, p1, p2)
             p2_token_mapping = self._get_token_mapping(p_in, p2, p1)
@@ -261,14 +261,38 @@ class Iplom(LogParser):
 
         self.partitions = pruned_partitions
 
-    def _determine_p1_and_p2(self, tokenized_log_entries):
+    def _determine_p1_and_p2(self, tokenized_log_entries, step):
         """
-        Return the two most frequent token positions.
+        Return the indices of the two most frequent unique token count positions.
         """
-        unique_tokens = self._get_unique_tokens(tokenized_log_entries)
-        count_per_token_idx = [(len(unique_tokens[token_idx]), token_idx) for token_idx in unique_tokens]
-        counts = get_n_sorted(2, count_per_token_idx, key=lambda x: x[0], get_max=True)
-        return sorted(count[1] for count in counts)
+        if len(tokenized_log_entries[0]) == 2:
+            return 0, 1
+        elif len(tokenized_log_entries[0]) > 2:
+            unique_tokens = self._get_unique_tokens(tokenized_log_entries)
+            if step == 2:
+                card_count = {}
+                for idx in unique_tokens:
+                    cardinality = len(unique_tokens[idx])
+                    if cardinality not in card_count:
+                        card_count[cardinality] = []
+                    card_count[cardinality].append(idx)
+                count_per_cardinality = [(len(card_count[cardinality]), cardinality) for cardinality in card_count]
+                max_count_tuples = get_n_sorted(2, count_per_cardinality, key=lambda x: x[0], get_max=True)
+                if max_count_tuples[0][0] > 1:
+                    max_freq_card = max_count_tuples[0][1]
+                    return sorted(card_count[max_freq_card][0:2])
+                elif max_count_tuples[0][0] == 1:
+                    max_freq_card = max_count_tuples[0][1]
+                    second_max_freq_card = max_count_tuples[1][1]
+                    return sorted([card_count[max_freq_card][0], card_count[second_max_freq_card][0]])
+                else:
+                    raise Exception('Error trying to calculate most frequent cardinalities')
+            else:
+                count_per_token_idx = [(len(unique_tokens[token_idx]), token_idx) for token_idx in unique_tokens]
+                counts = get_n_sorted(2, count_per_token_idx, key=lambda x: x[0], get_max=False)
+                return sorted(count[1] for count in counts)
+        else:
+            raise Exception('Invalid log entry length')
 
     def _get_token_mapping(self, p_in, domain_idx, codomain_idx):
         """
