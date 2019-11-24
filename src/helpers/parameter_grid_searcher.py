@@ -5,11 +5,12 @@ from src.helpers.evaluator import Evaluator
 
 
 class ParameterGridSearcher:
-    def __init__(self, file_path, parameter_ranges_dict):
+    def __init__(self, file_path, parameter_ranges_dict, verbose=False):
         self.file_path = file_path
         self.parameter_ranges_dict = parameter_ranges_dict
         self.best_accuracy = -1
         self.best_parameters_dict = {}
+        self.verbose = verbose
 
     def search(self):
         current_iteration = 1
@@ -25,8 +26,10 @@ class ParameterGridSearcher:
                 self.best_parameters_dict = parameter_dict
                 self.best_accuracy = current_accuracy
 
-            msg = '{}/{} ---- Current Accuracy: {} ---- Best Accuracy: {}'
-            print(msg.format(current_iteration, total_iterations, current_accuracy, self.best_accuracy))
+            if self.verbose:
+                msg = '{}/{} ---- Current Accuracy: {} ---- Best Accuracy: {}'
+                print(msg.format(current_iteration, total_iterations, current_accuracy, self.best_accuracy))
+
             current_iteration += 1
 
     def print_results(self):
