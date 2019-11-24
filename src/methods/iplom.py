@@ -1,5 +1,5 @@
 from src.methods.log_parser import LogParser
-from src.utils import print_items, get_n_sorted
+from src.utils import print_items, get_n_sorted, delete_indices_from_list
 from src.helpers.mapping_finder import MappingFinder
 from src.helpers.partitions import Partitions
 from src.constants import MAP, PLACEHOLDER
@@ -179,14 +179,17 @@ class Iplom(LogParser):
                             split_pos = p2
 
                 # Split into new partitions based on split_pos
+                indices_to_delete = []
                 for idx, tokenized_log_entry in enumerate(p_in):
                     if tokenized_log_entry[p1] == token:
                         split_token = tokenized_log_entry[split_pos]
                         if split_token not in tmp_partitions[split_pos]:
                             tmp_partitions[split_pos][split_token] = []
                         tmp_partitions[split_pos][split_token].append(log_indices[idx])
-                        log_indices.pop(idx)
-                        p_in.pop(idx)
+                        indices_to_delete.append(idx)
+
+                delete_indices_from_list(log_indices, indices_to_delete)
+                delete_indices_from_list(p_in, indices_to_delete)
 
                 if len(p_in) == 0:
                     break
