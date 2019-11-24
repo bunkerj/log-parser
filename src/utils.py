@@ -31,3 +31,8 @@ def are_lists_equal(list1, list2):
         if sorted_list1[idx] != sorted_list2[idx]:
             return False
     return True
+
+
+def delete_indices_from_list(base_list, indices):
+    for idx in sorted(indices, reverse=True):
+        del base_list[idx]
