@@ -28,4 +28,4 @@ iplom.parse()
 evaluator = Evaluator(DataConfigs.BGL, iplom.cluster_templates)
 iplom_bgl_accuracy = evaluator.evaluate()
 
-print('\nFinal IPLoM BGL Accuracy: {}'.format(iplom_bgl_accuracy))
+print('Final IPLoM BGL Accuracy: {}'.format(iplom_bgl_accuracy))

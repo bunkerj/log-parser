@@ -1,6 +1,6 @@
 # Benchmarking Suite for Log Parsing
 
-Project entry point: *src/exp_runner.py*
+***exp/*** - Standalone scripts to run various experiments
 
 ***data/*** - Small data samples (structured and unstructured) used for rapid prototyping  
 
