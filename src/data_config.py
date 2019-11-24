@@ -1,4 +1,4 @@
-class DataConfig:
+class DataConfigs:
     Android = {
         'name': 'Android',
         'path': '../data/Android_2k.log_structured.csv',

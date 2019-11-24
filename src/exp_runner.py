@@ -1,5 +1,5 @@
 from src.methods.iplom import Iplom
-from src.data_config import DataConfig
+from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.parameter_grid_searcher import ParameterGridSearcher
 
@@ -15,7 +15,7 @@ from src.helpers.parameter_grid_searcher import ParameterGridSearcher
 # parameter_grid_searcher.search()
 # parameter_grid_searcher.print_results()
 
-iplom = Iplom(DataConfig.BGL, **{
+iplom = Iplom(DataConfigs.BGL, **{
     'file_threshold': 0.0,
     'partition_threshold': 0.0,
     'lower_bound': 0.1,
@@ -25,7 +25,7 @@ iplom = Iplom(DataConfig.BGL, **{
 iplom.parse()
 # iplom.print_cluster_templates()
 
-evaluator = Evaluator(DataConfig.BGL, iplom.cluster_templates)
+evaluator = Evaluator(DataConfigs.BGL, iplom.cluster_templates)
 iplom_bgl_accuracy = evaluator.evaluate()
 
 print('\nFinal IPLoM BGL Accuracy: {}'.format(iplom_bgl_accuracy))
