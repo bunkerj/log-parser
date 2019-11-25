@@ -1,4 +1,4 @@
-from src.methods.iplom import Iplom
+from src.parsers.iplom import Iplom
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 

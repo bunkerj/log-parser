@@ -1,6 +1,6 @@
 import os
 import pickle
-from src.methods.iplom import Iplom
+from src.parsers.iplom import Iplom
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.parameter_grid_searcher import ParameterGridSearcher

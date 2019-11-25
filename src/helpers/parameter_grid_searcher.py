@@ -1,6 +1,6 @@
 import numpy as np
 from itertools import product
-from src.methods.iplom import Iplom
+from src.parsers.iplom import Iplom
 from src.helpers.evaluator import Evaluator
 
 
