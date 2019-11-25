@@ -1,7 +1,11 @@
+import os
+import pickle
 from src.methods.iplom import Iplom
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.parameter_grid_searcher import ParameterGridSearcher
+
+RESULTS_DIR = '../results'
 
 data_set_configs = [
     DataConfigs.Android,
@@ -30,6 +34,8 @@ parameter_ranges_dict = {
     'goodness_threshold': (0.3, 0.65, 0.05)
 }
 
+final_best_accuracies = {}
+
 for data_set_config in data_set_configs:
     parameter_grid_searcher = ParameterGridSearcher(data_set_config, parameter_ranges_dict)
     parameter_grid_searcher.search()
@@ -38,6 +44,11 @@ for data_set_config in data_set_configs:
     iplom.parse()
 
     evaluator = Evaluator(data_set_config, iplom.cluster_templates)
-    iplom_bgl_accuracy = evaluator.evaluate()
+    iplom_accuracy = evaluator.evaluate()
 
-    print('Final IPLoM {} Accuracy: {}'.format(data_set_config['name'], iplom_bgl_accuracy))
+    print('Final IPLoM {} Accuracy: {}'.format(data_set_config['name'], iplom_accuracy))
+    final_best_accuracies[data_set_config['name']] = iplom_accuracy
+
+if not os.path.exists(RESULTS_DIR):
+    os.makedirs(RESULTS_DIR)
+pickle.dump(final_best_accuracies, open('../results/dataset_comparison.p', 'wb'))
