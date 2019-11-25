@@ -23,7 +23,6 @@ benchmark_baseline_accuracies = {
 }
 
 final_best_accuracies = pickle.load(open('../results/dataset_comparison.p', 'rb'))
-print(final_best_accuracies)
 
 labels = benchmark_baseline_accuracies.keys()
 baseline_accuracies = benchmark_baseline_accuracies.values()

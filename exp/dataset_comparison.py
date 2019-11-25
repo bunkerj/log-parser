@@ -31,7 +31,7 @@ parameter_ranges_dict = {
     'partition_threshold': (0, 0.35, 0.05),
     'lower_bound': (0.1, 0.35, 0.05),
     'upper_bound': (0.9, 1, 1),
-    'goodness_threshold': (0.3, 0.65, 0.05)
+    'goodness_threshold': (0.3, 1, 0.1)
 }
 
 final_best_accuracies = {}
