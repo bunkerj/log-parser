@@ -208,10 +208,20 @@ class Iplom(LogParser):
             if len(outlier_log_indices) > 0:
                 bijection_partitions.add(outlier_log_indices, 3)
 
-            # Create a new partition with the remaining lines (from M-M relationships)
-            # TODO: Split disjoint M-M groups
-            if len(p_in) > 0:
-                bijection_partitions.add(log_indices, 3)
+            # Split disjoint M-M groups
+            while len(p_in) != 0:
+                base_token = p_in[0][p1]
+                mapping_finder.update_relevant_token_sets(base_token)
+                domain_set = mapping_finder.domain_set
+                tmp_log_indices = []
+                indices_to_delete = []
+                for idx, tokenized_log_entry in enumerate(p_in):
+                    if tokenized_log_entry[p1] in domain_set:
+                        tmp_log_indices.append(log_indices[idx])
+                        indices_to_delete.append(idx)
+                delete_indices_from_list(log_indices, indices_to_delete)
+                delete_indices_from_list(p_in, indices_to_delete)
+                bijection_partitions.add(tmp_log_indices, 3)
 
         self.partitions = bijection_partitions
         self._prune_partitions()
