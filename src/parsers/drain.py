@@ -1,5 +1,5 @@
 from src.parsers.log_parser import LogParser
-from src.constants import PLACEHOLDER
+from constants import PLACEHOLDER
 
 
 class Node:
