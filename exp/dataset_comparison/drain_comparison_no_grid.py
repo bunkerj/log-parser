@@ -21,14 +21,27 @@ data_set_configs = [
     DataConfigs.Zookeeper,
 ]
 
-parameter_ranges_dict = {
-    'max_depth': (3, 8, 1),
-    'max_child': (100, 101, 100),
-    'sim_threshold': (0.1, 0.9, 0.05),
+fixed_configs = {
+    'Android': (6, 100, 0.2),
+    'Apache': (4, 100, 0.5),
+    'BGL': (4, 100, 0.5),
+    'Hadoop': (4, 100, 0.5),
+    'HDFS': (4, 100, 0.5),
+    'HealthApp': (4, 100, 0.2),
+    'HPC': (4, 100, 0.5),
+    'Linux': (6, 100, 0.39),
+    'Mac': (6, 100, 0.7),
+    'OpenSSH': (5, 100, 0.6),
+    'OpenStack': (5, 100, 0.5),
+    'Proxifier': (3, 100, 0.6),
+    'Spark': (4, 100, 0.5),
+    'Thunderbird': (4, 100, 0.5),
+    'Windows': (5, 100, 0.7),
+    'Zookeeper': (4, 100, 0.5),
 }
 
 final_best_accuracies = get_final_dataset_accuracies(Drain,
                                                      data_set_configs,
-                                                     parameter_ranges_dict=parameter_ranges_dict)
+                                                     fixed_configs=fixed_configs)
 
-dump_results('drain_dataset_comparison.p', final_best_accuracies)
+dump_results('drain_dataset_comparison_no_grid.p', final_best_accuracies)

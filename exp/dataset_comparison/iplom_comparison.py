@@ -31,6 +31,6 @@ parameter_ranges_dict = {
 
 final_best_accuracies = get_final_dataset_accuracies(Iplom,
                                                      data_set_configs,
-                                                     parameter_ranges_dict)
+                                                     parameter_ranges_dict=parameter_ranges_dict)
 
 dump_results('iplom_dataset_comparison.p', final_best_accuracies)
