@@ -6,7 +6,7 @@ from constants import RESULTS_DIR
 from graphs.helpers import autolabel
 
 
-def show_dataset_comparison_graph(benchmark_accuracies, final_best_accuracies):
+def show_dataset_comparison_graph(dataset_name, benchmark_accuracies, final_best_accuracies):
     relevant_benchmark_accuracies = {}
     for name in benchmark_accuracies:
         if name in final_best_accuracies:
@@ -24,7 +24,7 @@ def show_dataset_comparison_graph(benchmark_accuracies, final_best_accuracies):
     rects2 = ax.bar(x + width / 2, candidate_accuracies, width, label='Candidate')
 
     ax.set_ylabel('Accuracy')
-    ax.set_title('IPLoM Accuracies')
+    ax.set_title('{} Accuracies'.format(dataset_name))
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
     ax.legend()
