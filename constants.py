@@ -1,5 +1,7 @@
 PLACEHOLDER = '<*>'
 
+RESULTS_DIR = '../results'
+
 
 class MAP:
     ONE_TO_ONE = 'ONE_TO_ONE'
