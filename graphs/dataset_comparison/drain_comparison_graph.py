@@ -20,4 +20,7 @@ drain_benchmark_accuracies = {
 }
 
 final_best_accuracies = load_results('drain_dataset_comparison_no_grid.p')
-show_dataset_comparison_graph('Drain', drain_benchmark_accuracies, final_best_accuracies)
+
+show_dataset_comparison_graph('Drain Accuracies',
+                              drain_benchmark_accuracies,
+                              final_best_accuracies)

@@ -20,4 +20,7 @@ iplom_benchmark_accuracies = {
 }
 
 final_best_accuracies = load_results('iplom_dataset_comparison.p')
-show_dataset_comparison_graph('IPLoM', iplom_benchmark_accuracies, final_best_accuracies)
+
+show_dataset_comparison_graph('IPLoM Accuracies',
+                              iplom_benchmark_accuracies,
+                              final_best_accuracies)

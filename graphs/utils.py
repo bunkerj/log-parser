@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from constants import RESULTS_DIR
 
 
-def show_dataset_comparison_graph(dataset_name, benchmark_accuracies, final_best_accuracies):
+def show_dataset_comparison_graph(title, benchmark_accuracies, final_best_accuracies):
     relevant_benchmark_accuracies = {}
     for name in benchmark_accuracies:
         if name in final_best_accuracies:
@@ -19,11 +19,13 @@ def show_dataset_comparison_graph(dataset_name, benchmark_accuracies, final_best
     width = 0.35  # the width of the bars
 
     fig, ax = plt.subplots()
-    rects1 = ax.bar(x - width / 2, baseline_accuracies, width, label='Baseline')
-    rects2 = ax.bar(x + width / 2, candidate_accuracies, width, label='Candidate')
+    rects1 = ax.bar(x - width / 2, baseline_accuracies, width,
+                    label='Baseline', color=np.random.rand(3, ))
+    rects2 = ax.bar(x + width / 2, candidate_accuracies, width,
+                    label='Candidate', color=np.random.rand(3, ))
 
     ax.set_ylabel('Accuracy')
-    ax.set_title('{} Accuracies'.format(dataset_name))
+    ax.set_title(title)
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
     ax.legend()
