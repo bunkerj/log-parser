@@ -44,4 +44,4 @@ final_best_accuracies = get_final_dataset_accuracies(Iplom,
                                                      data_set_configs,
                                                      fixed_configs=fixed_configs)
 
-dump_results('drain_dataset_comparison_no_grid.p', final_best_accuracies)
+dump_results('iplom_dataset_comparison_no_grid.p', final_best_accuracies)
