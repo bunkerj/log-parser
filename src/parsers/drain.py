@@ -14,10 +14,16 @@ class LogGroup:
         self.log_indices = [log_idx]
 
     def add(self, tokenized_log_entry, log_idx):
+        """
+        Adds new log entry to the group and updates the template if needed.
+        """
         self.log_indices.append(log_idx)
         self._update_tokenized_template(tokenized_log_entry)
 
     def _update_tokenized_template(self, tokenized_log_entry):
+        """
+        Updates the template by adding wildcards where required.
+        """
         for idx in range(len(self.tokenized_template)):
             if tokenized_log_entry[idx] != self.tokenized_template[idx]:
                 self.tokenized_template[idx] = PLACEHOLDER
@@ -35,12 +41,18 @@ class Drain(LogParser):
         self.log_groups = []
 
     def parse(self):
+        """
+        Inserts each log entry into the parse tree.
+        """
         for idx, log_entry in enumerate(self.tokenized_log_entries):
             self.idx = idx
             self._traverse_tree(self.root)
         self._discover_cluster_templates()
 
     def _traverse_tree(self, node):
+        """
+        Recursively traverses the log tree to insert the new log entry.
+        """
         log_entry = self.tokenized_log_entries[self.idx]
         if node.depth == (self.max_depth - 1) or node.depth == len(log_entry):
             self._update_most_similar_groups(node.children)
@@ -62,6 +74,9 @@ class Drain(LogParser):
             self._traverse_tree(node.children[child_key])
 
     def _update_most_similar_groups(self, log_groups):
+        """
+        Inserts the log entry into the most similar log group.
+        """
         log_entry = self.tokenized_log_entries[self.idx]
         if len(log_groups) == 0:
             log_group = LogGroup(log_entry, self.idx)
@@ -83,6 +98,9 @@ class Drain(LogParser):
                 self.log_groups.append(log_group)
 
     def _get_similarity(self, log_entry1, log_entry2):
+        """
+        Returns a similarity measure between two token lists.
+        """
         delta_sum = 0
         for idx in range(len(log_entry1)):
             if log_entry1[idx] == log_entry2[idx]:
@@ -90,6 +108,9 @@ class Drain(LogParser):
         return delta_sum / len(log_entry1)
 
     def _discover_cluster_templates(self):
+        """
+        Discovers all cluster templates from the current partitions.
+        """
         for log_group in self.log_groups:
             template = ' '.join(log_group.tokenized_template)
             self.cluster_templates[template] = log_group.log_indices
