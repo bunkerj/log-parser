@@ -19,7 +19,7 @@ class Iplom(LogParser):
 
     def parse(self):
         """
-        Perform 3 partitioning steps followed by template generation.
+        Performs 3 partitioning steps followed by template generation.
         This function will update the partitions and cluster_templates fields.
         """
         self._partition_by_count()
@@ -27,21 +27,32 @@ class Iplom(LogParser):
         self._partition_by_bijections()
         self._discover_cluster_templates()
 
-    def print_partitions(self):
-        for partition_item in self.partitions:
-            log_entries = self._get_log_entries_from_indices(partition_item.log_indices)
+    def print_cluster_templates(self):
+        """
+        Prints each template and their respective log entries.
+        """
+        for template in self.cluster_templates:
+            print(template)
+            log_indices = self.cluster_templates[template]
+            log_entries = self._get_log_entries_from_indices(log_indices)
             print_items(log_entries)
 
     def _get_log_entries_from_indices(self, log_indices):
+        """
+        Returns string log entry corresponding to the passed log indices.
+        """
         return [' '.join(tokenized_log_entry) for tokenized_log_entry in
                 self._get_tokenized_log_entries_from_indices(log_indices)]
 
     def _get_tokenized_log_entries_from_indices(self, log_indices):
+        """
+        Returns a lists containing lists of tokens corresponding to the passed log indices.
+        """
         return [self.tokenized_log_entries[log_id] for log_id in log_indices]
 
     def _partition_by_count(self):
         """
-        Split partitions by token count.
+        Splits partitions by token count.
         """
         count_dict = {}
         for idx, log_entry in enumerate(self.tokenized_log_entries):
@@ -58,7 +69,7 @@ class Iplom(LogParser):
 
     def _partition_by_position(self):
         """
-        Split partitions by the least unique token position.
+        Splits partitions by the least unique token position.
         """
         position_partitions = Partitions(self.tokenized_log_entries)
 
@@ -127,7 +138,7 @@ class Iplom(LogParser):
 
     def _partition_by_bijections(self):
         """
-        Split partitions by seeking bijective relationships.
+        Splits partitions by seeking bijective relationships.
         """
         bijection_partitions = Partitions(self.tokenized_log_entries)
         for partition_item in self.partitions:
@@ -227,6 +238,10 @@ class Iplom(LogParser):
         self._prune_partitions()
 
     def _get_partition_goodness(self, p_in):
+        """
+        Returns the ratio of the number of token columns with unique
+        tokens over the total number of columns.
+        """
         count_1 = 0
         token_count = len(p_in[0])
         for token_idx in range(token_count):
@@ -245,7 +260,7 @@ class Iplom(LogParser):
 
     def _prune_partitions(self):
         """
-        Place all log entries from partitions with a file support
+        Places all log entries from partitions with a file support
         less than the threshold into a single partition.
         """
         # highest_pruned_step = -1
@@ -273,7 +288,7 @@ class Iplom(LogParser):
 
     def _determine_p1_and_p2(self, tokenized_log_entries, step):
         """
-        Return the indices of the two most frequent unique token count positions.
+        Returns the indices of the two most frequent unique token count positions.
         """
         if len(tokenized_log_entries[0]) == 2:
             return 0, 1
@@ -306,7 +321,7 @@ class Iplom(LogParser):
 
     def _get_token_mapping(self, p_in, domain_idx, codomain_idx):
         """
-        Return mapping between tokens in domain to tokens in codomain.
+        Returns mapping between tokens in domain to tokens in codomain.
         """
         token_mapping = {}
         for log_entry in p_in:
@@ -353,7 +368,7 @@ class Iplom(LogParser):
 
     def _discover_cluster_templates(self):
         """
-        Discover all cluster templates from the current partitions.
+        Discovers all cluster templates from the current partitions.
         """
         for partition_item in self.partitions:
             log_indices = partition_item.log_indices
@@ -371,7 +386,7 @@ class Iplom(LogParser):
 
     def _get_constant_token_indices(self, log_entries):
         """
-        Get of token indices that represent constant tokens for a given partition.
+        Gets the token indices that represent constant tokens for a given partition.
         """
         reference_tokens = log_entries[0]
         constant_token_indices = set()
@@ -384,10 +399,3 @@ class Iplom(LogParser):
             if is_constant:
                 constant_token_indices.add(idx)
         return constant_token_indices
-
-    def print_cluster_templates(self):
-        for template in self.cluster_templates:
-            print(template)
-            log_indices = self.cluster_templates[template]
-            log_entries = self._get_log_entries_from_indices(log_indices)
-            print_items(log_entries)
