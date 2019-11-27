@@ -1,6 +1,6 @@
 PLACEHOLDER = '<*>'
 
-RESULTS_DIR = '../results'
+RESULTS_DIR = '../../results'
 
 
 class MAP:
