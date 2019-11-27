@@ -3,7 +3,6 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from constants import RESULTS_DIR
-from graphs.helpers import autolabel
 
 
 def show_dataset_comparison_graph(dataset_name, benchmark_accuracies, final_best_accuracies):
@@ -35,6 +34,19 @@ def show_dataset_comparison_graph(dataset_name, benchmark_accuracies, final_best
     fig.tight_layout()
 
     plt.show()
+
+
+def autolabel(ax, rects):
+    """
+    Attach a text label above each bar to display its height.
+    """
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate('{}'.format(height),
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom')
 
 
 def load_results(name):
