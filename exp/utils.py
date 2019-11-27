@@ -1,9 +1,8 @@
 import os
 import pickle
+from constants import RESULTS_DIR
 from src.helpers.evaluator import Evaluator
 from src.helpers.parameter_grid_searcher import ParameterGridSearcher
-
-RESULTS_DIR = '../results'
 
 
 def get_final_dataset_accuracies(Parser_class, data_set_configs, parameter_ranges_dict):
@@ -26,5 +25,5 @@ def get_final_dataset_accuracies(Parser_class, data_set_configs, parameter_range
 def dump_results(name, results):
     if not os.path.exists(RESULTS_DIR):
         os.makedirs(RESULTS_DIR)
-    path = os.path.join('../results/', name)
+    path = os.path.join(RESULTS_DIR, name)
     pickle.dump(results, open(path, 'wb'))

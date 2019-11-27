@@ -29,5 +29,8 @@ parameter_ranges_dict = {
     'goodness_threshold': (0.3, 1, 0.1)
 }
 
-final_best_accuracies = get_final_dataset_accuracies(Iplom, data_set_configs, parameter_ranges_dict)
-dump_results('iplom_dataset_comparison', final_best_accuracies)
+final_best_accuracies = get_final_dataset_accuracies(Iplom,
+                                                     data_set_configs,
+                                                     parameter_ranges_dict)
+
+dump_results('iplom_dataset_comparison.p', final_best_accuracies)
