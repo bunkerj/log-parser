@@ -1,7 +1,6 @@
-import pickle
-from graphs.utils import print_dataset_comparison
+from graphs.utils import show_dataset_comparison_graph, load_results
 
-iplom_benchmark_baseline_accuracies = {
+iplom_benchmark_accuracies = {
     'Android': 0.712,               # 0.712
     'Apache': 1.000,                # 1.000
     'BGL': 0.939,                   # 0.939
@@ -20,6 +19,5 @@ iplom_benchmark_baseline_accuracies = {
     'Zookeeper': 0.962,             # 0.962
 }
 
-final_best_accuracies = pickle.load(open('../results/dataset_comparison.p', 'rb'))
-
-print_dataset_comparison(iplom_benchmark_baseline_accuracies, final_best_accuracies)
+final_best_accuracies = load_results('iplom_dataset_comparison.p')
+show_dataset_comparison_graph(iplom_benchmark_accuracies, final_best_accuracies)
