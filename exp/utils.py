@@ -8,17 +8,19 @@ from src.helpers.parameter_grid_searcher import ParameterGridSearcher
 def get_final_dataset_accuracies(Parser_class, data_set_configs, parameter_ranges_dict):
     final_best_accuracies = {}
     for data_set_config in data_set_configs:
-        parameter_grid_searcher = ParameterGridSearcher(data_set_config, parameter_ranges_dict)
+        parameter_grid_searcher = ParameterGridSearcher(Parser_class,
+                                                        data_set_config,
+                                                        parameter_ranges_dict)
         parameter_grid_searcher.search()
 
         parser = Parser_class(data_set_config, **parameter_grid_searcher.best_parameters_dict)
         parser.parse()
 
         evaluator = Evaluator(data_set_config, parser.cluster_templates)
-        iplom_accuracy = evaluator.evaluate()
+        accuracy = evaluator.evaluate()
 
-        print('Final IPLoM {} Accuracy: {}'.format(data_set_config['name'], iplom_accuracy))
-        final_best_accuracies[data_set_config['name']] = iplom_accuracy
+        print('Final IPLoM {} Accuracy: {}'.format(data_set_config['name'], accuracy))
+        final_best_accuracies[data_set_config['name']] = accuracy
     return final_best_accuracies
 
 

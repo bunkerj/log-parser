@@ -1,23 +1,23 @@
 import numpy as np
 from itertools import product
-from src.parsers.iplom import Iplom
 from src.helpers.evaluator import Evaluator
 
 
 class ParameterGridSearcher:
-    def __init__(self, file_path, parameter_ranges_dict, verbose=False):
+    def __init__(self, Parser_class, file_path, parameter_ranges_dict, verbose=False):
         self.file_path = file_path
         self.parameter_ranges_dict = parameter_ranges_dict
         self.best_accuracy = -1
         self.best_parameters_dict = {}
         self.verbose = verbose
+        self.Parser_class = Parser_class
 
     def search(self):
         current_iteration = 1
         total_iterations = self._get_total_iterations_count()
         for parameter_tuple in self._get_parameter_combinations():
             parameter_dict = self._get_parameter_dict(parameter_tuple)
-            iplom = Iplom(self.file_path, **parameter_dict)
+            iplom = self.Parser_class(self.file_path, **parameter_dict)
             iplom.parse()
             evaluator = Evaluator(self.file_path, iplom.cluster_templates)
             current_accuracy = evaluator.evaluate()
