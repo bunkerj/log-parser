@@ -73,7 +73,7 @@ class Drain(LogParser):
         Recursively traverses the log tree to insert the new log entry.
         """
         log_entry = self.tokenized_log_entries[self.idx]
-        if node.depth == (self.max_depth - 1) or node.depth == len(log_entry):
+        if node.depth == (self.max_depth - 1) or node.depth == (len(log_entry) + 1):
             self._update_most_similar_groups(node.children)
         elif node.depth == 0:
             child_key = len(log_entry)
