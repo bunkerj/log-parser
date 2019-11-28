@@ -1,6 +1,7 @@
-from src.parsers.log_parser import LogParser
-from constants import PLACEHOLDER
 from copy import copy
+from src.utils import has_digit
+from constants import PLACEHOLDER
+from src.parsers.log_parser import LogParser
 
 
 class Node:
@@ -53,6 +54,18 @@ class Drain(LogParser):
             self._traverse_tree(self.root)
         self._discover_cluster_templates()
 
+    def print_tree(self, node=None):
+        """
+        Print all node labels within the subtree starting at the passed node.
+        """
+        if node is None:
+            node = self.root
+        if hasattr(node, 'children'):
+            for child_key in node.children:
+                tab_offset = '\t' * node.depth
+                print('{}{}'.format(tab_offset, child_key))
+                self.print_tree(node.children[child_key])
+
     def _traverse_tree(self, node):
         """
         Recursively traverses the log tree to insert the new log entry.
@@ -68,7 +81,7 @@ class Drain(LogParser):
         else:
             token = log_entry[node.depth - 1]
             is_wild_card = any([
-                token.isdigit(),
+                has_digit(token),
                 PLACEHOLDER in node.children and len(node.children) == self.max_child,
                 PLACEHOLDER not in node.children and len(node.children) == (self.max_child - 1),
             ])
@@ -120,15 +133,3 @@ class Drain(LogParser):
         for log_group in self.log_groups:
             template = ' '.join(log_group.tokenized_template)
             self.cluster_templates[template] = log_group.log_indices
-
-    def print_tree(self, node=None):
-        """
-        Print all node labels within the subtree starting at the passed node.
-        """
-        if node is None:
-            node = self.root
-        if hasattr(node, 'children'):
-            for child_key in node.children:
-                tab_offset = '\t' * node.depth
-                print('{}{}'.format(tab_offset, child_key))
-                self.print_tree(node.children[child_key])

@@ -36,3 +36,7 @@ def are_lists_equal(list1, list2):
 def delete_indices_from_list(base_list, indices):
     for idx in sorted(indices, reverse=True):
         del base_list[idx]
+
+
+def has_digit(token):
+    return any(char.isdigit() for char in token)
