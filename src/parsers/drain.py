@@ -1,5 +1,6 @@
 from src.parsers.log_parser import LogParser
 from constants import PLACEHOLDER
+from copy import copy
 
 
 class Node:
@@ -9,9 +10,9 @@ class Node:
 
 
 class LogGroup:
-    def __init__(self, first_entry, log_idx):
-        self.tokenized_template = first_entry
-        self.log_indices = [log_idx]
+    def __init__(self):
+        self.tokenized_template = None
+        self.log_indices = []
 
     def add(self, tokenized_log_entry, log_idx):
         """
@@ -24,9 +25,12 @@ class LogGroup:
         """
         Updates the template by adding wildcards where required.
         """
-        for idx in range(len(self.tokenized_template)):
-            if tokenized_log_entry[idx] != self.tokenized_template[idx]:
-                self.tokenized_template[idx] = PLACEHOLDER
+        if self.tokenized_template is None:
+            self.tokenized_template = copy(tokenized_log_entry)
+        else:
+            for idx in range(len(self.tokenized_template)):
+                if tokenized_log_entry[idx] != self.tokenized_template[idx]:
+                    self.tokenized_template[idx] = PLACEHOLDER
 
 
 class Drain(LogParser):
@@ -79,7 +83,8 @@ class Drain(LogParser):
         """
         log_entry = self.tokenized_log_entries[self.idx]
         if len(log_groups) == 0:
-            log_group = LogGroup(log_entry, self.idx)
+            log_group = LogGroup()
+            log_group.add(log_entry, self.idx)
             log_groups[0] = log_group
             self.log_groups.append(log_group)
         else:
@@ -93,7 +98,8 @@ class Drain(LogParser):
             if highest_sim > self.sim_threshold:
                 log_groups[highest_sim_idx].add(log_entry, self.idx)
             else:
-                log_group = LogGroup(log_entry, self.idx)
+                log_group = LogGroup()
+                log_group.add(log_entry, self.idx)
                 log_groups[len(log_groups)] = log_group
                 self.log_groups.append(log_group)
 
