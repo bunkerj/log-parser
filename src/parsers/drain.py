@@ -62,9 +62,11 @@ class Drain(LogParser):
             node = self.root
         if hasattr(node, 'children'):
             for child_key in node.children:
-                tab_offset = '\t' * node.depth
-                print('{}{}'.format(tab_offset, child_key))
-                self.print_tree(node.children[child_key])
+                child_node = node.children[child_key]
+                if child_node.__class__.__name__ == 'Node':
+                    tab_offset = '\t' * node.depth
+                    print('{}{}'.format(tab_offset, child_key))
+                    self.print_tree(child_node)
 
     def _traverse_tree(self, node):
         """
