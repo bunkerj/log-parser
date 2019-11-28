@@ -114,3 +114,15 @@ class Drain(LogParser):
         for log_group in self.log_groups:
             template = ' '.join(log_group.tokenized_template)
             self.cluster_templates[template] = log_group.log_indices
+
+    def print_tree(self, node=None):
+        """
+        Print all node labels within the subtree starting at the passed node.
+        """
+        if node is None:
+            node = self.root
+        for child_key in node.children:
+            if node.depth != (self.max_depth - 1):
+                tab_offset = '\t' * node.depth
+                print('{}{}'.format(tab_offset, child_key))
+                self.print_tree(node.children[child_key])
