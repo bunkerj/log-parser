@@ -121,8 +121,8 @@ class Drain(LogParser):
         """
         if node is None:
             node = self.root
-        for child_key in node.children:
-            if node.depth != (self.max_depth - 1):
+        if hasattr(node, 'children'):
+            for child_key in node.children:
                 tab_offset = '\t' * node.depth
                 print('{}{}'.format(tab_offset, child_key))
                 self.print_tree(node.children[child_key])
