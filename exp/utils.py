@@ -29,7 +29,7 @@ def get_final_dataset_accuracies(Parser_class,
         evaluator = Evaluator(data_set_config, parser.cluster_templates)
         accuracy = evaluator.evaluate()
 
-        print('Final IPLoM {} Accuracy: {}'.format(data_set_config['name'], accuracy))
+        print('Final {} Accuracy: {}'.format(data_set_config['name'], accuracy))
         final_best_accuracies[data_set_config['name']] = accuracy
     return final_best_accuracies
 
