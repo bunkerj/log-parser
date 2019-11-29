@@ -1,8 +1,7 @@
 import re
+from constants import PLACEHOLDER
 from src.utils import read_csv
 from abc import ABC, abstractmethod
-
-SPLIT_REGEX = r'[\s=:,]'
 
 
 class LogParser(ABC):
@@ -22,7 +21,7 @@ class LogParser(ABC):
         for structured_log_line in raw_log[1:]:
             raw_log_msg = structured_log_line[-3]
             for currentRex in self.regex_list:
-                raw_log_msg = re.sub(currentRex, '', raw_log_msg)
-            log_entry = list(filter(lambda x: x != '', re.split(SPLIT_REGEX, raw_log_msg)))
+                raw_log_msg = re.sub(currentRex, PLACEHOLDER, raw_log_msg)
+            log_entry = raw_log_msg.strip().split()
             result.append(log_entry)
         return result
