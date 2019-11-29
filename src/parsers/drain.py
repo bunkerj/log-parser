@@ -107,10 +107,10 @@ class Drain(LogParser):
             highest_sim_idx = -1
             for idx in log_groups:
                 sim = self._get_similarity(log_groups[idx].tokenized_template, log_entry)
-                if sim >= highest_sim:
+                if sim > highest_sim:
                     highest_sim = sim
                     highest_sim_idx = idx
-            if highest_sim > self.sim_threshold:
+            if highest_sim >= self.sim_threshold:
                 log_groups[highest_sim_idx].add(log_entry, self.idx)
             else:
                 log_group = LogGroup()
