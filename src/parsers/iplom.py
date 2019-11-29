@@ -295,21 +295,19 @@ class Iplom(LogParser):
         elif len(tokenized_log_entries[0]) > 2:
             unique_tokens = self._get_unique_tokens(tokenized_log_entries)
             if step == 2:
-                card_count = {}
-                for idx in unique_tokens:
-                    cardinality = len(unique_tokens[idx])
-                    if cardinality not in card_count:
-                        card_count[cardinality] = []
-                    card_count[cardinality].append(idx)
-                count_per_cardinality = [(len(card_count[cardinality]), cardinality) for cardinality in card_count]
-                max_count_tuples = get_n_sorted(2, count_per_cardinality, key=lambda x: x[0], get_max=True)
-                if max_count_tuples[0][0] > 1:
-                    max_freq_card = max_count_tuples[0][1]
-                    return sorted(card_count[max_freq_card][0:2])
-                elif max_count_tuples[0][0] == 1:
-                    max_freq_card = max_count_tuples[0][1]
-                    second_max_freq_card = max_count_tuples[1][1]
-                    return sorted([card_count[max_freq_card][0], card_count[second_max_freq_card][0]])
+                card_to_idx_map = self._get_cardinality_to_index_map(unique_tokens)
+                card_to_freq_tuples = self._get_cardinality_to_freq_tuple(card_to_idx_map)
+                max_freq_card_to_freq_tuples = get_n_sorted(2, card_to_freq_tuples,
+                                                            key=lambda x: x[1], get_max=True)
+                if max_freq_card_to_freq_tuples[0][1] > 1:
+                    max_freq_card = max_freq_card_to_freq_tuples[0][0]
+                    return sorted(card_to_idx_map[max_freq_card][0:2])
+                elif max_freq_card_to_freq_tuples[0][1] == 1:
+                    max_freq_card = max_freq_card_to_freq_tuples[0][0]
+                    second_max_freq_card = max_freq_card_to_freq_tuples[1][0]
+                    return sorted(
+                        [card_to_idx_map[max_freq_card][0],
+                         card_to_idx_map[second_max_freq_card][0]])
                 else:
                     raise Exception('Error trying to calculate most frequent cardinalities')
             else:
@@ -318,6 +316,27 @@ class Iplom(LogParser):
                 return sorted(count[1] for count in counts)
         else:
             raise Exception('Invalid log entry length')
+
+    def _get_cardinality_to_freq_tuple(self, cardinality_to_idx_map):
+        """
+        Returns 2-tuple where first element is a cardinality and the second
+        element is the frequency of the associated cardinality.
+        """
+        return [(cardinality, len(cardinality_to_idx_map[cardinality])) for cardinality in
+                cardinality_to_idx_map]
+
+    def _get_cardinality_to_index_map(self, unique_tokens):
+        """
+        Returns a dictionary where the key is the cardinality count and the value
+        is a list of token positions associated to that count.
+        """
+        cardinality_count = {}
+        for idx in unique_tokens:
+            cardinality = len(unique_tokens[idx])
+            if cardinality not in cardinality_count:
+                cardinality_count[cardinality] = []
+            cardinality_count[cardinality].append(idx)
+        return cardinality_count
 
     def _get_token_mapping(self, p_in, domain_idx, codomain_idx):
         """
