@@ -14,19 +14,31 @@ class Evaluator:
         for template in self.template_parsed:
             parsed_entry_indices = self.template_parsed[template]
             line_count = len(parsed_entry_indices)
-            truth_templates = self._get_truth_templates(parsed_entry_indices)
-            if len(truth_templates) == 1 and list(truth_templates.values())[0] == line_count:
-                num_correct_lines += line_count
+            truth_templates = self._get_truth_templates_from_parsed(parsed_entry_indices)
+            if len(truth_templates) == 1:
+                truth_templates_count = self._get_truth_templates_count(truth_templates)
+                truth_template = list(truth_templates_count.keys())[0]
+                if truth_templates_count[truth_template] == line_count:
+                    num_correct_lines += line_count
         return num_correct_lines / self.total_lines
 
-    def _get_truth_templates(self, parsed_entry_indices):
-        truth_templates = {}
+    def _get_truth_templates_from_parsed(self, parsed_entry_indices):
+        truth_templates = set()
         for idx in parsed_entry_indices:
             template = self.raw_truth[idx + 1][-1]
             if template not in truth_templates:
-                truth_templates[template] = 0
-            truth_templates[template] += 1
+                truth_templates.add(template)
         return truth_templates
+
+    def _get_truth_templates_count(self, truth_templates):
+        truth_templates_count = {}
+        for idx in range(1, len(self.raw_truth)):
+            template = self.raw_truth[idx][-1]
+            if template in truth_templates:
+                if template not in truth_templates_count:
+                    truth_templates_count[template] = 0
+                truth_templates_count[template] += 1
+        return truth_templates_count
 
     def _get_template_truth(self, raw_truth):
         cluster_templates_truth = {}
