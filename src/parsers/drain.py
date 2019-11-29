@@ -106,8 +106,8 @@ class Drain(LogParser):
             highest_sim = -1
             highest_sim_idx = -1
             for idx in log_groups:
-                sim = self._get_similarity(log_entry, log_groups[idx].tokenized_template)
-                if sim > highest_sim:
+                sim = self._get_similarity(log_groups[idx].tokenized_template, log_entry)
+                if sim >= highest_sim:
                     highest_sim = sim
                     highest_sim_idx = idx
             if highest_sim > self.sim_threshold:
@@ -118,15 +118,15 @@ class Drain(LogParser):
                 log_groups[len(log_groups)] = log_group
                 self.log_groups.append(log_group)
 
-    def _get_similarity(self, log_entry1, log_entry2):
+    def _get_similarity(self, template, log_entry):
         """
         Returns a similarity measure between two token lists.
         """
         delta_sum = 0
-        for idx in range(len(log_entry1)):
-            if log_entry1[idx] == log_entry2[idx]:
+        for idx in range(len(template)):
+            if template[idx] != PLACEHOLDER and template[idx] == log_entry[idx]:
                 delta_sum += 1
-        return delta_sum / len(log_entry1)
+        return delta_sum / len(template)
 
     def _discover_cluster_templates(self):
         """
