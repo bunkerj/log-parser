@@ -294,26 +294,21 @@ class Iplom(LogParser):
             return 0, 1
         elif len(tokenized_log_entries[0]) > 2:
             unique_tokens = self._get_unique_tokens(tokenized_log_entries)
-            if step == 2:
-                card_to_idx_map = self._get_cardinality_to_index_map(unique_tokens)
-                card_to_freq_tuples = self._get_cardinality_to_freq_tuple(card_to_idx_map)
-                max_freq_card_to_freq_tuples = get_n_sorted(2, card_to_freq_tuples,
-                                                            key=lambda x: x[1], get_max=True)
-                if max_freq_card_to_freq_tuples[0][1] > 1:
-                    max_freq_card = max_freq_card_to_freq_tuples[0][0]
-                    return sorted(card_to_idx_map[max_freq_card][0:2])
-                elif max_freq_card_to_freq_tuples[0][1] == 1:
-                    max_freq_card = max_freq_card_to_freq_tuples[0][0]
-                    second_max_freq_card = max_freq_card_to_freq_tuples[1][0]
-                    return sorted(
-                        [card_to_idx_map[max_freq_card][0],
-                         card_to_idx_map[second_max_freq_card][0]])
-                else:
-                    raise Exception('Error trying to calculate most frequent cardinalities')
+            card_to_idx_map = self._get_cardinality_to_index_map(unique_tokens)
+            card_to_freq_tuples = self._get_cardinality_to_freq_tuple(card_to_idx_map)
+            max_freq_card_to_freq_tuples = get_n_sorted(2, card_to_freq_tuples,
+                                                        key=lambda x: x[1], get_max=step == 2)
+            if max_freq_card_to_freq_tuples[0][1] > 1:
+                max_freq_card = max_freq_card_to_freq_tuples[0][0]
+                return sorted(card_to_idx_map[max_freq_card][0:2])
+            elif max_freq_card_to_freq_tuples[0][1] == 1:
+                max_freq_card = max_freq_card_to_freq_tuples[0][0]
+                second_max_freq_card = max_freq_card_to_freq_tuples[1][0]
+                return sorted(
+                    [card_to_idx_map[max_freq_card][0],
+                     card_to_idx_map[second_max_freq_card][0]])
             else:
-                count_per_token_idx = [(len(unique_tokens[token_idx]), token_idx) for token_idx in unique_tokens]
-                counts = get_n_sorted(2, count_per_token_idx, key=lambda x: x[0], get_max=False)
-                return sorted(count[1] for count in counts)
+                raise Exception('Error trying to calculate most frequent cardinalities')
         else:
             raise Exception('Invalid log entry length')
 
