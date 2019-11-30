@@ -37,6 +37,20 @@ class Iplom(LogParser):
             log_entries = self._get_log_entries_from_indices(log_indices)
             print_items(log_entries)
 
+    def get_partition_contents_list(self):
+        """
+        Returns list of partition contents divided by a separator.
+        """
+        partitions = []
+        for partition_item in self.partitions:
+            partitions.append(self._get_tokenized_log_entries_from_indices(partition_item.log_indices))
+        partition_contents = []
+        for partition in sorted(partitions, key=lambda p: len(p[0]), reverse=False):
+            for entry in partition:
+                partition_contents.append(entry)
+            partition_contents.append('----------------------------')
+        return partition_contents
+
     def _get_log_entries_from_indices(self, log_indices):
         """
         Returns string log entry corresponding to the passed log indices.
@@ -410,20 +424,6 @@ class Iplom(LogParser):
                     cluster_template_tokens.append(PLACEHOLDER)
             cluster_template_string = ' '.join(cluster_template_tokens)
             self.cluster_templates[cluster_template_string] = log_indices
-
-    def get_partition_contents_list(self):
-        """
-        Returns list of partition contents divided by a separator.
-        """
-        partitions = []
-        for partition_item in self.partitions:
-            partitions.append(self._get_log_entries_from_indices(partition_item.log_indices))
-        partition_contents = []
-        for partition in sorted(partitions):
-            for entry in partition:
-                partition_contents.append(entry)
-            partition_contents.append('----------------------------')
-        return partition_contents
 
     def _get_constant_token_indices(self, log_entries):
         """
