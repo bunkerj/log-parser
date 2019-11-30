@@ -297,8 +297,14 @@ class Iplom(LogParser):
             card_to_idx_map = self._get_cardinality_to_index_map(unique_tokens)
             card_to_freq_tuples = self._get_cardinality_to_freq_tuple(card_to_idx_map)
             if step == 2:
-                max_freq_card_to_freq_tuples = get_n_sorted(2, card_to_freq_tuples,
+                filtered_card_to_freq_tuples = filter(lambda x: x[0] != 1, card_to_freq_tuples)
+                max_freq_card_to_freq_tuples = get_n_sorted(2, filtered_card_to_freq_tuples,
                                                             key=lambda x: x[1], get_max=True)
+
+                if len(max_freq_card_to_freq_tuples) < 2 and max_freq_card_to_freq_tuples[0][1] < 2:
+                    max_freq_card_to_freq_tuples = get_n_sorted(2, card_to_freq_tuples,
+                                                                key=lambda x: x[1], get_max=True)
+
                 if max_freq_card_to_freq_tuples[0][1] > 1:
                     max_freq_card = max_freq_card_to_freq_tuples[0][0]
                     return sorted(card_to_idx_map[max_freq_card][0:2])
