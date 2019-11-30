@@ -296,19 +296,26 @@ class Iplom(LogParser):
             unique_tokens = self._get_unique_tokens(tokenized_log_entries)
             card_to_idx_map = self._get_cardinality_to_index_map(unique_tokens)
             card_to_freq_tuples = self._get_cardinality_to_freq_tuple(card_to_idx_map)
-            max_freq_card_to_freq_tuples = get_n_sorted(2, card_to_freq_tuples,
-                                                        key=lambda x: x[1], get_max=step == 2)
-            if max_freq_card_to_freq_tuples[0][1] > 1:
-                max_freq_card = max_freq_card_to_freq_tuples[0][0]
-                return sorted(card_to_idx_map[max_freq_card][0:2])
-            elif max_freq_card_to_freq_tuples[0][1] == 1:
-                max_freq_card = max_freq_card_to_freq_tuples[0][0]
-                second_max_freq_card = max_freq_card_to_freq_tuples[1][0]
-                return sorted(
-                    [card_to_idx_map[max_freq_card][0],
-                     card_to_idx_map[second_max_freq_card][0]])
+            if step == 2:
+                max_freq_card_to_freq_tuples = get_n_sorted(2, card_to_freq_tuples,
+                                                            key=lambda x: x[1], get_max=True)
+                if max_freq_card_to_freq_tuples[0][1] > 1:
+                    max_freq_card = max_freq_card_to_freq_tuples[0][0]
+                    return sorted(card_to_idx_map[max_freq_card][0:2])
+                elif max_freq_card_to_freq_tuples[0][1] == 1:
+                    max_freq_card = max_freq_card_to_freq_tuples[0][0]
+                    second_max_freq_card = max_freq_card_to_freq_tuples[1][0]
+                    return sorted(
+                        [card_to_idx_map[max_freq_card][0],
+                         card_to_idx_map[second_max_freq_card][0]])
+                else:
+                    raise Exception('Error trying to calculate most frequent cardinalities')
             else:
-                raise Exception('Error trying to calculate most frequent cardinalities')
+                min_card_card_to_freq_tuples = get_n_sorted(2, card_to_freq_tuples,
+                                                            key=lambda x: x[0], get_max=False)
+                min_tuple, sec_min_tuple = min_card_card_to_freq_tuples
+                return sorted([card_to_idx_map[min_tuple[0]][0], card_to_idx_map[sec_min_tuple[0]][0]])
+
         else:
             raise Exception('Invalid log entry length')
 
