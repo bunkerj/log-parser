@@ -111,3 +111,10 @@ class DataConfigs:
         'log_format': '<Date> <Time> - <Level>  \[<Node>:<Component>@<Id>\] - <Content>',
         'regex': [r'(/|)(\d+\.){3}\d+(:\d+)?'],
     }
+    BGL_FULL = {
+        'name': 'BGL',
+        'structured_path': '../../data/structured/BGL_2k.log_structured.csv',
+        'unstructured_path': '../../data/full/BGL.log',
+        'log_format': '<Label> <Timestamp> <Date> <Node> <Time> <NodeRepeat> <Type> <Component> <Level> <Content>',
+        'regex': [r'core\.\d+'],
+    }
