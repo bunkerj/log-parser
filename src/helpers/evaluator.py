@@ -3,7 +3,7 @@ from src.utils import read_csv
 
 class Evaluator:
     def __init__(self, data_config, parsed_results):
-        raw_truth = read_csv(data_config['path'])
+        raw_truth = read_csv(data_config['structured_path'])
         self.raw_truth = raw_truth
         self.template_truth = self._get_template_truth(raw_truth)
         self.template_parsed = parsed_results
