@@ -80,6 +80,7 @@ class DataManager:
                 message = [match.group(header) for header in headers]
                 log_messages.append(message)
                 linecount += 1
+                # TODO: Remove this
                 if not (0 < linecount <= 200000):
                     break
         log_df = pd.DataFrame(log_messages, columns=headers)

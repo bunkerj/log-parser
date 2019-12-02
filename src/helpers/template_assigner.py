@@ -40,8 +40,7 @@ class TemplateAssigner:
             log_entry = ' '.join(tokenized_log_entry)
             if re.match(template.regex, log_entry):
                 return template.idx
-            else:
-                return -1
+        return -1
         # for idx in range(len(tokenized_log_entry)):
         #     possible_templates = list(filter(lambda t: self._is_strong_match(t, tokenized_log_entry), templates))
         #     if len(possible_templates) > 0:
