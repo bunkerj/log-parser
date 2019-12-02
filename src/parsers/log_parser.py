@@ -1,8 +1,6 @@
 from src.helpers.data_manager import DataManager
 from abc import ABC, abstractmethod
 
-SPLIT_REGEX = r'[\s=:,]'
-
 
 class LogParser(ABC):
     def __init__(self, data_config):

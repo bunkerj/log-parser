@@ -22,7 +22,7 @@ def get_final_dataset_accuracies(Parser_class,
             parser = Parser_class(data_set_config,
                                   *fixed_configs[data_set_config['name']])
         else:
-            raise Exception('Invalid configuration setup.')
+            raise Exception('Invalid configuration setup')
 
         parser.parse()
 
