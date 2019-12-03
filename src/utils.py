@@ -12,6 +12,33 @@ def read_csv(file_path):
         return list(csv_reader)
 
 
+def write_csv(file_path, content_dict):
+    with open(file_path, mode='w+', newline='') as f:
+        csv_writer = csv.writer(f, delimiter=',')
+        csv_writer.writerow(content_dict.keys())
+        content_list = get_content_list(content_dict)
+        if len(content_list) != 0:
+            for line_idx in range(len(content_list[0])):
+                line_contents = []
+                for key in content_dict:
+                    line_contents.append(content_dict[key][line_idx])
+                csv_writer.writerow(line_contents)
+
+
+def get_content_list(content_dict):
+    n_ref = None
+    content_list = []
+    for key in content_dict:
+        n = len(content_dict[key])
+        if n_ref is None:
+            n_ref = n
+        elif n_ref != n:
+            error_msg = 'Invalid content length ---> Expected: {} / Actual: {}'
+            raise Exception(error_msg.format(n_ref, n))
+        content_list.append(content_dict[key])
+    return content_list
+
+
 def print_items(items):
     for item in items:
         print(item)

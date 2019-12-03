@@ -1,6 +1,7 @@
 import re
 from constants import PLACEHOLDER
 from src.helpers.data_manager import DataManager
+from src.utils import write_csv
 
 
 class TemplateAssigner:
@@ -9,9 +10,9 @@ class TemplateAssigner:
 
     def write_assignments(self):
         template_assignments = self._get_template_assignments()
-        with open(self.data_config['assignments_path'], 'w+', encoding='utf-8') as f:
-            for template_assignment in template_assignments:
-                f.write('{}\n'.format(template_assignment))
+        line_indices = list(range(1, len(template_assignments) + 1))
+        csv_contents = {'LineId': line_indices, 'EventTemplate': template_assignments}
+        write_csv(self.data_config['assignments_path'], csv_contents)
 
     def _get_template_assignments(self):
         data_manager = DataManager(self.data_config)
