@@ -9,7 +9,19 @@ data_manager = DataManager(DataConfigs.BGL_FULL)
 template_assignments = readlines_with_jump(DataConfigs.BGL_FULL['assignments_path'], JUMP_SIZE)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()[::JUMP_SIZE]
 
-for idx in range(len(template_assignments)):
-    if template_assignments[idx] == -1:
-        print(tokenized_log_entries[idx])
+n = len(template_assignments)
 
+mismatches = set()
+mismatch_count = 0
+for idx in range(n):
+    log_entry = ' '.join(tokenized_log_entries[idx])
+    if template_assignments[idx] == '-1':
+        mismatches.add(log_entry)
+        mismatch_count += 1
+
+for mismatch in mismatches:
+    print(mismatch)
+
+print('\n-------------------------------------\n')
+print('Number of mismatches: {}'.format(mismatch_count))
+print('Percentage matched: {}'.format(100 * (n - mismatch_count) / n))
