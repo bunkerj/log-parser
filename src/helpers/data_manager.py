@@ -76,6 +76,8 @@ class DataManager:
         with open(log_file, 'r', encoding='utf-8') as f:
             for line in f.readlines():
                 match = regex.search(line.strip())
+                if match is None:
+                    continue
                 message = [match.group(header) for header in headers]
                 log_messages.append(message)
                 linecount += 1
