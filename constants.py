@@ -1,6 +1,6 @@
 PLACEHOLDER = '<*>'
 RESULTS_DIR = '../../results'
-SPLIT_REGEX = r'[\s=:,]'
+SPLIT_REGEX = r'[\s]'
 
 
 class MAP:
