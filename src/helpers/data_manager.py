@@ -49,9 +49,9 @@ class DataManager:
         tokenized_log_entries = []
         for raw_log_msg in logdf['Content']:
             for currentRex in self.data_config['regex']:
-                # raw_log_msg = re.sub(currentRex, PLACEHOLDER, raw_log_msg)
+                # raw_log_msg = re.sub(currentRex, PLACEHOLDER, raw_log_msg)  # For Drain consistency
                 raw_log_msg = re.sub(currentRex, '', raw_log_msg)
-            # log_entry = raw_log_msg.strip().split()
+            # log_entry = raw_log_msg.strip().split()  # For Drain consistency
             log_entry = get_split_list(raw_log_msg)
             tokenized_log_entries.append(log_entry)
         return tokenized_log_entries
