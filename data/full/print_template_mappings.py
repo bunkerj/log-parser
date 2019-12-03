@@ -1,12 +1,11 @@
-from data.full.utils import readlines_with_jump
+from data.full.utils import read_template_assignments_from_file
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 
 JUMP_SIZE = 1000
 
 path = DataConfigs.BGL_FULL['assignments_path']
-
-assignments = readlines_with_jump(path, JUMP_SIZE)
+assignments = read_template_assignments_from_file(path, JUMP_SIZE)
 
 data_manager = DataManager(DataConfigs.BGL_FULL)
 templates = data_manager.get_templates()
