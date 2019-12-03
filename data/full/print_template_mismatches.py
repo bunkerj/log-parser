@@ -11,6 +11,7 @@ tokenized_log_entries = data_manager.get_tokenized_log_entries()[::JUMP_SIZE]
 
 n = len(template_assignments)
 
+# Get template mismatches
 mismatches = set()
 mismatch_count = 0
 for idx in range(n):
@@ -19,6 +20,7 @@ for idx in range(n):
         mismatches.add(log_entry)
         mismatch_count += 1
 
+# Print template mismatches
 for mismatch in mismatches:
     print(mismatch)
 
