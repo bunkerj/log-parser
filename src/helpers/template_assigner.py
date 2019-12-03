@@ -21,17 +21,12 @@ class TemplateAssigner:
                                   reverse=True,
                                   key=lambda t: self._get_constant_count(t.tokens))
         assignments = []
-        unmatched_templates = set()
-
-        templates_tmp = [t.tokens for t in templates]
-
         for log_idx, tokenized_log_entry in enumerate(tokenized_log_entries):
             match_idx = self._get_matching_template_idx(tokenized_log_entry, sorted_templates)
             assignments.append(match_idx)
             if match_idx == -1:
                 log_entry_str = ' '.join(tokenized_log_entry)
                 print('Could not match: {}'.format(log_entry_str))
-                unmatched_templates.add(' '.join(tokenized_log_entry))
         return assignments
 
     def _get_matching_template_idx(self, tokenized_log_entry, templates):
@@ -41,48 +36,6 @@ class TemplateAssigner:
             if re.match(template.regex, log_entry):
                 return template.idx
         return -1
-        # for idx in range(len(tokenized_log_entry)):
-        #     possible_templates = list(filter(lambda t: self._is_strong_match(t, tokenized_log_entry), templates))
-        #     if len(possible_templates) > 0:
-        #         matched_template = self._get_template_with_lowest_placeholder_count(possible_templates)
-        #         return matched_template.idx
-        #     else:
-        #         possible_templates = list(filter(lambda t: self._is_weak_match(t, tokenized_log_entry), templates))
-        #         if len(possible_templates) > 0:
-        #             matched_template = self._get_template_with_lowest_placeholder_count(possible_templates)
-        #             log_entry_str = ' '.join(tokenized_log_entry)
-        #             matched_template_str = ' '.join(matched_template.tokens)
-        #             print('Weak match: {} -----> {}'.format(log_entry_str, matched_template_str))
-        #             return matched_template.idx
-        #         else:
-        #             raise Exception('Cannot find a matching template')
-
-    def _is_weak_match(self, template, tokenized_log_entry):
-        for idx in template.constant_token_indices:
-            if template.tokens[idx] not in tokenized_log_entry:
-                return False
-        return True
-
-    def _is_strong_match(self, template, tokenized_log_entry):
-        if len(tokenized_log_entry) > len(template.tokens):
-            return False
-        for idx in template.constant_token_indices:
-            if idx < len(tokenized_log_entry) and tokenized_log_entry[idx] != template.tokens[idx]:
-                return False
-        return True
-
-    def _get_template_with_lowest_placeholder_count(self, remaining_templates):
-        lowest_placeholder_count = len(remaining_templates[0].tokens)
-        best_template = remaining_templates[0]
-        for template in remaining_templates:
-            placeholder_count = self._get_placeholder_count(template.tokens)
-            if placeholder_count < lowest_placeholder_count:
-                lowest_placeholder_count = placeholder_count
-                best_template = template
-        return best_template
-
-    def _get_placeholder_count(self, tokenized_template):
-        return sum(map(lambda token: token == PLACEHOLDER, tokenized_template))
 
     def _get_constant_count(self, tokenized_template):
         return sum(map(lambda token: token != PLACEHOLDER, tokenized_template))
