@@ -22,11 +22,10 @@ class TemplateAssigner:
                                   key=lambda t: self._get_constant_count(t.tokens))
         assignments = []
         for log_idx, tokenized_log_entry in enumerate(tokenized_log_entries):
+            if (log_idx + 1) % 100000 == 0:
+                print('Log {}/{}...'.format(log_idx + 1, len(tokenized_log_entries)))
             match_idx = self._get_matching_template_idx(tokenized_log_entry, sorted_templates)
             assignments.append(match_idx)
-            if match_idx == -1:
-                log_entry_str = ' '.join(tokenized_log_entry)
-                print('Could not match: {}'.format(log_entry_str))
         return assignments
 
     def _get_matching_template_idx(self, tokenized_log_entry, templates):
