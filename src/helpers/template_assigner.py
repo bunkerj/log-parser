@@ -31,8 +31,8 @@ class TemplateAssigner:
 
     def _get_matching_template_idx(self, tokenized_log_entry, templates):
         # TODO: Verify correctness and efficiency
+        log_entry = ' '.join(tokenized_log_entry)
         for template in templates:
-            log_entry = ' '.join(tokenized_log_entry)
             if re.match(template.regex, log_entry):
                 return template.idx
         return -1
