@@ -42,6 +42,7 @@ class DataManager:
             regex = re.sub(r'^\\\<\\\*\\\>', r'\S*\s?', regex)
             regex = re.sub(r'\\ \\\<\\\*\\\>$', r'\s?\S*', regex)
             regex = re.sub(r'\\\<\\\*\\\>', r'\s?\S*\s?', regex)
+            regex = '^{}$'.format(regex)
             templates.append(Template(idx, template, regex))
         return templates
 
@@ -68,7 +69,7 @@ class DataManager:
                 header = splitters[k].strip('<').strip('>')
                 regex += '(?P<%s>.*?)' % header
                 headers.append(header)
-        regex = re.compile('^' + regex + '$')
+        regex = re.compile('^{}$'.format(regex))
         return headers, regex
 
     def _log_to_dataframe(self, log_file, regex, headers):
