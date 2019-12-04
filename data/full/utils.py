@@ -1,7 +1,7 @@
 import csv
 
 
-def read_template_assignments_from_file(file_path, jump_size):
+def read_template_assignments_from_file(file_path, jump_size=1):
     lines = []
     with open(file_path, 'r') as f:
         csv_reader = csv.reader(f, delimiter=',')
