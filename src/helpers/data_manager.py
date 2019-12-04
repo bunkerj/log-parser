@@ -38,20 +38,24 @@ class DataManager:
         for line in raw_templates[1:]:
             idx, template = line
             template = ' '.join(get_split_list(template))
-            regex = re.escape(template)
-            regex = re.sub(r'^\\\<\\\*\\\>', r'\S*\s?', regex)
-            regex = re.sub(r'\\ \\\<\\\*\\\>$', r'\s?\S*', regex)
-            regex = re.sub(r'\\\<\\\*\\\>', r'\s?\S*\s?', regex)
-            regex = '^{}$'.format(regex)
+            regex = self._get_template_regex(template)
             templates.append(Template(idx, template, regex))
         return templates
+
+    def _get_template_regex(self, template):
+        regex = re.escape(template)
+        regex = re.sub(r'^\\\<\\\*\\\>', r'\S*\s?', regex)
+        regex = re.sub(r'\\ \\\<\\\*\\\>$', r'\s?\S*', regex)
+        regex = re.sub(r'\\\<\\\*\\\>', r'\s?\S*\s?', regex)
+        regex = '^{}$'.format(regex)
+        return regex
 
     def _prepreprocess_raw_log_entries(self, logdf):
         tokenized_log_entries = []
         for raw_log_msg in logdf['Content']:
             for currentRex in self.data_config['regex']:
                 # raw_log_msg = re.sub(currentRex, PLACEHOLDER, raw_log_msg)  # For Drain consistency
-                raw_log_msg = re.sub(currentRex, '', raw_log_msg)
+                raw_log_msg = re.sub(currentRex, '', raw_log_msg)  # For IPLoM consistency
             # log_entry = raw_log_msg.strip().split()  # For Drain consistency
             log_entry = get_split_list(raw_log_msg)
             tokenized_log_entries.append(log_entry)
