@@ -15,6 +15,6 @@ parser.parse()
 parser.print_cluster_templates()
 
 evaluator = Evaluator(DATA_CONFIG, parser.cluster_templates)
-iplom_accuracy = evaluator.evaluate()
+accuracy = evaluator.evaluate()
 
-print('Final IPLoM Accuracy: {}'.format(iplom_accuracy))
+print('Final IPLoM Accuracy: {}'.format(accuracy))

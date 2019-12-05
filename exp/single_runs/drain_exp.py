@@ -8,6 +8,6 @@ parser = Drain(DATA_CONFIG, 3, 100, 0.5)
 parser.parse()
 
 evaluator = Evaluator(DATA_CONFIG, parser.cluster_templates)
-iplom_bgl_accuracy = evaluator.evaluate()
+accuracy = evaluator.evaluate()
 
-print('Final Drain Accuracy: {}'.format(iplom_bgl_accuracy))
+print('Final Drain Accuracy: {}'.format(accuracy))
