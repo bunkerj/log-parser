@@ -74,7 +74,7 @@ class TestMappingFinder(unittest.TestCase):
         match = re.match(regex, 'B failed to lock')
         self.assertIsNone(match)
 
-    def test_no_space_wildcards(self):
+    def test_no_space_wildcards_1(self):
         template = 'lr:<*> cr:<*> xer:<*> ctr:<*>'
         regex = data_manager._get_template_regex(template)
 
@@ -84,6 +84,32 @@ class TestMappingFinder(unittest.TestCase):
         match = re.match(regex, 'lr:12cr:132 xer:342 ctr:9383')
         self.assertIsNone(match)
         match = re.match(regex, 'lr:12  cr:132   xer:342  ctr:9383')
+        self.assertIsNone(match)
+
+    def test_no_space_wildcards_2(self):
+        template = 'ciod: LOGIN chdir(<*>) failed: Input/output error'
+        regex = data_manager._get_template_regex(template)
+
+        match = re.match(regex, 'ciod: LOGIN chdir(123) failed: Input/output error')
+        self.assertIsNotNone(match)
+        match = re.match(regex, 'ciod: LOGIN chdir( 123) failed: Input/output error')
+        self.assertIsNotNone(match)
+        match = re.match(regex, 'ciod: LOGIN chdir(123 ) failed: Input/output error')
+        self.assertIsNotNone(match)
+        match = re.match(regex, 'ciod: LOGIN chdir( 123 ) failed: Input/output error')
+        self.assertIsNotNone(match)
+        match = re.match(regex, 'ciod: LOGIN chdir() failed: Input/output error')
+        self.assertIsNotNone(match)
+        match = re.match(regex, 'ciod: LOGIN chdir( ) failed: Input/output error')
+        self.assertIsNotNone(match)
+        match = re.match(regex, 'ciod: LOGIN chdir(  ) failed: Input/output error')
+        self.assertIsNotNone(match)
+
+        match = re.match(regex, 'ciod: LOGIN chdir(123  ) failed: Input/output error')
+        self.assertIsNone(match)
+        match = re.match(regex, 'ciod: LOGIN chdir(  123 ) failed: Input/output error')
+        self.assertIsNone(match)
+        match = re.match(regex, 'ciod: LOGIN chdir(   ) failed: Input/output error')
         self.assertIsNone(match)
 
     def test_single_wildcard(self):
