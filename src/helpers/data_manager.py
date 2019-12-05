@@ -44,7 +44,6 @@ class DataManager:
 
     def _get_template_regex(self, template):
         regex = re.escape(template)
-        regex = re.sub(r'^\\\<\\\*\\\>', r'\S*\s?', regex)
         regex = re.sub(r'\\ \\\<\\\*\\\>$', r'\s?\S*', regex)
         regex = re.sub(r'\\\<\\\*\\\>', r'\s?\S*\s?', regex)
         regex = '^{}$'.format(regex)
