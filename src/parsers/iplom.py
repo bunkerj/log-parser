@@ -7,9 +7,9 @@ from copy import deepcopy
 
 
 class Iplom(LogParser):
-    def __init__(self, data_config, file_threshold, partition_threshold,
+    def __init__(self, tokenized_log_entries, file_threshold, partition_threshold,
                  lower_bound, upper_bound, goodness_threshold):
-        super().__init__(data_config)
+        super().__init__(tokenized_log_entries)
         self.partitions = Partitions(self.tokenized_log_entries)
         self.file_threshold = file_threshold
         self.partition_threshold = partition_threshold

@@ -4,22 +4,22 @@ from src.helpers.evaluator import Evaluator
 
 
 class ParameterGridSearcher:
-    def __init__(self, Parser_class, file_path, parameter_ranges_dict, verbose=False):
-        self.file_path = file_path
+    def __init__(self, Parser_class, parameter_ranges_dict, verbose=False):
         self.parameter_ranges_dict = parameter_ranges_dict
         self.best_accuracy = -1
         self.best_parameters_dict = {}
         self.verbose = verbose
         self.Parser_class = Parser_class
 
-    def search(self):
+    def search(self, tokenized_log_entries, true_assignments):
         current_iteration = 1
         total_iterations = self._get_total_iterations_count()
         for parameter_tuple in self._get_parameter_combinations():
             parameter_dict = self._get_parameter_dict(parameter_tuple)
-            iplom = self.Parser_class(self.file_path, **parameter_dict)
-            iplom.parse()
-            evaluator = Evaluator(self.file_path, iplom.cluster_templates)
+            parser = self.Parser_class(tokenized_log_entries, **parameter_dict)
+            parser.parse()
+
+            evaluator = Evaluator(true_assignments, parser.cluster_templates)
             current_accuracy = evaluator.evaluate()
 
             if current_accuracy > self.best_accuracy:
