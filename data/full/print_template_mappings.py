@@ -3,13 +3,12 @@ from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 
 JUMP_SIZE = 1000
+DATA_CONFIG = DataConfigs.BGL_FULL
 
-path = DataConfigs.BGL_FULL['assignments_path']
-assignments = read_template_assignments_from_file(path, JUMP_SIZE)
-
-data_manager = DataManager(DataConfigs.BGL_FULL)
+data_manager = DataManager(DATA_CONFIG)
 templates = data_manager.get_templates()
 tokenized_log_entries = data_manager.get_tokenized_log_entries()[::JUMP_SIZE]
+assignments = read_template_assignments_from_file(DATA_CONFIG['assignments_path'], JUMP_SIZE)
 
 # Get template mappings
 template_mappings = {}
