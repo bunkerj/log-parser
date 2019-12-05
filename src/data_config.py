@@ -113,8 +113,8 @@ class DataConfigs:
     }
     BGL_FULL = {
         'name': 'BGL',
-        'unstructured_path': '../../data/full/unstructured/BGL.log',
-        'assignments_path': '../../data/full/assignments/BGL_assignments.csv',
+        'unstructured_path': '../../data/full/unstructured/BGL_filtered.log',
+        'assignments_path': '../../data/full/assignments/BGL_filtered_assignments.csv',
         'template_path': '../../data/full/templates/BGL_templates.csv',
         'log_format': '<Label> <Timestamp> <Date> <Node> <Time> <NodeRepeat> <Type> <Component> <Level> <Content>',
         'regex': [r'core\.\d+'],
