@@ -8,7 +8,7 @@ from src.helpers.data_manager import DataManager
 DATA_CONFIG = DataConfigs.BGL
 
 accuracies = []
-tree_depths = list(range(3, 30, 1))
+tree_depths = list(range(3, 31, 1))
 true_assignments = read_csv(DATA_CONFIG['assignments_path'])
 
 for tree_depth in tree_depths:
