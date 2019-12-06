@@ -1,5 +1,5 @@
 PLACEHOLDER = '<*>'
-RESULTS_DIR = '../../results'
+RESULTS_DIR = 'results'
 # SPLIT_REGEX = r'[\s=:,]'  # For IPLoM consistency
 SPLIT_REGEX = r'[\s]'  # For Drain consistency
 
