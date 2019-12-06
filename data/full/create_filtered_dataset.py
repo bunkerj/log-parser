@@ -4,7 +4,7 @@ from src.helpers.data_manager import DataManager
 
 DATA_CONFIG = DataConfigs.BGL_FULL
 TEMPLATE_ASSIGNMENT_PATH = DATA_CONFIG['assignments_path']
-OUTPUT_PATH = 'unstructured/{}_filtered2.log'.format(DATA_CONFIG['name'])
+OUTPUT_PATH = 'data/full/unstructured/{}_filtered.log'.format(DATA_CONFIG['name'])
 
 data_manager = DataManager(DATA_CONFIG)
 raw_log_entries = data_manager.get_raw_log_entries()
