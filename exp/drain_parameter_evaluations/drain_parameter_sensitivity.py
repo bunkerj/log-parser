@@ -16,9 +16,9 @@ base_config = {
 }
 
 parameter_ranges_dict = {
-    'max_depth': (2, 22, 1),
-    'max_child': (10, 110, 5),
-    'sim_threshold': (0.1, 0.90, 0.04),
+    'max_depth': (2, 22, 2),
+    'max_child': (10, 110, 10),
+    'sim_threshold': (0.1, 0.90, 0.08),
 }
 
 accuracies = {}
