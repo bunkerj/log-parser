@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from src.utils import read_csv
+from src.utils import get_template_assignments
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
@@ -9,7 +9,7 @@ DATA_CONFIG = DataConfigs.BGL
 
 accuracies = []
 tree_depths = list(range(3, 31, 1))
-true_assignments = read_csv(DATA_CONFIG['assignments_path'])
+true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
 
 for tree_depth in tree_depths:
     data_manager = DataManager(DATA_CONFIG)

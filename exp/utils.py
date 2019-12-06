@@ -1,7 +1,7 @@
 import os
 import pickle
 from constants import RESULTS_DIR
-from src.utils import read_csv
+from src.utils import get_template_assignments
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.helpers.parameter_grid_searcher import ParameterGridSearcher
@@ -15,7 +15,7 @@ def get_final_dataset_accuracies(Parser_class,
     for data_set_config in data_set_configs:
         data_manager = DataManager(data_set_config)
         tokenized_log_entries = data_manager.get_tokenized_log_entries()
-        true_assignments = read_csv(data_set_config['assignments_path'])
+        true_assignments = get_template_assignments(data_set_config['assignments_path'])
 
         if parameter_ranges_dict is not None:
             parameter_grid_searcher = ParameterGridSearcher(Parser_class,
@@ -31,7 +31,6 @@ def get_final_dataset_accuracies(Parser_class,
 
         parser.parse()
 
-        true_assignments = read_csv(data_set_config['assignments_path'])
         evaluator = Evaluator(true_assignments, parser.cluster_templates)
         accuracy = evaluator.evaluate()
 

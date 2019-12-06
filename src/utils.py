@@ -12,6 +12,10 @@ def read_csv(file_path):
         return list(csv_reader)
 
 
+def get_template_assignments(file_path):
+    return read_csv(file_path)[1:]
+
+
 def write_csv(file_path, content_dict):
     with open(file_path, mode='w+', newline='') as f:
         csv_writer = csv.writer(f, delimiter=',')

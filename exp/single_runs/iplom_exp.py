@@ -2,7 +2,7 @@ from src.helpers.data_manager import DataManager
 from src.parsers.iplom import Iplom
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
-from src.utils import read_csv
+from src.utils import get_template_assignments
 
 DATA_CONFIG = DataConfigs.OpenStack
 
@@ -18,7 +18,7 @@ parser = Iplom(tokenized_log_entries, **{
 parser.parse()
 parser.print_cluster_templates()
 
-true_assignments = read_csv(DATA_CONFIG['assignments_path'])
+true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
 evaluator = Evaluator(true_assignments, parser.cluster_templates)
 accuracy = evaluator.evaluate()
 

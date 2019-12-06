@@ -6,7 +6,7 @@ class Evaluator:
         self.true_assignments = true_assignments
         self.template_truth = self._get_template_truth(true_assignments)
         self.template_parsed = parsed_results
-        self.total_lines = len(true_assignments) - 1
+        self.total_lines = len(true_assignments)
 
     def evaluate(self):
         num_correct_lines = 0
@@ -24,14 +24,14 @@ class Evaluator:
     def _get_truth_templates_from_parsed(self, parsed_entry_indices):
         truth_templates = set()
         for idx in parsed_entry_indices:
-            template = self.true_assignments[idx + 1][-1]
+            template = self.true_assignments[idx][-1]
             if template not in truth_templates:
                 truth_templates.add(template)
         return truth_templates
 
     def _get_truth_templates_count(self, truth_templates):
         truth_templates_count = {}
-        for idx in range(1, len(self.true_assignments)):
+        for idx in range(len(self.true_assignments)):
             template = self.true_assignments[idx][-1]
             if template in truth_templates:
                 if template not in truth_templates_count:

@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from copy import copy
-from src.utils import read_csv
+from src.utils import get_template_assignments
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
@@ -23,7 +23,7 @@ parameter_ranges_dict = {
 
 accuracies = {}
 tree_depths = list(range(3, 30, 1))
-true_assignments = read_csv(DATA_CONFIG['assignments_path'])
+true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
