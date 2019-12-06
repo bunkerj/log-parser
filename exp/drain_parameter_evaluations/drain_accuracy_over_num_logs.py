@@ -17,9 +17,9 @@ indices = []
 accuracies = []
 for idx in range(len(tokenized_log_entries)):
     parser.single_parse()
-    if idx % JUMP_SIZE == 0 or idx == (len(tokenized_log_entries) - 1):
+    if (idx + 1) % JUMP_SIZE == 0 or idx == (len(tokenized_log_entries) - 1):
         parser.discover_cluster_templates()
-        evaluator = Evaluator(true_assignments, parser.cluster_templates)
+        evaluator = Evaluator(true_assignments[:(idx + 2)], parser.cluster_templates)
         accuracies.append(evaluator.evaluate())
         indices.append(idx)
 
