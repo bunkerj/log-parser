@@ -49,7 +49,7 @@ boxplot_data = [
 ]
 
 plt.boxplot(boxplot_data, sym='')
-plt.title('Parameter Sensitivity')
+plt.title('Drain Parameter Sensitivity')
 plt.ylabel('Percentage Accuracy')
 plt.xticks(range(1, 4), ['max_depth', 'max_child', 'sim_threshold'])
 plt.grid()
