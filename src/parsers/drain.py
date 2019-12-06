@@ -49,10 +49,22 @@ class Drain(LogParser):
         """
         Inserts each log entry into the parse tree.
         """
-        for idx, log_entry in enumerate(self.tokenized_log_entries):
-            self.idx = idx
-            self._traverse_tree(self.root)
-        self._discover_cluster_templates()
+        for idx in range(len(self.tokenized_log_entries)):
+            self.single_parse()
+        self.discover_cluster_templates()
+
+    def single_parse(self):
+        self.idx += 1
+        self._traverse_tree(self.root)
+
+    def discover_cluster_templates(self):
+        """
+        Discovers all cluster templates from the current partitions.
+        """
+        self.cluster_templates = {}
+        for log_group in self.log_groups:
+            template = ' '.join(log_group.tokenized_template)
+            self.cluster_templates[template] = log_group.log_indices
 
     def print_tree(self, node=None):
         """
@@ -127,11 +139,3 @@ class Drain(LogParser):
             if template[idx] != PLACEHOLDER and template[idx] == log_entry[idx]:
                 delta_sum += 1
         return delta_sum / len(template)
-
-    def _discover_cluster_templates(self):
-        """
-        Discovers all cluster templates from the current partitions.
-        """
-        for log_group in self.log_groups:
-            template = ' '.join(log_group.tokenized_template)
-            self.cluster_templates[template] = log_group.log_indices
