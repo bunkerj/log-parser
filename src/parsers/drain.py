@@ -37,8 +37,8 @@ class LogGroup:
 class Drain(LogParser):
     def __init__(self, tokenized_log_entries, max_depth, max_child, sim_threshold):
         super().__init__(tokenized_log_entries)
-        self.max_depth = max_depth
-        self.max_child = max_child
+        self.max_depth = round(max_depth)
+        self.max_child = round(max_child)
         self.sim_threshold = sim_threshold
         self.root = Node(0)
         self.idx = -1
