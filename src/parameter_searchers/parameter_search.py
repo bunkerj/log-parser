@@ -1,9 +1,8 @@
-import numpy as np
-from itertools import product
+from abc import ABC, abstractmethod
 from src.helpers.evaluator import Evaluator
 
 
-class ParameterGridSearcher:
+class ParameterSearch(ABC):
     def __init__(self, Parser_class, parameter_ranges_dict, verbose=False):
         self.parameter_ranges_dict = parameter_ranges_dict
         self.best_accuracy = -1
@@ -12,9 +11,12 @@ class ParameterGridSearcher:
         self.Parser_class = Parser_class
 
     def search(self, tokenized_log_entries, true_assignments):
+        self.best_accuracy = -1
+        self.best_parameters_dict = {}
         current_iteration = 1
-        total_iterations = self._get_total_iterations_count()
-        for parameter_tuple in self._get_parameter_combinations():
+        parameter_tuples = self._get_parameter_tuples()
+        total_iterations = len(parameter_tuples)
+        for parameter_tuple in parameter_tuples:
             parameter_dict = self._get_parameter_dict(parameter_tuple)
             parser = self.Parser_class(tokenized_log_entries, **parameter_dict)
             parser.parse()
@@ -42,15 +44,9 @@ class ParameterGridSearcher:
         return {parameter_name: parameter_tuple[idx] for idx, parameter_name in
                 enumerate(self.parameter_ranges_dict)}
 
-    def _get_parameter_array_list(self):
-        parameter_array_list = []
-        for parameter_field in self.parameter_ranges_dict:
-            parameter_range = self.parameter_ranges_dict[parameter_field]
-            parameter_array_list.append(np.arange(*parameter_range))
-        return parameter_array_list
-
-    def _get_parameter_combinations(self):
-        return product(*self._get_parameter_array_list())
-
-    def _get_total_iterations_count(self):
-        return np.prod([len(arr) for arr in self._get_parameter_array_list()])
+    @abstractmethod
+    def _get_parameter_tuples(self):
+        """
+        Returns list of tuples where each tuple represents a parameter configuration.
+        """
+        pass
