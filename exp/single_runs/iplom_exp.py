@@ -1,3 +1,7 @@
+"""
+Perform a single IPLoM run on a target dataset (DATA_CONFIG).
+"""
+
 from src.helpers.data_manager import DataManager
 from src.parsers.iplom import Iplom
 from src.data_config import DataConfigs

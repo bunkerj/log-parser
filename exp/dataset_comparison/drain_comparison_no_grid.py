@@ -1,3 +1,7 @@
+"""
+Print and save the accuracies of the listed datasets using Drain with fixed parameters.
+"""
+
 from exp.utils import get_final_dataset_accuracies, dump_results
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs

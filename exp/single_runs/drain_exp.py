@@ -1,3 +1,7 @@
+"""
+Perform a single Drain run on a target dataset (DATA_CONFIG).
+"""
+
 from time import time
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
