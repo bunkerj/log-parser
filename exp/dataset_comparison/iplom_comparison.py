@@ -1,5 +1,5 @@
 """
-Print and save the accuracies of the listed datasets using IPLoM with grid search.
+Print and save the accuracies of the listed datasets using IPLoM with fixed parameters.
 """
 
 from exp.utils import get_final_dataset_accuracies, dump_results
@@ -25,16 +25,27 @@ data_set_configs = [
     DataConfigs.Zookeeper,
 ]
 
-parameter_ranges_dict = {
-    'file_threshold': (0, 0.15, 0.05),
-    'partition_threshold': (0, 0.35, 0.05),
-    'lower_bound': (0.1, 0.35, 0.05),
-    'upper_bound': (0.9, 1, 1),
-    'goodness_threshold': (0.3, 1, 0.1)
+fixed_configs = {
+    'Android': (0, 0, 0.3, 0.9, 0.25),
+    'Apache': (0, 0, 0.4, 0.9, 0.3),
+    'BGL': (0, 0, 0.01, 0.9, 0.4),
+    'Hadoop': (0, 0, 0.2, 0.9, 0.4),
+    'HDFS': (0, 0, 0.25, 0.9, 0.35),
+    'HealthApp': (0, 0, 0.3, 0.9, 0.25),
+    'HPC': (0, 0, 0.25, 0.9, 0.58),
+    'Linux': (0, 0, 0.3, 0.9, 0.3),
+    'Mac': (0, 0, 0.25, 0.9, 0.3),
+    'OpenSSH': (0, 0, 0.25, 0.9, 0.78),
+    'OpenStack': (0, 0, 0.25, 0.9, 0.9),
+    'Proxifier': (0, 0, 0.25, 0.9, 0.9),
+    'Spark': (0, 0, 0.3, 0.9, 0.35),
+    'Thunderbird': (0, 0, 0.2, 0.9, 0.3),
+    'Windows': (0, 0, 0.25, 0.9, 0.3),
+    'Zookeeper': (0, 0, 0.7, 0.9, 0.4),
 }
 
 final_best_accuracies = get_final_dataset_accuracies(Iplom,
                                                      data_set_configs,
-                                                     parameter_ranges_dict=parameter_ranges_dict)
+                                                     fixed_configs=fixed_configs)
 
 dump_results('iplom_dataset_comparison.p', final_best_accuracies)

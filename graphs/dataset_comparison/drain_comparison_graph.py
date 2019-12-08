@@ -26,7 +26,7 @@ drain_benchmark_accuracies = {      # Results from benchmark paper
     'Zookeeper': 0.967,             # 0.967
 }
 
-final_best_accuracies = load_results('drain_dataset_comparison_no_grid.p')
+final_best_accuracies = load_results('drain_dataset_comparison.p')
 
 show_dataset_comparison_graph('Drain Accuracies',
                               drain_benchmark_accuracies,
