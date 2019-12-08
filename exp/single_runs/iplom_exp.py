@@ -1,5 +1,5 @@
 """
-Perform a single IPLoM run on a target dataset (DATA_CONFIG).
+Print and save the accuracies of a single IPLoM run on a target dataset (DATA_CONFIG).
 """
 
 from src.helpers.data_manager import DataManager
