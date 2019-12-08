@@ -33,7 +33,7 @@ parameter_ranges_dict = {
     'sim_threshold': (0.1, 0.9),
 }
 
-parameter_searcher = ParameterRandomSearcher(Drain, parameter_ranges_dict)
+parameter_searcher = ParameterRandomSearcher(Drain, parameter_ranges_dict, n_runs=N_RUNS)
 final_best_accuracies = get_final_dataset_accuracies(Drain,
                                                      data_set_configs,
                                                      parameter_searcher=parameter_searcher)
