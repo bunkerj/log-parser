@@ -1,6 +1,13 @@
+"""
+Plots a histogram of IPLoM experiments (from the dataset_comparison directory) to compare the accuracies against the
+ones acquired from the LogPAI open source benchmark.
+
+In the comments, are the results as reported by the associated benchmark paper from Zhu et al., 2019.
+"""
+
 from graphs.utils import show_dataset_comparison_graph, load_results
 
-iplom_benchmark_accuracies = {
+iplom_benchmark_accuracies = {      # Results from benchmark paper
     'Android': 0.712,               # 0.712
     'Apache': 1.000,                # 1.000
     'BGL': 0.939,                   # 0.939
