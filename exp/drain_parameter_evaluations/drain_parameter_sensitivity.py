@@ -1,7 +1,6 @@
 """
 Plot boxplots for different accuracy values resulting from different parameter settings.
 """
-
 import numpy as np
 import matplotlib.pyplot as plt
 from copy import copy

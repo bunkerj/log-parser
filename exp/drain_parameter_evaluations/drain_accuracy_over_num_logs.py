@@ -2,7 +2,6 @@
 Plot the Drain accuracy for a specific dataset (DATA_CONFIG) evaluated at every increment (JUMP_SIZE). This
 procedure is repeated several times (N_RUNS) and each run is performed on a shuffled version of the dataset.
 """
-
 import random
 import matplotlib.pyplot as plt
 from src.helpers.data_manager import DataManager

@@ -1,7 +1,6 @@
 """
 Plot the accuracy over the maximum tree depth.
 """
-
 import matplotlib.pyplot as plt
 from src.utils import get_template_assignments
 from src.parsers.drain import Drain

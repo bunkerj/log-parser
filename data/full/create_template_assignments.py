@@ -1,7 +1,6 @@
 """
 Creates the template assignment for a specific dataset configuration.
 """
-
 from src.helpers.template_assigner import TemplateAssigner
 from src.data_config import DataConfigs
 
