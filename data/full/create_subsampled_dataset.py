@@ -21,7 +21,7 @@ if n != m:
 elif n < N_SAMPLES:
     raise Exception('Sample size {} is greater than number of input lines {}'.format(N_SAMPLES, n))
 
-indices = choice(n, N_SAMPLES, replace=False)
+indices = set(choice(n, N_SAMPLES, replace=False))
 
 subsample_file(INPUT_DATASET_PATH,
                OUTPUT_DATASET_PATH,

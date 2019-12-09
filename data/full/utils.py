@@ -13,8 +13,8 @@ def read_template_assignments_from_file(file_path, jump_size=1):
 
 def subsample_file(input_path, output_path, indices, include_header=False):
     if include_header:
-        indices = [idx + 1 for idx in indices]
-        indices.insert(0, 0)
+        indices = set(idx + 1 for idx in indices)
+        indices.add(0)
     with open(output_path, 'w+', encoding='utf-8') as output_file:
         with open(input_path, 'r+', encoding='utf-8') as input_file:
             for idx, line in enumerate(input_file.readlines()):
