@@ -27,11 +27,19 @@ class ParameterSearch(ABC):
                 self.best_accuracy = current_accuracy
 
             if self.verbose:
-                msg = '{}/{} ---- Current Accuracy: {} ---- Best Accuracy: {}'
-                print(msg.format(current_iteration, total_iterations, current_accuracy, self.best_accuracy))
+                self._print_status(current_accuracy, current_iteration, parameter_tuple, total_iterations)
 
             self.best_accuracy_history.append(self.best_accuracy)
             current_iteration += 1
+
+    def _print_status(self, current_accuracy, current_iteration, parameter_tuple, total_iterations):
+        msg = '{}/{} ---- Best Accuracy: {} ---- Current Accuracy: {} ---- Current Parameters: {}'
+        filled_msg = msg.format(current_iteration,
+                                total_iterations,
+                                self.best_accuracy,
+                                current_accuracy,
+                                parameter_tuple)
+        print(filled_msg)
 
     def _initialize_dynamic_fields(self):
         self.best_accuracy = -1
