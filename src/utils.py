@@ -17,7 +17,7 @@ def get_template_assignments(file_path):
 
 
 def write_csv(file_path, content_dict):
-    with open(file_path, mode='w+', newline='') as f:
+    with open(file_path, mode='w+', newline='', encoding='utf-8') as f:
         csv_writer = csv.writer(f, delimiter=',')
         csv_writer.writerow(content_dict.keys())
         content_list = get_content_list(content_dict)
