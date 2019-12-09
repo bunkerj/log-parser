@@ -4,15 +4,13 @@ from src.helpers.evaluator import Evaluator
 
 class ParameterSearch(ABC):
     def __init__(self, Parser_class, parameter_ranges_dict, verbose=False):
+        self._initialize_dynamic_fields()
         self.parameter_ranges_dict = parameter_ranges_dict
-        self.best_accuracy = -1
-        self.best_parameters_dict = {}
         self.verbose = verbose
         self.Parser_class = Parser_class
 
     def search(self, tokenized_log_entries, true_assignments):
-        self.best_accuracy = -1
-        self.best_parameters_dict = {}
+        self._initialize_dynamic_fields()
         current_iteration = 1
         parameter_tuples = self._get_parameter_tuples()
         total_iterations = len(parameter_tuples)
@@ -32,7 +30,13 @@ class ParameterSearch(ABC):
                 msg = '{}/{} ---- Current Accuracy: {} ---- Best Accuracy: {}'
                 print(msg.format(current_iteration, total_iterations, current_accuracy, self.best_accuracy))
 
+            self.best_accuracy_history.append(self.best_accuracy)
             current_iteration += 1
+
+    def _initialize_dynamic_fields(self):
+        self.best_accuracy = -1
+        self.best_parameters_dict = {}
+        self.best_accuracy_history = []
 
     def print_results(self):
         print('\n---- Best Parameters (Accuracy: {}) ----'.format(self.best_accuracy))
