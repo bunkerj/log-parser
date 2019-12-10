@@ -1,4 +1,5 @@
 import csv
+from random import uniform
 
 
 def read_file(file_path):
@@ -71,3 +72,8 @@ def delete_indices_from_list(base_list, indices):
 
 def has_digit(token):
     return any(char.isdigit() for char in token)
+
+
+def get_random_parameter_tuple(parameter_ranges_dict):
+    return tuple(uniform(*parameter_ranges_dict[parameter_field])
+                 for parameter_field in parameter_ranges_dict)

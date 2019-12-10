@@ -1,7 +1,6 @@
 import numpy as np
-from random import uniform
-from itertools import product
 from src.parameter_searchers.parameter_search import ParameterSearch
+from src.utils import get_random_parameter_tuple
 
 
 class ParameterRandomSearcher(ParameterSearch):
@@ -19,7 +18,6 @@ class ParameterRandomSearcher(ParameterSearch):
     def _get_parameter_tuples(self):
         parameter_tuples = []
         for run in range(self.n_runs):
-            parameter_tuple = tuple(uniform(*self.parameter_ranges_dict[parameter_field])
-                                    for parameter_field in self.parameter_ranges_dict)
+            parameter_tuple = get_random_parameter_tuple(self.parameter_ranges_dict)
             parameter_tuples.append(parameter_tuple)
         return parameter_tuples
