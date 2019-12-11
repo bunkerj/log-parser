@@ -1,5 +1,6 @@
 """
-Print and save the accuracies of the listed datasets using Drain with fixed parameters.
+Print and save the accuracies of the listed datasets using Drain with fixed
+parameters.
 """
 from exp.utils import get_final_dataset_accuracies, dump_results
 from src.parsers.drain import Drain
@@ -43,8 +44,9 @@ fixed_configs = {
     'Zookeeper': (3, 100, 0.5),
 }
 
-final_best_accuracies = get_final_dataset_accuracies(Drain,
-                                                     data_set_configs,
-                                                     fixed_configs=fixed_configs)
+final_best_accuracies = \
+    get_final_dataset_accuracies(Drain,
+                                 data_set_configs,
+                                 fixed_configs=fixed_configs)
 
 dump_results('drain_dataset_comparison.p', final_best_accuracies)

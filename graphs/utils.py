@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from constants import RESULTS_DIR
 
 
-def show_dataset_comparison_graph(title, benchmark_accuracies, final_best_accuracies):
+def show_dataset_comparison_graph(title, benchmark_accuracies,
+                                  final_best_accuracies):
     relevant_benchmark_accuracies = {}
     for name in benchmark_accuracies:
         if name in final_best_accuracies:

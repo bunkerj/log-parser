@@ -1,8 +1,10 @@
 """
-Generate the time taken in minutes and accuracies for corresponding sampled Drain configurations.
+Generate the time taken in minutes and accuracies for corresponding sampled
+Drain configurations.
 
-The goal is to fill the "morris_data" dictionary with: timings, accuracies, parameter names, parameter configurations,
-and the Morris sensitivity indices for the timings and accuracies.
+The goal is to fill the "morris_data" dictionary with: timings, accuracies,
+parameter names, parameter configurations, and the Morris sensitivity indices
+for the timings and accuracies.
 """
 import numpy as np
 from time import time

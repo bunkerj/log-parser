@@ -34,5 +34,6 @@ class Partitions:
         for token_idx in log_indices:
             token_length = len(self.tokenized_log_entries[token_idx])
             if token_length != ref_token_length:
-                error_msg = 'Invalid log entry length ---> Expected: {} / Actual: {}'
-                raise Exception(error_msg.format(ref_token_length, token_length))
+                msg = 'Invalid log entry length ---> Expected: {} / Actual: {}'
+                raise Exception(
+                    msg.format(ref_token_length, token_length))

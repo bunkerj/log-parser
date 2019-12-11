@@ -35,7 +35,8 @@ class LogGroup:
 
 
 class Drain(LogParser):
-    def __init__(self, tokenized_log_entries, max_depth, max_child, sim_threshold):
+    def __init__(self, tokenized_log_entries, max_depth, max_child,
+                 sim_threshold):
         super().__init__(tokenized_log_entries)
         self.max_depth = round(max_depth)
         self.max_child = round(max_child)
@@ -85,7 +86,8 @@ class Drain(LogParser):
         Recursively traverses the log tree to insert the new log entry.
         """
         log_entry = self.tokenized_log_entries[self.idx]
-        if node.depth == (self.max_depth - 1) or node.depth == (len(log_entry) + 1):
+        if node.depth == (self.max_depth - 1) or node.depth == (
+                len(log_entry) + 1):
             self._update_most_similar_groups(node.children)
         elif node.depth == 0:
             child_key = len(log_entry)
@@ -96,8 +98,10 @@ class Drain(LogParser):
             token = log_entry[node.depth - 1]
             is_wild_card = any([
                 has_digit(token),
-                PLACEHOLDER in node.children and len(node.children) == self.max_child,
-                PLACEHOLDER not in node.children and len(node.children) == (self.max_child - 1),
+                PLACEHOLDER in node.children and len(
+                    node.children) == self.max_child,
+                PLACEHOLDER not in node.children and len(node.children) == (
+                            self.max_child - 1),
             ])
             child_key = PLACEHOLDER if is_wild_card else token
             if child_key not in node.children:
@@ -118,7 +122,8 @@ class Drain(LogParser):
             highest_sim = -1
             highest_sim_idx = -1
             for idx in log_groups:
-                sim = self._get_similarity(log_groups[idx].tokenized_template, log_entry)
+                sim = self._get_similarity(log_groups[idx].tokenized_template,
+                                           log_entry)
                 if sim > highest_sim:
                     highest_sim = sim
                     highest_sim_idx = idx

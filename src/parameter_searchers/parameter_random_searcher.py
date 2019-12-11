@@ -4,7 +4,8 @@ from src.utils import get_random_parameter_tuple
 
 
 class ParameterRandomSearcher(ParameterSearch):
-    def __init__(self, Parser_class, parameter_ranges_dict, verbose=False, n_runs=10):
+    def __init__(self, Parser_class, parameter_ranges_dict, verbose=False,
+                 n_runs=10):
         super().__init__(Parser_class, parameter_ranges_dict, verbose=verbose)
         self.n_runs = n_runs
 
@@ -18,6 +19,7 @@ class ParameterRandomSearcher(ParameterSearch):
     def _get_parameter_tuples(self):
         parameter_tuples = []
         for run in range(self.n_runs):
-            parameter_tuple = get_random_parameter_tuple(self.parameter_ranges_dict)
+            parameter_tuple = get_random_parameter_tuple(
+                self.parameter_ranges_dict)
             parameter_tuples.append(parameter_tuple)
         return parameter_tuples

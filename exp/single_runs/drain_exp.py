@@ -1,5 +1,6 @@
 """
-Print and save the accuracies of a single Drain run on a target dataset (DATA_CONFIG).
+Print and save the accuracies of a single Drain run on a target dataset
+(DATA_CONFIG).
 """
 from time import time
 from src.parsers.drain import Drain
@@ -27,4 +28,5 @@ minutes_to_evaluate = (time() - start_time) / 60
 print('Final Drain Accuracy: {}'.format(accuracy))
 print('Time to parse: {:.5f} minutes'.format(minutes_to_parse))
 print('Time to evaluate: {:.5f} minutes'.format(minutes_to_evaluate))
-print('Total time taken: {:.5f} minutes'.format(minutes_to_parse + minutes_to_evaluate))
+print('Total time taken: {:.5f} minutes'.format(
+    minutes_to_parse + minutes_to_evaluate))

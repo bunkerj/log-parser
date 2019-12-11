@@ -1,9 +1,11 @@
 """
-Compares two template assignment files: one target file (PATH) that we are interested in evaluating against a reference
-file (REF_PATH). Prints the number of mismatches.
+Compares two template assignment files: one target file (PATH) that we are
+interested in evaluating against a reference file (REF_PATH). Prints the number
+of mismatches.
 
-In this script, a mismatch is defined as the circumstance where a line is unmatched in the target file (i.e has a
-template index of -1), while having a proper match in the reference file.
+In this script, a mismatch is defined as the circumstance where a line is
+unmatched in the target file (i.e has a template index of -1), while having a
+proper match in the reference file.
 """
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager

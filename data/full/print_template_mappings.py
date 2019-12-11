@@ -1,6 +1,6 @@
 """
-Print template assignments of a given dataset configuration. The specified dataset is subsampled by the increment
-specified by JUMP_SIZE.
+Print template assignments of a given dataset configuration. The specified
+dataset is subsampled by the increment specified by JUMP_SIZE.
 """
 from data.full.utils import read_template_assignments_from_file
 from src.data_config import DataConfigs
@@ -12,7 +12,8 @@ DATA_CONFIG = DataConfigs.BGL_FULL
 data_manager = DataManager(DATA_CONFIG)
 templates = data_manager.get_templates()
 tokenized_log_entries = data_manager.get_tokenized_log_entries()[::JUMP_SIZE]
-assignments = read_template_assignments_from_file(DATA_CONFIG['assignments_path'], JUMP_SIZE)
+assignments = read_template_assignments_from_file(
+    DATA_CONFIG['assignments_path'], JUMP_SIZE)
 
 # Get template mappings
 template_mappings = {}

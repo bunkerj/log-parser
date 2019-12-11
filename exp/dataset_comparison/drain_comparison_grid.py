@@ -1,8 +1,10 @@
 """
-Print and save the accuracies of the listed datasets using Drain with grid search.
+Print and save the accuracies of the listed datasets using Drain with grid
+search.
 """
 from exp.utils import get_final_dataset_accuracies, dump_results
-from src.parameter_searchers.parameter_grid_searcher import ParameterGridSearcher
+from src.parameter_searchers.parameter_grid_searcher import \
+    ParameterGridSearcher
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 
@@ -32,8 +34,9 @@ parameter_ranges_dict = {
 }
 
 parameter_searcher = ParameterGridSearcher(Drain, parameter_ranges_dict)
-final_best_accuracies = get_final_dataset_accuracies(Drain,
-                                                     data_set_configs,
-                                                     parameter_searcher=parameter_searcher)
+final_best_accuracies = \
+    get_final_dataset_accuracies(Drain,
+                                 data_set_configs,
+                                 parameter_searcher=parameter_searcher)
 
 dump_results('drain_dataset_comparison_grid.p', final_best_accuracies)

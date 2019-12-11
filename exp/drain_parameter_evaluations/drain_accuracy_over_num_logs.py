@@ -1,6 +1,7 @@
 """
-Plot the Drain accuracy for a specific dataset (DATA_CONFIG) evaluated at every increment (JUMP_SIZE). This
-procedure is repeated several times (N_RUNS) and each run is performed on a shuffled version of the dataset.
+Plot the Drain accuracy for a specific dataset (DATA_CONFIG) evaluated at every
+increment (JUMP_SIZE). This procedure is repeated several times (N_RUNS) and
+each run is performed on a shuffled version of the dataset.
 """
 import random
 import matplotlib.pyplot as plt
@@ -30,7 +31,8 @@ for run in range(N_RUNS):
         parser.single_parse()
         if end_idx % JUMP_SIZE == 0 or end_idx == len(tokenized_log_entries):
             parser.discover_cluster_templates()
-            evaluator = Evaluator(true_assignments[:end_idx], parser.cluster_templates)
+            evaluator = Evaluator(true_assignments[:end_idx],
+                                  parser.cluster_templates)
             accuracy = evaluator.evaluate()
             if run == 0:
                 accuracies.append(accuracy / N_RUNS)

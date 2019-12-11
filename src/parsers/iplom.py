@@ -7,7 +7,8 @@ from copy import deepcopy
 
 
 class Iplom(LogParser):
-    def __init__(self, tokenized_log_entries, file_threshold, partition_threshold,
+    def __init__(self, tokenized_log_entries, file_threshold,
+                 partition_threshold,
                  lower_bound, upper_bound, goodness_threshold):
         super().__init__(tokenized_log_entries)
         self.partitions = Partitions(self.tokenized_log_entries)
@@ -43,9 +44,11 @@ class Iplom(LogParser):
         """
         partitions = []
         for partition_item in self.partitions:
-            partitions.append(self._get_tokenized_log_entries_from_indices(partition_item.log_indices))
+            partitions.append(self._get_tokenized_log_entries_from_indices(
+                partition_item.log_indices))
         partition_contents = []
-        for partition in sorted(partitions, key=lambda p: len(p[0]), reverse=False):
+        for partition in sorted(partitions, key=lambda p: len(p[0]),
+                                reverse=False):
             for entry in partition:
                 partition_contents.append(entry)
             partition_contents.append('----------------------------')
@@ -60,7 +63,8 @@ class Iplom(LogParser):
 
     def _get_tokenized_log_entries_from_indices(self, log_indices):
         """
-        Returns a lists containing lists of tokens corresponding to the passed log indices.
+        Returns a lists containing lists of tokens corresponding to the passed
+        log indices.
         """
         return [self.tokenized_log_entries[log_id] for log_id in log_indices]
 
@@ -90,12 +94,16 @@ class Iplom(LogParser):
         for partition_item in self.partitions:
             outlier_log_indices = []
             log_indices = partition_item.log_indices
-            tokenized_log_entries = self._get_tokenized_log_entries_from_indices(log_indices)
-            least_unique_token_index = self._get_least_unique_token_index(tokenized_log_entries)
-            child_partitions = self._get_position_subpartitions_dict(least_unique_token_index, log_indices)
+            tokenized_log_entries = \
+                self._get_tokenized_log_entries_from_indices(log_indices)
+            least_unique_token_index = self._get_least_unique_token_index(
+                tokenized_log_entries)
+            child_partitions = self._get_position_subpartitions_dict(
+                least_unique_token_index, log_indices)
             for token in child_partitions:
                 child_partition = child_partitions[token]
-                partition_support = len(child_partition) / len(tokenized_log_entries)
+                partition_support = len(child_partition) / len(
+                    tokenized_log_entries)
                 if partition_support < self.partition_threshold:
                     outlier_log_indices.extend(child_partition)
                 else:
@@ -108,7 +116,8 @@ class Iplom(LogParser):
         self.partitions = position_partitions
         self._prune_partitions()
 
-    def _get_position_subpartitions_dict(self, least_unique_token_index, log_indices):
+    def _get_position_subpartitions_dict(self, least_unique_token_index,
+                                         log_indices):
         """
         Returns a dict where the key corresponds to the token while
         the value is a list of log entry indices.
@@ -124,15 +133,17 @@ class Iplom(LogParser):
 
     def _get_least_unique_token_index(self, tokenized_log_entries):
         """
-        Returns: (1) the index corresponding to the token position with the least
-        number of unique tokens as well as (2) the set of corresponding tokens.
+        Returns: (1) the index corresponding to the token position with the
+        least number of unique tokens as well as (2) the set of corresponding
+        tokens.
         """
         unique_tokens = self._get_unique_tokens(tokenized_log_entries)
         least_unique_col_idx = None
         least_unique_col_count = None
         for idx in unique_tokens:
             count = len(unique_tokens[idx])
-            if (least_unique_col_idx is None) or (count < least_unique_col_count):
+            if (least_unique_col_idx is None) or (
+                    count < least_unique_col_count):
                 least_unique_col_idx = idx
                 least_unique_col_count = count
         return least_unique_col_idx
@@ -157,11 +168,13 @@ class Iplom(LogParser):
         bijection_partitions = Partitions(self.tokenized_log_entries)
         for partition_item in self.partitions:
             log_indices = deepcopy(partition_item.log_indices)
-            p_in = deepcopy(self._get_tokenized_log_entries_from_indices(log_indices))
+            p_in = deepcopy(
+                self._get_tokenized_log_entries_from_indices(log_indices))
 
             # Check for goodness threshold and token entry size
             partition_goodness = self._get_partition_goodness(p_in)
-            if partition_goodness >= self.goodness_threshold or len(p_in[0]) < 2:
+            if partition_goodness >= self.goodness_threshold or len(
+                    p_in[0]) < 2:
                 bijection_partitions.add(log_indices, 2)
                 continue
 
@@ -174,20 +187,23 @@ class Iplom(LogParser):
 
             for token in p1_token_mapping:
                 mapping_finder.update_relevant_token_sets(token)
-                token_sets = {p1: mapping_finder.domain_set, p2: mapping_finder.codomain_set}
+                token_sets = {p1: mapping_finder.domain_set,
+                              p2: mapping_finder.codomain_set}
                 map_type = self._get_map_type(token_sets[p1], token_sets[p2])
                 if map_type == MAP.ONE_TO_ONE:
                     split_pos = p1
                 elif map_type == MAP.ONE_TO_MANY:
                     s_temp = token_sets[p2]
-                    split_rank = self._get_rank_positions(p_in, p2, s_temp, True)
+                    split_rank = self._get_rank_positions(p_in, p2, s_temp,
+                                                          True)
                     if split_rank == 1:
                         split_pos = p1
                     else:
                         split_pos = p2
                 elif map_type == MAP.MANY_TO_ONE:
                     s_temp = token_sets[p1]
-                    split_rank = self._get_rank_positions(p_in, p1, s_temp, False)
+                    split_rank = self._get_rank_positions(p_in, p1, s_temp,
+                                                          False)
                     if split_rank == 2:
                         split_pos = p2
                     else:
@@ -210,7 +226,8 @@ class Iplom(LogParser):
                         split_token = tokenized_log_entry[split_pos]
                         if split_token not in tmp_partitions[split_pos]:
                             tmp_partitions[split_pos][split_token] = []
-                        tmp_partitions[split_pos][split_token].append(log_indices[idx])
+                        tmp_partitions[split_pos][split_token].append(
+                            log_indices[idx])
                         indices_to_delete.append(idx)
 
                 delete_indices_from_list(log_indices, indices_to_delete)
@@ -224,7 +241,8 @@ class Iplom(LogParser):
             for split_pos in tmp_partitions:
                 for split_token in tmp_partitions[split_pos]:
                     child_partition = tmp_partitions[split_pos][split_token]
-                    partition_support = len(child_partition) / len(partition_item.log_indices)
+                    partition_support = len(child_partition) / len(
+                        partition_item.log_indices)
                     if partition_support < self.partition_threshold:
                         outlier_log_indices.extend(child_partition)
                     else:
@@ -287,7 +305,8 @@ class Iplom(LogParser):
             partition_line_count = len(log_indices)
             file_support = partition_line_count / total_line_count
             # if file_support < self.file_threshold:
-            #     highest_pruned_step = max(highest_pruned_step, partition_item.step)
+            #     highest_pruned_step = max(highest_pruned_step,
+            #                               partition_item.step)
             #     pruned_log_indices.extend(log_indices)
             # else:
             #     pruned_partitions.add(log_indices, partition_item.step)
@@ -302,22 +321,33 @@ class Iplom(LogParser):
 
     def _determine_p1_and_p2(self, tokenized_log_entries, step):
         """
-        Returns the indices of the two most frequent unique token count positions.
+        Returns the indices of the two most frequent unique token count
+        positions.
         """
         if len(tokenized_log_entries[0]) == 2:
             return 0, 1
         elif len(tokenized_log_entries[0]) > 2:
             unique_tokens = self._get_unique_tokens(tokenized_log_entries)
             card_to_idx_map = self._get_cardinality_to_index_map(unique_tokens)
-            card_to_freq_tuples = self._get_cardinality_to_freq_tuple(card_to_idx_map)
+            card_to_freq_tuples = self._get_cardinality_to_freq_tuple(
+                card_to_idx_map)
             if step == 2:
-                filtered_card_to_freq_tuples = filter(lambda x: x[0] != 1, card_to_freq_tuples)
-                max_freq_card_to_freq_tuples = get_n_sorted(2, filtered_card_to_freq_tuples,
-                                                            key=lambda x: x[1], get_max=True)
+                filtered_card_to_freq_tuples = filter(lambda x: x[0] != 1,
+                                                      card_to_freq_tuples)
+                max_freq_card_to_freq_tuples = \
+                    get_n_sorted(2,
+                                 filtered_card_to_freq_tuples,
+                                 key=lambda x: x[1],
+                                 get_max=True)
 
-                if len(max_freq_card_to_freq_tuples) < 2 and max_freq_card_to_freq_tuples[0][1] < 2:
-                    max_freq_card_to_freq_tuples = get_n_sorted(2, card_to_freq_tuples,
-                                                                key=lambda x: x[1], get_max=True)
+                if len(max_freq_card_to_freq_tuples) < 2 and \
+                        max_freq_card_to_freq_tuples[0][1] < 2:
+                    max_freq_card_to_freq_tuples = \
+                        get_n_sorted(2,
+                                     card_to_freq_tuples,
+                                     key=lambda x: x[
+                                         1],
+                                     get_max=True)
 
                 if max_freq_card_to_freq_tuples[0][1] > 1:
                     max_freq_card = max_freq_card_to_freq_tuples[0][0]
@@ -329,12 +359,16 @@ class Iplom(LogParser):
                         [card_to_idx_map[max_freq_card][0],
                          card_to_idx_map[second_max_freq_card][0]])
                 else:
-                    raise Exception('Error trying to calculate most frequent cardinalities')
+                    raise Exception(
+                        'Error trying to calculate most frequent cardinalities')
             else:
-                min_card_card_to_freq_tuples = get_n_sorted(2, card_to_freq_tuples,
-                                                            key=lambda x: x[0], get_max=False)
+                min_card_card_to_freq_tuples = get_n_sorted(2,
+                                                            card_to_freq_tuples,
+                                                            key=lambda x: x[0],
+                                                            get_max=False)
                 min_tuple, sec_min_tuple = min_card_card_to_freq_tuples
-                return sorted([card_to_idx_map[min_tuple[0]][0], card_to_idx_map[sec_min_tuple[0]][0]])
+                return sorted([card_to_idx_map[min_tuple[0]][0],
+                               card_to_idx_map[sec_min_tuple[0]][0]])
 
         else:
             raise Exception('Invalid log entry length')
@@ -344,13 +378,14 @@ class Iplom(LogParser):
         Returns 2-tuple where first element is a cardinality and the second
         element is the frequency of the associated cardinality.
         """
-        return [(cardinality, len(cardinality_to_idx_map[cardinality])) for cardinality in
+        return [(cardinality, len(cardinality_to_idx_map[cardinality])) for
+                cardinality in
                 cardinality_to_idx_map]
 
     def _get_cardinality_to_index_map(self, unique_tokens):
         """
-        Returns a dictionary where the key is the cardinality count and the value
-        is a list of token positions associated to that count.
+        Returns a dictionary where the key is the cardinality count and the
+        value is a list of token positions associated to that count.
         """
         cardinality_count = {}
         for idx in unique_tokens:
@@ -375,7 +410,8 @@ class Iplom(LogParser):
 
     def _get_map_type(self, domain_token_set, codomain_token_set):
         """
-        Returns the map type given the associated token sets for a particular token.
+        Returns the map type given the associated token sets for a particular
+        token.
         """
         if len(domain_token_set) == len(codomain_token_set) == 1:
             return MAP.ONE_TO_ONE
@@ -413,8 +449,10 @@ class Iplom(LogParser):
         """
         for partition_item in self.partitions:
             log_indices = partition_item.log_indices
-            log_entries = self._get_tokenized_log_entries_from_indices(log_indices)
-            constant_token_indices = self._get_constant_token_indices(log_entries)
+            log_entries = self._get_tokenized_log_entries_from_indices(
+                log_indices)
+            constant_token_indices = self._get_constant_token_indices(
+                log_entries)
             cluster_template_tokens = []
             for idx in range(len(log_entries[0])):
                 if idx in constant_token_indices:
@@ -427,7 +465,8 @@ class Iplom(LogParser):
 
     def _get_constant_token_indices(self, log_entries):
         """
-        Gets the token indices that represent constant tokens for a given partition.
+        Gets the token indices that represent constant tokens for a given
+        partition.
         """
         reference_tokens = log_entries[0]
         constant_token_indices = set()

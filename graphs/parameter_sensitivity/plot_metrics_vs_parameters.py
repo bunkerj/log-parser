@@ -1,5 +1,6 @@
 """
-Plot the various parameters against both their corresponding accuracies and timings.
+Plot the various parameters against both their corresponding accuracies and
+timings.
 """
 from graphs.utils import load_results
 import matplotlib.pyplot as plt

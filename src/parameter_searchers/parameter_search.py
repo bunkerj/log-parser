@@ -29,13 +29,15 @@ class ParameterSearch(ABC):
                 self.best_accuracy = current_accuracy
 
             if self.verbose:
-                self._print_status(current_accuracy, current_iteration, parameter_tuple, total_iterations)
+                self._print_status(current_accuracy, current_iteration,
+                                   parameter_tuple, total_iterations)
 
             self.best_accuracy_history.append(self.best_accuracy)
             current_iteration += 1
 
-    def _print_status(self, current_accuracy, current_iteration, parameter_tuple, total_iterations):
-        msg = '{}/{} ---- Best Accuracy: {} ---- Current Accuracy: {} ---- Current Parameters: {}'
+    def _print_status(self, current_accuracy, current_iteration,
+                      parameter_tuple, total_iterations):
+        msg = '{}/{} -- Best Acc: {} -- Current Acc: {} -- Current Params: {}'
         filled_msg = msg.format(current_iteration,
                                 total_iterations,
                                 self.best_accuracy,
@@ -49,7 +51,8 @@ class ParameterSearch(ABC):
         self.best_accuracy_history = []
 
     def print_results(self):
-        print('\n---- Best Parameters (Accuracy: {}) ----'.format(self.best_accuracy))
+        print('\n---- Best Parameters (Accuracy: {}) ----'.format(
+            self.best_accuracy))
         for name in self.best_parameters_dict:
             value = self.best_parameters_dict[name]
             print('{}: {}'.format(name, value))
@@ -61,6 +64,7 @@ class ParameterSearch(ABC):
     @abstractmethod
     def _get_parameter_tuples(self):
         """
-        Returns list of tuples where each tuple represents a parameter configuration.
+        Returns list of tuples where each tuple represents a parameter
+        configuration.
         """
         pass

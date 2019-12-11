@@ -1,5 +1,6 @@
 """
-Print and save the accuracies of the listed datasets using IPLoM with fixed parameters.
+Print and save the accuracies of the listed datasets using IPLoM with fixed
+parameters.
 """
 from exp.utils import get_final_dataset_accuracies, dump_results
 from src.parsers.iplom import Iplom

@@ -1,6 +1,3 @@
-from src.utils import read_csv
-
-
 class Evaluator:
     def __init__(self, true_assignments, parsed_results):
         self.true_assignments = true_assignments
@@ -13,7 +10,8 @@ class Evaluator:
         for template in self.template_parsed:
             parsed_entry_indices = self.template_parsed[template]
             parsed_template_count = len(parsed_entry_indices)
-            truth_templates = self._get_truth_templates_from_parsed(parsed_entry_indices)
+            truth_templates = self._get_truth_templates_from_parsed(
+                parsed_entry_indices)
             if len(truth_templates) == 1:
                 truth_template = truth_templates[0]
                 truth_template_count = len(self.template_truth[truth_template])

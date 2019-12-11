@@ -1,9 +1,11 @@
 """
-Print and save the accuracies of the listed datasets using Drain with random search.
+Print and save the accuracies of the listed datasets using Drain with random
+search.
 """
 from exp.utils import get_final_dataset_accuracies, dump_results
 from src.data_config import DataConfigs
-from src.parameter_searchers.parameter_random_searcher import ParameterRandomSearcher
+from src.parameter_searchers.parameter_random_searcher import \
+    ParameterRandomSearcher
 from src.parsers.drain import Drain
 
 N_RUNS = 10
@@ -33,9 +35,11 @@ parameter_ranges_dict = {
     'sim_threshold': (0.1, 0.9),
 }
 
-parameter_searcher = ParameterRandomSearcher(Drain, parameter_ranges_dict, n_runs=N_RUNS)
-final_best_accuracies = get_final_dataset_accuracies(Drain,
-                                                     data_set_configs,
-                                                     parameter_searcher=parameter_searcher)
+parameter_searcher = ParameterRandomSearcher(Drain, parameter_ranges_dict,
+                                             n_runs=N_RUNS)
+final_best_accuracies = \
+    get_final_dataset_accuracies(Drain,
+                                 data_set_configs,
+                                 parameter_searcher=parameter_searcher)
 
 dump_results('drain_dataset_comparison_random.p', final_best_accuracies)

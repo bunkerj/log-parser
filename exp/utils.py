@@ -14,7 +14,8 @@ def get_final_dataset_accuracies(Parser_class,
     for data_set_config in data_set_configs:
         data_manager = DataManager(data_set_config)
         tokenized_log_entries = data_manager.get_tokenized_log_entries()
-        true_assignments = get_template_assignments(data_set_config['assignments_path'])
+        true_assignments = get_template_assignments(
+            data_set_config['assignments_path'])
 
         if parameter_searcher is not None:
             parameter_searcher.search(tokenized_log_entries, true_assignments)

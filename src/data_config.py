@@ -4,7 +4,8 @@ class DataConfigs:
         'assignments_path': 'data/samples_2k/structured/Android_2k.log_structured.csv',
         'unstructured_path': 'data/samples_2k/unstructured/Android_2k.log',
         'log_format': '<Date> <Time>  <Pid>  <Tid> <Level> <Component>: <Content>',
-        'regex': [r'(/[\w-]+)+', r'([\w-]+\.){2,}[\w-]+', r'\b(\-?\+?\d+)\b|\b0[Xx][a-fA-F\d]+\b|\b[a-fA-F\d]{4,}\b'],
+        'regex': [r'(/[\w-]+)+', r'([\w-]+\.){2,}[\w-]+',
+                  r'\b(\-?\+?\d+)\b|\b0[Xx][a-fA-F\d]+\b|\b[a-fA-F\d]{4,}\b'],
     }
     Apache = {
         'name': 'Apache',
@@ -81,7 +82,8 @@ class DataConfigs:
         'assignments_path': 'data/samples_2k/structured/Proxifier_2k.log_structured.csv',
         'unstructured_path': 'data/samples_2k/unstructured/Proxifier_2k.log',
         'log_format': '\[<Time>\] <Program> - <Content>',
-        'regex': [r'<\d+\ssec', r'([\w-]+\.)+[\w-]+(:\d+)?', r'\d{2}:\d{2}(:\d{2})*', r'[KGTM]B'],
+        'regex': [r'<\d+\ssec', r'([\w-]+\.)+[\w-]+(:\d+)?',
+                  r'\d{2}:\d{2}(:\d{2})*', r'[KGTM]B'],
     }
     Spark = {
         'name': 'Spark',

@@ -1,12 +1,14 @@
 """
-Print and save the accuracies of a single Drain run on a target dataset (DATA_CONFIG) using random search.
+Print and save the accuracies of a single Drain run on a target dataset
+(DATA_CONFIG) using random search.
 """
 import matplotlib.pyplot as plt
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.utils import get_template_assignments
-from src.parameter_searchers.parameter_random_searcher import ParameterRandomSearcher
+from src.parameter_searchers.parameter_random_searcher import \
+    ParameterRandomSearcher
 
 N_RUNS = 30
 DATA_CONFIG = DataConfigs.BGL
@@ -21,7 +23,8 @@ parameter_ranges_dict = {
     'sim_threshold': (0.1, 0.9),
 }
 
-parameter_searcher = ParameterRandomSearcher(Drain, parameter_ranges_dict, verbose=True, n_runs=N_RUNS)
+parameter_searcher = ParameterRandomSearcher(Drain, parameter_ranges_dict,
+                                             verbose=True, n_runs=N_RUNS)
 parameter_searcher.search(tokenized_log_entries, true_assignments)
 
 best_accuracy_history = parameter_searcher.best_accuracy_history

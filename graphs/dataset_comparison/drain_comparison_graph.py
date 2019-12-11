@@ -1,8 +1,10 @@
 """
-Plots a histogram of Drain experiments (from the dataset_comparison directory) to compare the accuracies against the
-ones acquired from the LogPAI open source benchmark.
+Plots a histogram of Drain experiments (from the dataset_comparison directory)
+to compare the accuracies against the ones acquired from the LogPAI open source
+benchmark.
 
-In the comments, are the results as reported by the associated benchmark paper from Zhu et al., 2019.
+In the comments, are the results as reported by the associated benchmark paper
+from Zhu et al., 2019.
 """
 
 from graphs.utils import show_dataset_comparison_graph, load_results

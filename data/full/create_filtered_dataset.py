@@ -2,8 +2,8 @@
 Create a new dataset from a base dataset (DATA_CONFIG) and its corresponding template assignment file
 (TEMPLATE_ASSIGNMENT_PATH).
 
-The new dataset is created by filtering the base dataset lines that do not have a template assignment (i.e has a
-template index of -1).
+The new dataset is created by filtering the base dataset lines that do not have
+a template assignment (i.e has a template index of -1).
 """
 from src.data_config import DataConfigs
 from data.full.utils import read_template_assignments_from_file
@@ -11,11 +11,13 @@ from src.helpers.data_manager import DataManager
 
 DATA_CONFIG = DataConfigs.BGL_FULL
 TEMPLATE_ASSIGNMENT_PATH = DATA_CONFIG['assignments_path']
-OUTPUT_PATH = 'data/full/unstructured/{}_filtered.log'.format(DATA_CONFIG['name'])
+OUTPUT_PATH = 'data/full/unstructured/{}_filtered.log'.format(
+    DATA_CONFIG['name'])
 
 data_manager = DataManager(DATA_CONFIG)
 raw_log_entries = data_manager.get_raw_log_entries()
-template_assignments = read_template_assignments_from_file(TEMPLATE_ASSIGNMENT_PATH)
+template_assignments = read_template_assignments_from_file(
+    TEMPLATE_ASSIGNMENT_PATH)
 input_line_count = len(raw_log_entries)
 output_line_count = 0
 
