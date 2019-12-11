@@ -21,7 +21,7 @@ def plot_graphs_for_single_metric(data, metric_name, row_idx, n_rows):
 
 
 plt.title('Scatter Plots of Timings and Accuracy over Parameters')
-plot_graphs_for_single_metric(morris_data, 'accuracies', 1, 2)
-plot_graphs_for_single_metric(morris_data, 'timings', 2, 2)
+plot_graphs_for_single_metric(morris_data, 'accuracy', 1, 2)
+plot_graphs_for_single_metric(morris_data, 'timing', 2, 2)
 plt.tight_layout()
 plt.show()
