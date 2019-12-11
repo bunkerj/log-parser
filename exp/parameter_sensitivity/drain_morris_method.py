@@ -1,7 +1,8 @@
 """
-Generate the time taken in minutes and accuracies for corresponding randomly sampled Drain configurations.
+Generate the time taken in minutes and accuracies for corresponding sampled Drain configurations.
 
-Also provide additional data such as parameter names and bounds for SALib.
+The goal is to fill the "morris_data" dictionary with: timings, accuracies, parameter names, parameter configurations,
+and the Morris sensitivity indices for the timings and accuracies.
 """
 import numpy as np
 from time import time
@@ -36,10 +37,12 @@ problem = {
 }
 
 morris_data = {
-    'timings': [],
-    'accuracies': [],
+    'timing': [],
+    'accuracy': [],
+    'parameter_names': list(parameter_ranges_dict.keys()),
     'parameters': sample(problem, N_TRAJECTORIES, num_levels=NUM_LEVELS),
-    'sensitivity_indices': None,
+    'accuracy_sens_indices': None,
+    'timing_sens_indices': None,
 }
 
 for idx, parameter_tuple in enumerate(morris_data['parameters']):
@@ -54,13 +57,19 @@ for idx, parameter_tuple in enumerate(morris_data['parameters']):
     evaluator = Evaluator(true_assignments, parser.cluster_templates)
     accuracy = evaluator.evaluate()
 
-    morris_data['timings'].append(minutes_to_parse)
-    morris_data['accuracies'].append(accuracy)
+    morris_data['timing'].append(minutes_to_parse)
+    morris_data['accuracy'].append(accuracy)
 
 # Perform analysis
-morris_data['sensitivity_indices'] = analyze(problem,
+morris_data['accuracy_sens_indices'] = analyze(problem,
+                                               morris_data['parameters'],
+                                               np.array(morris_data['accuracy']),
+                                               conf_level=CONF_LEVEL,
+                                               num_levels=NUM_LEVELS)
+
+morris_data['timing_sens_indices'] = analyze(problem,
                                              morris_data['parameters'],
-                                             np.array(morris_data['accuracies']),
+                                             np.array(morris_data['timing']),
                                              conf_level=CONF_LEVEL,
                                              num_levels=NUM_LEVELS)
 

@@ -1,8 +1,12 @@
+"""
+Plot the Morris sensitivity indices using a scatter plot.
+"""
+
 from graphs.utils import load_results
 import matplotlib.pyplot as plt
 
 morris_data = load_results('drain_morris_data.p')
-sensitivity_indices = morris_data['sensitivity_indices']
+sensitivity_indices = morris_data['accuracy_sens_indices']
 
 plt.scatter(sensitivity_indices['mu_star'], sensitivity_indices['sigma'], marker='x')
 
