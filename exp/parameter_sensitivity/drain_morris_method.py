@@ -17,8 +17,8 @@ from SALib.sample.morris import sample
 
 NUM_LEVELS = 4
 CONF_LEVEL = 0.95
-N_TRAJECTORIES = 10
-DATA_CONFIG = DataConfigs.BGL
+N_TRAJECTORIES = 100
+DATA_CONFIG = DataConfigs.BGL_FULL
 
 parameter_ranges_dict = {
     'Max Depth': (3, 8),
@@ -60,17 +60,18 @@ for idx, parameter_tuple in enumerate(morris_data['parameters']):
     morris_data['timing'].append(minutes_to_parse)
     morris_data['accuracy'].append(accuracy)
 
-# Perform analysis
-morris_data['accuracy_sens_indices'] = analyze(problem,
-                                               morris_data['parameters'],
-                                               np.array(morris_data['accuracy']),
-                                               conf_level=CONF_LEVEL,
-                                               num_levels=NUM_LEVELS)
+morris_data['accuracy_sens_indices'] = \
+    analyze(problem,
+            morris_data['parameters'],
+            np.array(morris_data['accuracy']),
+            conf_level=CONF_LEVEL,
+            num_levels=NUM_LEVELS)
 
-morris_data['timing_sens_indices'] = analyze(problem,
-                                             morris_data['parameters'],
-                                             np.array(morris_data['timing']),
-                                             conf_level=CONF_LEVEL,
-                                             num_levels=NUM_LEVELS)
+morris_data['timing_sens_indices'] = \
+    analyze(problem,
+            morris_data['parameters'],
+            np.array(morris_data['timing']),
+            conf_level=CONF_LEVEL,
+            num_levels=NUM_LEVELS)
 
 dump_results('drain_morris_data.p', morris_data)
