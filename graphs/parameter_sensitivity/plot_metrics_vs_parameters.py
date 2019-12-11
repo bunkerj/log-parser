@@ -12,6 +12,7 @@ def plot_graphs_for_single_metric(data, metric_name, row_idx, n_rows):
         n_col = data['parameters'].shape[1]
         subplot_idx = (row_idx - 1) * n_col + parameter_idx + 1
         plt.subplot(n_rows, n_col, subplot_idx)
+        plt.title('{} vs {}'.format(metric_name.capitalize(), name))
         plt.xlabel(name)
         plt.ylabel(metric_name.capitalize())
         plt.grid()
