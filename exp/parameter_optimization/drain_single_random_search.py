@@ -2,7 +2,7 @@
 Print and save the accuracies of a single Drain run on a target dataset
 (DATA_CONFIG) using random search.
 """
-import matplotlib.pyplot as plt
+from exp.utils import dump_results
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
@@ -26,15 +26,6 @@ parameter_ranges_dict = {
 parameter_searcher = ParameterRandomSearcher(Drain, parameter_ranges_dict,
                                              verbose=True, n_runs=N_RUNS)
 parameter_searcher.search(tokenized_log_entries, true_assignments)
-
 best_accuracy_history = parameter_searcher.best_accuracy_history
-accuracy_indices = range(1, len(best_accuracy_history) + 1)
 
-print('\nFinal Best Accuracy: {}'.format(best_accuracy_history[-1]))
-
-plt.plot(accuracy_indices, best_accuracy_history)
-plt.title('Drain Accuracy Over Number of Random Samples')
-plt.ylabel('Accuracy')
-plt.xlabel('Number of Samples')
-plt.grid()
-plt.show()
+dump_results('best_random_search_accuracy_history.p', best_accuracy_history)
