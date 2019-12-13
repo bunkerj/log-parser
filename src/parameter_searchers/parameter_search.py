@@ -14,6 +14,7 @@ class ParameterSearch(ABC):
     def search(self, tokenized_log_entries, true_assignments):
         self._reset_dynamic_fields()
         current_iteration = 1
+        evaluator = Evaluator(true_assignments)
         parameter_tuples = self._get_parameter_tuples()
         total_iterations = len(parameter_tuples)
         for parameter_tuple in parameter_tuples:
@@ -21,8 +22,7 @@ class ParameterSearch(ABC):
             parser = self.Parser_class(tokenized_log_entries, **parameter_dict)
             parser.parse()
 
-            evaluator = Evaluator(true_assignments, parser.cluster_templates)
-            current_accuracy = evaluator.evaluate()
+            current_accuracy = evaluator.evaluate(parser.cluster_templates)
 
             if current_accuracy > self.best_accuracy:
                 self.best_parameters_dict = parameter_dict

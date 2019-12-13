@@ -23,7 +23,7 @@ parser.parse()
 parser.print_cluster_templates()
 
 true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
-evaluator = Evaluator(true_assignments, parser.cluster_templates)
-accuracy = evaluator.evaluate()
+evaluator = Evaluator(true_assignments)
+accuracy = evaluator.evaluate(parser.cluster_templates)
 
 print('Final IPLoM Accuracy: {}'.format(accuracy))

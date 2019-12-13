@@ -1,14 +1,13 @@
 class Evaluator:
-    def __init__(self, true_assignments, parsed_results):
+    def __init__(self, true_assignments):
         self.true_assignments = true_assignments
         self.template_truth = self._get_template_truth(true_assignments)
-        self.template_parsed = parsed_results
         self.total_lines = len(true_assignments)
 
-    def evaluate(self):
+    def evaluate(self, template_parsed):
         num_correct_lines = 0
-        for template in self.template_parsed:
-            parsed_entry_indices = self.template_parsed[template]
+        for template in template_parsed:
+            parsed_entry_indices = template_parsed[template]
             parsed_template_count = len(parsed_entry_indices)
             truth_templates = self._get_truth_templates_from_parsed(
                 parsed_entry_indices)

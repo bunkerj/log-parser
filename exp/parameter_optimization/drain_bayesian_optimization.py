@@ -15,6 +15,7 @@ PARAMETER_BOUNDS = [(3, 8), (20, 100), (0.1, 0.9)]
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
 true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
+evaluator = Evaluator(true_assignments)
 
 
 def get_cumulative_best_accuracies(loss_func_evaluations):
@@ -25,8 +26,7 @@ def get_cumulative_best_accuracies(loss_func_evaluations):
 def loss_function(parameters):
     parser = Drain(tokenized_log_entries, *parameters)
     parser.parse()
-    evaluator = Evaluator(true_assignments, parser.cluster_templates)
-    return -evaluator.evaluate()
+    return -evaluator.evaluate(parser.cluster_templates)
 
 
 average_best_accuracy_history = [0] * N_CALLS

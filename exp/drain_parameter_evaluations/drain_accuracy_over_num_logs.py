@@ -31,9 +31,8 @@ for run in range(N_RUNS):
         parser.single_parse()
         if end_idx % JUMP_SIZE == 0 or end_idx == len(tokenized_log_entries):
             parser.discover_cluster_templates()
-            evaluator = Evaluator(true_assignments[:end_idx],
-                                  parser.cluster_templates)
-            accuracy = evaluator.evaluate()
+            evaluator = Evaluator(true_assignments[:end_idx])
+            accuracy = evaluator.evaluate(parser.cluster_templates)
             if run == 0:
                 accuracies.append(accuracy / N_RUNS)
                 end_indices.append(end_idx)

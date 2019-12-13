@@ -21,8 +21,8 @@ parser.parse()
 minutes_to_parse = (time() - start_time) / 60
 
 start_time = time()
-evaluator = Evaluator(true_assignments, parser.cluster_templates)
-accuracy = evaluator.evaluate()
+evaluator = Evaluator(true_assignments)
+accuracy = evaluator.evaluate(parser.cluster_templates)
 minutes_to_evaluate = (time() - start_time) / 60
 
 print('Final Drain Accuracy: {}'.format(accuracy))

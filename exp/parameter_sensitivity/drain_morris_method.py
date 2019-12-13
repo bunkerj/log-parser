@@ -31,6 +31,7 @@ parameter_ranges_dict = {
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
 true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
+evaluator = Evaluator(true_assignments)
 
 problem = {
     'num_vars': len(parameter_ranges_dict),
@@ -56,8 +57,7 @@ for idx, parameter_tuple in enumerate(morris_data['parameters']):
     parser.parse()
     minutes_to_parse = (time() - start_time) / 60
 
-    evaluator = Evaluator(true_assignments, parser.cluster_templates)
-    accuracy = evaluator.evaluate()
+    accuracy = evaluator.evaluate(parser.cluster_templates)
 
     morris_data['timing'].append(minutes_to_parse)
     morris_data['accuracy'].append(accuracy)

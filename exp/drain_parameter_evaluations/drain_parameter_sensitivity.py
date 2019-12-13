@@ -28,6 +28,7 @@ parameter_ranges_dict = {
 accuracies = {}
 tree_depths = list(range(3, 30, 1))
 true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
+evaluator = Evaluator(true_assignments)
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
@@ -41,10 +42,10 @@ for parameter_field in parameter_ranges_dict:
         parser = Drain(tokenized_log_entries, **base_config_copy)
         parser.parse()
 
-        evaluator = Evaluator(true_assignments, parser.cluster_templates)
         if parameter_field not in accuracies:
             accuracies[parameter_field] = []
-        accuracies[parameter_field].append(evaluator.evaluate())
+        accuracies[parameter_field].append(
+            evaluator.evaluate(parser.cluster_templates))
 
 boxplot_data = [
     accuracies['max_depth'],
