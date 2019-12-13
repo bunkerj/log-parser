@@ -2,3 +2,4 @@ SALib
 matplotlib
 pandas
 numpy
+scikit-optimize
