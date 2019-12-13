@@ -9,6 +9,7 @@ from src.utils import get_template_assignments
 
 N_RUNS = 5
 N_CALLS = 30
+ACQ_FUNC = 'EI'
 DATA_CONFIG = DataConfigs.BGL_FULL
 PARAMETER_BOUNDS = [(3, 8), (20, 100), (0.1, 0.9)]
 
@@ -34,7 +35,7 @@ average_best_accuracy_history = [0] * N_CALLS
 for run in range(N_RUNS):
     res = gp_minimize(loss_function,
                       PARAMETER_BOUNDS,
-                      acq_func='EI',
+                      acq_func=ACQ_FUNC,
                       n_calls=N_CALLS,
                       n_random_starts=5,
                       random_state=randint(1, 1000000))
@@ -47,5 +48,6 @@ for run in range(N_RUNS):
         current_best_accuracy_history,
         N_RUNS)
 
-dump_results('average_best_bayes_opt_accuracy_history.p',
+filename_template = 'average_best_bayes_opt_accuracy_history_{}.p'
+dump_results(filename_template.format(ACQ_FUNC),
              average_best_accuracy_history)
