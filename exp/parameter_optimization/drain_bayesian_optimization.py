@@ -1,12 +1,14 @@
+from random import randint
 from skopt import gp_minimize
-from exp.utils import dump_results
+from exp.utils import dump_results, update_average_list
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
 from src.parsers.drain import Drain
 from src.utils import get_template_assignments
 
-N_RUNS = 30
+N_RUNS = 5
+N_CALLS = 30
 DATA_CONFIG = DataConfigs.BGL_FULL
 PARAMETER_BOUNDS = [(3, 8), (20, 100), (0.1, 0.9)]
 
@@ -27,13 +29,23 @@ def loss_function(parameters):
     return -evaluator.evaluate()
 
 
-res = gp_minimize(loss_function,
-                  PARAMETER_BOUNDS,
-                  acq_func='EI',
-                  n_calls=N_RUNS,
-                  n_random_starts=5,
-                  random_state=123)
+average_best_accuracy_history = [0] * N_CALLS
 
-best_accuracy_history = get_cumulative_best_accuracies(res.func_vals)
+for run in range(N_RUNS):
+    res = gp_minimize(loss_function,
+                      PARAMETER_BOUNDS,
+                      acq_func='EI',
+                      n_calls=N_CALLS,
+                      n_random_starts=5,
+                      random_state=randint(1, 1000000))
 
-dump_results('best_bayes_opt_accuracy_history.p', best_accuracy_history)
+    current_best_accuracy_history = \
+        get_cumulative_best_accuracies(res.func_vals)
+
+    average_best_accuracy_history = update_average_list(
+        average_best_accuracy_history,
+        current_best_accuracy_history,
+        N_RUNS)
+
+dump_results('average_best_bayes_opt_accuracy_history.p',
+             average_best_accuracy_history)

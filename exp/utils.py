@@ -43,3 +43,9 @@ def dump_results(name, results):
         os.makedirs(RESULTS_DIR)
     path = os.path.join(RESULTS_DIR, name)
     pickle.dump(results, open(path, 'wb'))
+
+
+def update_average_list(current_average, new_list, n):
+    for idx in range(len(current_average)):
+        current_average[idx] += (new_list[idx] / n)
+    return current_average
