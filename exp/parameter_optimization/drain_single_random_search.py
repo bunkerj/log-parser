@@ -12,7 +12,7 @@ from src.parameter_searchers.parameter_random_searcher import \
 
 N_RUNS = 5
 N_CALLS = 30
-DATA_CONFIG = DataConfigs.BGL
+DATA_CONFIG = DataConfigs.BGL_FULL
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
