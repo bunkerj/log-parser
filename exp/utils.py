@@ -19,20 +19,22 @@ def get_final_dataset_accuracies(Parser_class,
 
         if parameter_searcher is not None:
             parameter_searcher.search(tokenized_log_entries, true_assignments)
-            parser = Parser_class(tokenized_log_entries,
-                                  **parameter_searcher.best_parameters_dict)
+            parameters = tuple(parameter_searcher.best_parameters_dict.values())
         elif fixed_configs is not None:
-            parser = Parser_class(tokenized_log_entries,
-                                  *fixed_configs[data_set_config['name']])
+            parameters = fixed_configs[data_set_config['name']]
         else:
             raise Exception('Invalid configuration setup')
+
+        parser = Parser_class(tokenized_log_entries, *parameters)
 
         parser.parse()
 
         evaluator = Evaluator(true_assignments)
         accuracy = evaluator.evaluate(parser.cluster_templates)
 
-        print('Final {} Accuracy: {}'.format(data_set_config['name'], accuracy))
+        print('{}: Final {} Accuracy: {}'.format(parameters,
+                                                 data_set_config['name'],
+                                                 accuracy))
         final_accuracies[data_set_config['name']] = accuracy
 
     return final_accuracies
