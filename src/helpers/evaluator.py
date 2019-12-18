@@ -38,6 +38,7 @@ class Evaluator:
         self.template_evaluations = []
 
     def evaluate(self, template_parsed):
+        self.template_evaluations = []
         for template, parsed_indices in template_parsed.items():
             template_eval = TemplateEvaluation(template)
             truth_templates = self._get_truth_templates(parsed_indices)
