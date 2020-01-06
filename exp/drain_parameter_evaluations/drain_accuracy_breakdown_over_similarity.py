@@ -26,10 +26,9 @@ for sim_threshold in sim_thresholds:
     parser.parse()
     cluster_templates = parser.cluster_templates
 
-    evaluator.evaluate(cluster_templates)
+    accuracy = evaluator.evaluate(cluster_templates)
     type1_error_ratio = evaluator.get_type1_error_ratio()
     type2_error_ratio = evaluator.get_type2_error_ratio()
-    accuracy = 1 - type1_error_ratio - type2_error_ratio
 
     type1_error_ratios.append(type1_error_ratio)
     type2_error_ratios.append(type2_error_ratio)
