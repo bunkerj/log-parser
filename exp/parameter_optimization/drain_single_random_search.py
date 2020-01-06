@@ -11,7 +11,7 @@ from src.parameter_searchers.parameter_random_searcher import \
     ParameterRandomSearcher
 
 N_RUNS = 5
-N_CALLS = 30
+N_CALLS = 10
 DATA_CONFIG = DataConfigs.BGL_FULL
 
 data_manager = DataManager(DATA_CONFIG)
@@ -21,7 +21,7 @@ true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
 parameter_ranges_dict = {
     'max_depth': (3, 8),
     'max_child': (20, 100),
-    'sim_threshold': (0.1, 0.9),
+    'sim_threshold': (0.1, 0.6),
 }
 
 average_best_accuracy_history = [0] * N_CALLS
@@ -38,5 +38,5 @@ for run in range(N_RUNS):
         current_best_accuracy_history,
         N_RUNS)
 
-dump_results('average_best_random_search_accuracy_history.p',
+dump_results('average_best_random_search_full_accuracy_history.p',
              average_best_accuracy_history)
