@@ -1,8 +1,8 @@
 class TemplateEvaluation:
-    def __init__(self, parsed_template):
+    def __init__(self, parsed_template, actual_count):
         self.parsed_template = parsed_template
         self.truth_templates = []
-        self.actual_count = -1
+        self.actual_count = actual_count
         self.expected_count = -1
         self.is_correct = True
 
@@ -10,10 +10,9 @@ class TemplateEvaluation:
         self.truth_templates = truth_templates
         self.is_correct = len(truth_templates) == 1
 
-    def update_counts(self, actual_count, expected_count):
-        self.actual_count = actual_count
+    def update_expected_count(self, expected_count):
         self.expected_count = expected_count
-        self.is_correct = actual_count == expected_count
+        self.is_correct = self.actual_count == expected_count
 
     def print_discrepancies(self):
         print(self.parsed_template)
@@ -38,18 +37,44 @@ class Evaluator:
         self.template_evaluations = []
 
     def evaluate(self, template_parsed):
+        """
+        Updates the template_evaluations field and return the ratio of correct
+        lines.
+        """
         self.template_evaluations = []
         for template, parsed_indices in template_parsed.items():
-            template_eval = TemplateEvaluation(template)
+            actual_count = len(parsed_indices)
+            template_eval = TemplateEvaluation(template, actual_count)
             truth_templates = self._get_truth_templates(parsed_indices)
             template_eval.update_truth_templates(truth_templates)
             if len(truth_templates) == 1:
-                actual_count, expected_count = \
-                    self._get_template_counts(parsed_indices,
-                                              truth_templates)
-                template_eval.update_counts(actual_count, expected_count)
+                expected_count = len(self.template_truth[truth_templates[0]])
+                template_eval.update_expected_count(expected_count)
             self.template_evaluations.append(template_eval)
         return self._get_ratio_of_correct_lines()
+
+    def get_type1_error_ratio(self):
+        """
+        Returns the ratio of lines that belong to actual clusters which are
+        composed of lines from more than one true cluster.
+        """
+        error_line_count = 0
+        for template_eval in self.template_evaluations:
+            if len(template_eval.truth_templates) > 1:
+                error_line_count += template_eval.actual_count
+        return error_line_count / self.total_lines
+
+    def get_type2_error_ratio(self):
+        """
+        Returns the ratio of lines that belong to clusters that are missing at
+        least one entry (i.e. incomplete clusters).
+        """
+        error_line_count = 0
+        for template_eval in self.template_evaluations:
+            if len(template_eval.truth_templates) == 1 and \
+                    template_eval.actual_count != template_eval.expected_count:
+                error_line_count += template_eval.actual_count
+        return error_line_count / self.total_lines
 
     def _get_template_counts(self, parsed_entry_indices, truth_templates):
         truth_template_count = len(
