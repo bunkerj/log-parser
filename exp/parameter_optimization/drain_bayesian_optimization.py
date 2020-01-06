@@ -8,10 +8,10 @@ from src.parsers.drain import Drain
 from src.utils import get_template_assignments
 
 N_RUNS = 5
-N_CALLS = 30
+N_CALLS = 10
 ACQ_FUNC = 'EI'
 DATA_CONFIG = DataConfigs.BGL_FULL
-PARAMETER_BOUNDS = [(3, 8), (20, 100), (0.1, 0.9)]
+PARAMETER_BOUNDS = [(3, 8), (20, 100), (0.1, 0.6)]
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
@@ -48,6 +48,6 @@ for run in range(N_RUNS):
         current_best_accuracy_history,
         N_RUNS)
 
-filename_template = 'average_best_bayes_opt_accuracy_history_{}.p'
+filename_template = 'average_best_bayes_opt_full_accuracy_history_{}.p'
 dump_results(filename_template.format(ACQ_FUNC),
              average_best_accuracy_history)
