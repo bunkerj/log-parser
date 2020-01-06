@@ -8,7 +8,7 @@ from src.parameter_searchers.parameter_random_searcher import \
     ParameterRandomSearcher
 from src.parsers.drain import Drain
 
-N_RUNS = 10
+N_CALLS = 100
 
 data_set_configs = [
     DataConfigs.Android,
@@ -36,7 +36,7 @@ parameter_ranges_dict = {
 }
 
 parameter_searcher = ParameterRandomSearcher(Drain, parameter_ranges_dict,
-                                             n_runs=N_RUNS)
+                                             n_calls=N_CALLS)
 final_best_accuracies = \
     get_final_dataset_accuracies(Drain,
                                  data_set_configs,
