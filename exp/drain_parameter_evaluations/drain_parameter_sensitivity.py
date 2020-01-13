@@ -26,7 +26,6 @@ parameter_ranges_dict = {
 }
 
 accuracies = {}
-tree_depths = list(range(3, 30, 1))
 true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
 evaluator = Evaluator(true_assignments)
 

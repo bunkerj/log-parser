@@ -55,8 +55,8 @@ class Evaluator:
 
     def get_type1_error_ratio(self):
         """
-        Returns the ratio of lines that belong to actual clusters which are
-        composed of lines from more than one true cluster.
+        Returns the ratio of log entries which belong to generated clusters
+        that are composed of log entries from more than one true cluster.
         """
         error_line_count = 0
         for template_eval in self.template_evaluations:
@@ -66,8 +66,9 @@ class Evaluator:
 
     def get_type2_error_ratio(self):
         """
-        Returns the ratio of lines that belong to clusters that are missing at
-        least one entry (i.e. incomplete clusters).
+        Returns the ratio of log entries which belong to generated clusters
+        that are all from the same true cluster and are missing at least one
+        entry (i.e. incomplete clusters).
         """
         error_line_count = 0
         for template_eval in self.template_evaluations:
