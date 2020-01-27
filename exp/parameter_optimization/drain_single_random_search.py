@@ -10,9 +10,9 @@ from src.utils import get_template_assignments
 from src.parameter_searchers.parameter_random_searcher import \
     ParameterRandomSearcher
 
-N_RUNS = 5
 N_CALLS = 10
-DATA_CONFIG = DataConfigs.BGL_FULL
+N_RUNS_FOR_AVERAGING = 5
+DATA_CONFIG = DataConfigs.Proxifier
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
@@ -26,7 +26,7 @@ parameter_ranges_dict = {
 
 average_best_accuracy_history = [0] * N_CALLS
 
-for run in range(N_RUNS):
+for run in range(N_RUNS_FOR_AVERAGING):
     parameter_searcher = ParameterRandomSearcher(Drain, parameter_ranges_dict,
                                                  verbose=True, n_calls=N_CALLS)
 
@@ -36,7 +36,7 @@ for run in range(N_RUNS):
     average_best_accuracy_history = update_average_list(
         average_best_accuracy_history,
         current_best_accuracy_history,
-        N_RUNS)
+        N_RUNS_FOR_AVERAGING)
 
 dump_results('average_best_random_search_full_accuracy_history.p',
              average_best_accuracy_history)
