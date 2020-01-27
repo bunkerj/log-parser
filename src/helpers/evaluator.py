@@ -14,8 +14,10 @@ class TemplateEvaluation:
         self.expected_count = expected_count
         self.is_correct = self.actual_count == expected_count
 
-    def print_discrepancies(self):
+    def print_discrepancies(self, template_parsed):
         print(self.parsed_template)
+        print('Parsed log ids: {}'
+              .format(template_parsed[self.parsed_template]))
 
         if len(self.truth_templates) != 1:
             print('Discrepancy: more than one true templates')
@@ -86,7 +88,7 @@ class Evaluator:
     def print_all_discrepancies(self, template_parsed):
         self.evaluate(template_parsed)
         for template_eval in self._get_specific_templates_evals(False):
-            template_eval.print_discrepancies()
+            template_eval.print_discrepancies(template_parsed)
 
     def _get_ratio_of_correct_lines(self):
         correct_template_evals = self._get_specific_templates_evals(True)
