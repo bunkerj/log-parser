@@ -56,9 +56,9 @@ class DataManager:
         tokenized_log_entries = self._preprocess_raw_log_entries(log_df)
 
         for idx in log_indices:
-            print(raw_log_entries[idx])
-            print(tokenized_log_entries[idx])
-            print()
+            print('Log Id: {}'.format(idx))
+            print('\t{}'.format(raw_log_entries[idx]))
+            print('\t{}\n'.format(tokenized_log_entries[idx]))
 
     def _get_log_dataframe(self):
         headers, regex = self._generate_logformat_regex()
