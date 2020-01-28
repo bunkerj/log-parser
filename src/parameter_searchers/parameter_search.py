@@ -35,6 +35,9 @@ class ParameterSearch(ABC):
             self.best_accuracy_history.append(self.best_accuracy)
             current_iteration += 1
 
+    def get_optimal_parameter_tuple(self):
+        return tuple(self.best_parameters_dict.values())
+
     def _print_status(self, current_accuracy, current_iteration,
                       parameter_tuple, total_iterations):
         msg = '{}/{} -- Best Acc: {} -- Current Acc: {} -- Current Params: {}'

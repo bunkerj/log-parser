@@ -19,7 +19,7 @@ def get_final_dataset_accuracies(Parser_class,
 
         if parameter_searcher is not None:
             parameter_searcher.search(tokenized_log_entries, true_assignments)
-            parameters = tuple(parameter_searcher.best_parameters_dict.values())
+            parameters = parameter_searcher.get_optimal_parameter_tuple()
         elif fixed_configs is not None:
             parameters = fixed_configs[data_set_config['name']]
         else:
