@@ -1,6 +1,6 @@
 """
-Create a new dataset from a base dataset (DATA_CONFIG) and its corresponding template assignment file
-(TEMPLATE_ASSIGNMENT_PATH).
+Create a new dataset from a base dataset (DATA_CONFIG) and its corresponding
+template assignment file (TEMPLATE_ASSIGNMENT_PATH).
 
 The new dataset is created by filtering the base dataset lines that do not have
 a template assignment (i.e has a template index of -1).
@@ -15,15 +15,15 @@ OUTPUT_PATH = 'data/full/unstructured/{}_filtered.log'.format(
     DATA_CONFIG['name'])
 
 data_manager = DataManager(DATA_CONFIG)
-raw_log_entries = data_manager.get_raw_log_entries()
+raw_log_full_lines = data_manager.get_raw_log_full_lines()
 template_assignments = read_template_assignments_from_file(
     TEMPLATE_ASSIGNMENT_PATH)
-input_line_count = len(raw_log_entries)
+input_line_count = len(raw_log_full_lines)
 output_line_count = 0
 
-# Write only lines that have a valid template assignment
+# Only write lines that have a valid template assignment
 with open(OUTPUT_PATH, 'w+', encoding='utf-8') as output_file:
-    for idx, tokenized_log_entry in enumerate(raw_log_entries):
+    for idx, tokenized_log_entry in enumerate(raw_log_full_lines):
         log_entry = ' '.join(tokenized_log_entry)
         if template_assignments[idx] != '-1':
             output_file.write('{}\n'.format(log_entry))
@@ -31,4 +31,5 @@ with open(OUTPUT_PATH, 'w+', encoding='utf-8') as output_file:
 
 print('Input File: {} lines'.format(input_line_count))
 print('Output File: {} lines ({} filtered)'.format(output_line_count,
-                                                   input_line_count - output_line_count))
+                                                   input_line_count
+                                                   - output_line_count))
