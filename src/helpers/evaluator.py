@@ -86,9 +86,10 @@ class Evaluator:
         return parsed_template_count, truth_template_count
 
     def print_all_discrepancies(self, template_parsed):
-        self.evaluate(template_parsed)
+        result = self.evaluate(template_parsed)
         for template_eval in self._get_specific_templates_evals(False):
             template_eval.print_discrepancies(template_parsed)
+        print('Final accuracy: {}'.format(result))
 
     def _get_ratio_of_correct_lines(self):
         correct_template_evals = self._get_specific_templates_evals(True)
