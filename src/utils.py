@@ -1,5 +1,7 @@
 import csv
+import numpy as np
 from random import uniform
+from scipy.cluster.hierarchy import dendrogram
 
 
 def read_file(file_path):
@@ -77,3 +79,19 @@ def has_digit(token):
 def get_random_parameter_tuple(parameter_ranges_dict):
     return tuple(uniform(*parameter_ranges_dict[parameter_field])
                  for parameter_field in parameter_ranges_dict)
+
+
+def plot_dendrogram(model, **kwargs):
+    counts = np.zeros(model.children_.shape[0])
+    n_samples = len(model.labels_)
+    for i, merge in enumerate(model.children_):
+        current_count = 0
+        for child_idx in merge:
+            if child_idx < n_samples:
+                current_count += 1  # leaf node
+            else:
+                current_count += counts[child_idx - n_samples]
+        counts[i] = current_count
+    linkage_matrix = np.column_stack([model.children_, model.distances_,
+                                      counts]).astype(float)
+    dendrogram(linkage_matrix, **kwargs)
