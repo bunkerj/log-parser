@@ -1,10 +1,23 @@
-# Benchmarking Suite for Log Parsing
+# Log-parser
 
-***exp/*** - Standalone scripts to run various experiments
+The goal of this project is to provide a set of implementations and experiments for the rapid prototyping of log parsing solutions.
 
-***data/*** - Small data samples (structured and unstructured) used for rapid prototyping  
+### Prerequisites
 
-***src/parsers/*** - Log parser implementations  
-***src/helpers/*** - Auxiliary support classes and functions  
+The project dependencies can be installed by using the following command:
 
-***tests/*** - Unit tests for implementations contained in *src/*
+```
+pip install -r requirements.txt
+```
+
+## Project Organization
+    .
+    ├── data                # Datasets and helper scripts used to process data  
+    ├── exp                 # Standalone scripts that each run a standalone experiment
+    ├── graphs              # Scripts used to visualize data dumped from experiments in exp/
+    ├── papers              # Collection of various relevant papers
+    ├── src                 # Log parser implementations and auxiliary support classes/functions
+    ├── tests               # Unit tests for key implementations
+    ├── constants.py        # Constants used throughout the entire project
+    ├── requirements.txt    # Required libraries to run experiments in this project
+    └── README.md
