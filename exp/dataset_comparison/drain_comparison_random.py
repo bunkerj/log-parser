@@ -6,9 +6,9 @@ from exp.utils import get_final_dataset_accuracies, dump_results
 from src.data_config import DataConfigs
 from src.parameter_searchers.parameter_random_searcher import \
     ParameterRandomSearcher
-from src.parsers.drain import Drain
+from src.parsers.enhanced_drain import EnhancedDrain
 
-N_CALLS = 100
+N_CALLS = 250
 
 data_set_configs = [
     DataConfigs.Android,
@@ -30,16 +30,19 @@ data_set_configs = [
 ]
 
 parameter_ranges_dict = {
-    'max_depth': (3, 8),
+    'max_depth': (3, 50),
     'max_child': (20, 100),
-    'sim_threshold': (0.1, 0.9),
+    'sim_threshold': (0.5, 0.8),
+    'edit_ratio_threshold': (0, 0.5),
 }
 
-parameter_searcher = ParameterRandomSearcher(Drain, parameter_ranges_dict,
+parameter_searcher = ParameterRandomSearcher(EnhancedDrain,
+                                             parameter_ranges_dict,
                                              n_calls=N_CALLS)
 final_best_accuracies = \
-    get_final_dataset_accuracies(Drain,
+    get_final_dataset_accuracies(EnhancedDrain,
                                  data_set_configs,
                                  parameter_searcher=parameter_searcher)
 
-dump_results('drain_dataset_comparison_random.p', final_best_accuracies)
+dump_results('drain_enhanced_dataset_comparison_random.p',
+             final_best_accuracies)
