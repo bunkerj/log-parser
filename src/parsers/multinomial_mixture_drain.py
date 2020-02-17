@@ -4,6 +4,7 @@ from src.parsers.drain import Drain
 
 SAMPLE_SIZE = 5
 N_QUERIES_PER_ROUND = 5
+ZERO_THRESHOLD = 0.0000001
 
 
 class MultinomialMixtureDrain(Drain):
@@ -58,7 +59,6 @@ class MultinomialMixtureDrain(Drain):
     def _apply_user_feedback(self, selected_cluster, d):
         identical_token_indices = self._get_identical_token_indices(d)
         for d in identical_token_indices:
-            print(' '.join(self.tokenized_log_entries[d]))
             self.R[:, d] = 0
             self.R[selected_cluster, d] = 1
             self.frozen_indices.append(d)
@@ -125,8 +125,8 @@ class MultinomialMixtureDrain(Drain):
             likelihood = self._get_likelihood()
             print(likelihood)
             if old_likelihood is not None and \
-                    abs(old_likelihood - likelihood) \
-                    / old_likelihood < 0.0000001:
+                    (abs(old_likelihood - likelihood)
+                     / old_likelihood) < ZERO_THRESHOLD:
                 break
             old_likelihood = likelihood
 
@@ -157,7 +157,10 @@ class MultinomialMixtureDrain(Drain):
             sum_term = 0
             for g in range(G):
                 sum_term += self.Pi[g] * self._get_multinomial_term(g, d)
-            likelihood += np.log(sum_term)
+            if sum_term > ZERO_THRESHOLD:
+                likelihood += np.log(sum_term)
+            else:
+                likelihood += -99999999999
         return float(likelihood)
 
     def _merge_clusters(self):
