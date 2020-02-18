@@ -1,7 +1,9 @@
-from src.parsers.log_parser import LogParser
 import numpy as np
+from src.parsers.log_parser import LogParser
 
+LIKELIHOOD_THRESHOLD = 1
 ZERO_THRESHOLD = 0.0000001
+MAX_NEG_VALUE = -99999999999
 
 
 class MultinomialMixture(LogParser):
@@ -22,13 +24,14 @@ class MultinomialMixture(LogParser):
         self._merge_clusters()
 
     def print_cluster_samples(self, n_samples):
-        for cluster_idx in self.cluster_templates:
-            print('Cluster {}'.format(cluster_idx))
+        clusters = sorted(list(self.cluster_templates.keys()))
+        for cluster_idx in clusters:
+            print('\nCluster {}'.format(cluster_idx))
             log_indices = self.cluster_templates[cluster_idx][:n_samples]
             for log_idx in log_indices:
                 log_entry = ' '.join(self.tokenized_log_entries[log_idx])
                 print(log_entry)
-            print()
+        print()
 
     def _get_counts(self, tokenized_log_entries):
         D = len(tokenized_log_entries)
@@ -51,7 +54,7 @@ class MultinomialMixture(LogParser):
 
     def _update_parameters(self):
         self.Pi = self.R.sum(axis=1, keepdims=True)
-        self.Pi /= sum(self.Pi)
+        self.Pi /= len(self.tokenized_log_entries)
         self.Theta = self.R @ self.C + 1
         self.Theta /= self.Theta.sum(axis=1, keepdims=True)
 
@@ -73,13 +76,11 @@ class MultinomialMixture(LogParser):
             likelihood = self._get_likelihood()
             print(likelihood)
             if old_likelihood is not None and \
-                    (abs(old_likelihood - likelihood)
-                     / old_likelihood) < ZERO_THRESHOLD:
+                    abs(old_likelihood - likelihood) < LIKELIHOOD_THRESHOLD:
                 break
             old_likelihood = likelihood
 
     def _update_responsibilities(self):
-        # TODO: Make this more efficient with masking
         G, D = self.R.shape
         new_R = np.zeros(self.R.shape)
         for g in range(G):
@@ -91,12 +92,7 @@ class MultinomialMixture(LogParser):
         self.R /= self.R.sum(axis=0, keepdims=True)
 
     def _get_multinomial_term(self, k, d):
-        factorize = lambda arr: np.array([np.math.factorial(x) for x in arr])
-        coeff_num = np.math.factorial(self.C[d, :].sum())
-        coeff_den = factorize(self.C[d, :]).prod()
-        coeff = coeff_num / coeff_den
-        result = coeff * (self.Theta[k, :] ** self.C[d, :]).prod()
-        return result
+        return (self.Theta[k, :] ** self.C[d, :]).prod()
 
     def _get_likelihood(self):
         G, D = self.R.shape
@@ -108,7 +104,7 @@ class MultinomialMixture(LogParser):
             if sum_term > ZERO_THRESHOLD:
                 likelihood += np.log(sum_term)
             else:
-                likelihood += -99999999999
+                likelihood += MAX_NEG_VALUE
         return float(likelihood)
 
     def _merge_clusters(self):
