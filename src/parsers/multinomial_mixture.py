@@ -1,4 +1,5 @@
 import numpy as np
+from random import sample
 from src.parsers.log_parser import LogParser
 
 LIKELIHOOD_THRESHOLD = 1
@@ -27,7 +28,8 @@ class MultinomialMixture(LogParser):
         clusters = sorted(list(self.cluster_templates.keys()))
         for cluster_idx in clusters:
             print('\nCluster {}'.format(cluster_idx))
-            log_indices = self.cluster_templates[cluster_idx][:n_samples]
+            n = min(len(self.cluster_templates[cluster_idx]), n_samples)
+            log_indices = sample(self.cluster_templates[cluster_idx], n)
             for log_idx in log_indices:
                 log_entry = ' '.join(self.tokenized_log_entries[log_idx])
                 print(log_entry)
