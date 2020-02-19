@@ -15,14 +15,20 @@ class MultinomialMixture(LogParser):
         self.C = self._get_counts(tokenized_log_entries)
         self.Pi = np.zeros((num_clusters, 1))
         self.Theta = np.zeros((num_clusters, len(self.v_indices)))
-        self.frozen_indices = []
-        self.R = None
+        self.R = self._get_initial_responsibilities()
+        self.labeled_indices = []
 
     def parse(self):
-        self.R = self._get_initial_responsibilities()
         self._update_parameters()
         self._run_em_procedure()
         self._merge_clusters()
+
+    def label_logs(self, log_labels):
+        for cluster_idx, log_indices in enumerate(log_labels.values()):
+            for log_idx in log_indices:
+                self.labeled_indices.append(log_idx)
+                self.R[:, log_idx] = 0
+                self.R[cluster_idx, log_idx] = 1
 
     def print_cluster_samples(self, n_samples):
         clusters = sorted(list(self.cluster_templates.keys()))
@@ -88,7 +94,7 @@ class MultinomialMixture(LogParser):
         for g in range(G):
             for d in range(D):
                 new_R[g, d] = self.Pi[g] * self._get_multinomial_term(g, d)
-        for d in self.frozen_indices:
+        for d in self.labeled_indices:
             new_R[:, d] = self.R[:, d]
         self.R = new_R
         self.R /= self.R.sum(axis=0, keepdims=True)
