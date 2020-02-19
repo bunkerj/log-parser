@@ -2,13 +2,13 @@
 Print and save the accuracies of a single Drain run on a target dataset
 (DATA_CONFIG).
 """
+import matplotlib.pyplot as plt
 from time import time
 from src.parsers.enhanced_drain import EnhancedDrain
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.utils import get_template_assignments
-from matplotlib import pyplot as plt
 
 DATA_CONFIG = DataConfigs.Proxifier
 
