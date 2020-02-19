@@ -10,9 +10,9 @@ from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.utils import get_template_assignments
 
-N_SAMPLES = 5
+N_SAMPLES = 10
 DATA_CONFIG = DataConfigs.Proxifier
-LABEL_COUNTS = [0, 200, 400, 600, 800, 1000]
+LABEL_COUNTS = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
@@ -20,8 +20,11 @@ true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
 num_true_clusters = len(set(log_data[-1] for log_data in true_assignments))
 evaluator = Evaluator(true_assignments)
 
-labeled_impurities = []
-unlabeled_impurities = []
+results = {
+    'labeled_impurities': [],
+    'unlabeled_impurities': [],
+    'label_counts': LABEL_COUNTS,
+}
 
 for num_label in LABEL_COUNTS:
     print('Processing for {}...'.format(num_label))
@@ -45,14 +48,11 @@ for num_label in LABEL_COUNTS:
         unlab_impurity += evaluator.get_impurity(unlab_parser.cluster_templates,
                                                  labeled_indices) / N_SAMPLES
 
-    labeled_impurities.append(lab_impurity)
-    unlabeled_impurities.append(unlab_impurity)
+    results['labeled_impurities'].append(lab_impurity)
+    results['unlabeled_impurities'].append(unlab_impurity)
 
-dump_results('feedback_evaluation.p',
-             {
-                 'labeled_impurities': labeled_impurities,
-                 'unlabeled_impurities': unlabeled_impurities,
-                 'label_counts': LABEL_COUNTS
-             })
+result_filename = 'feedback_evaluation_{}_{}s.p'.format(
+    DATA_CONFIG['name'].lower(), N_SAMPLES)
+dump_results(result_filename, results)
 
 print('Done!')
