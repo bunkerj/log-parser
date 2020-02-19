@@ -10,6 +10,7 @@ from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.utils import get_template_assignments
 
+N_SAMPLES = 5
 DATA_CONFIG = DataConfigs.Proxifier
 LABEL_COUNTS = [0, 200, 400, 600, 800, 1000]
 
@@ -24,23 +25,27 @@ unlabeled_impurities = []
 
 for num_label in LABEL_COUNTS:
     print('Processing for {}...'.format(num_label))
+    lab_impurity = 0
+    unlab_impurity = 0
+    for i in range(N_SAMPLES):
+        lab_parser = MultinomialMixture(tokenized_log_entries,
+                                        num_true_clusters)
+        unlab_parser = MultinomialMixture(tokenized_log_entries,
+                                          num_true_clusters)
+        unlab_parser.initialize_responsibilities(lab_parser)
 
-    lab_parser = MultinomialMixture(tokenized_log_entries, num_true_clusters)
-    unlab_parser = MultinomialMixture(tokenized_log_entries, num_true_clusters)
-    unlab_parser.initialize_responsibilities(lab_parser)
+        log_labels = get_log_labels(true_assignments, num_label)
+        lab_parser.label_logs(log_labels)
+        labeled_indices = lab_parser.labeled_indices
 
-    log_labels = get_log_labels(true_assignments, num_label)
-    lab_parser.label_logs(log_labels)
-    labeled_indices = lab_parser.labeled_indices
+        lab_parser.parse()
+        lab_impurity += evaluator.get_impurity(lab_parser.cluster_templates,
+                                               labeled_indices) / N_SAMPLES
+        unlab_parser.parse()
+        unlab_impurity += evaluator.get_impurity(unlab_parser.cluster_templates,
+                                                 labeled_indices) / N_SAMPLES
 
-    lab_parser.parse()
-    lab_impurity = evaluator.get_impurity(lab_parser.cluster_templates,
-                                          labeled_indices)
     labeled_impurities.append(lab_impurity)
-
-    unlab_parser.parse()
-    unlab_impurity = evaluator.get_impurity(unlab_parser.cluster_templates,
-                                            labeled_indices)
     unlabeled_impurities.append(unlab_impurity)
 
 dump_results('feedback_evaluation.p',
