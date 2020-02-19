@@ -1,3 +1,6 @@
+import math
+
+
 class TemplateEvaluation:
     def __init__(self, parsed_template, actual_count):
         self.parsed_template = parsed_template
@@ -78,6 +81,45 @@ class Evaluator:
                     template_eval.actual_count != template_eval.expected_count:
                 error_line_count += template_eval.actual_count
         return error_line_count / self.total_lines
+
+    def get_impurity(self, template_parsed, labeled_indices):
+        """
+        Returns a measure of impurity using entropy.
+        """
+        N = len(self.true_assignments) - len(labeled_indices)
+        if N == 0:
+            return 0
+        total_impurity = 0
+        event_counts = self._get_event_counts(template_parsed, labeled_indices)
+        for cluster in event_counts:
+            entropy = 0
+            cluster_size = sum(event_counts[cluster].values())
+            for event in event_counts[cluster]:
+                count = event_counts[cluster][event]
+                p = count / cluster_size
+                entropy += -p * math.log(p)
+            total_impurity += (cluster_size / N) * entropy
+        return total_impurity
+
+    def _get_event_counts(self, template_parsed, labeled_indices):
+        """
+        Returns a dictionary where the key corresponds to a cluster and the
+        values are dictionaries each of which contains the counts for each
+        event found in the cluster. Note that labeled indices are completely
+        ignored.
+        """
+        event_counts = {}
+        for cluster in template_parsed:
+            if cluster not in event_counts:
+                event_counts[cluster] = {}
+                for log_idx in template_parsed[cluster]:
+                    if log_idx in labeled_indices:
+                        continue
+                    event = self.true_assignments[log_idx][-2]
+                    if event not in event_counts[cluster]:
+                        event_counts[cluster][event] = 0
+                    event_counts[cluster][event] += 1
+        return event_counts
 
     def _get_template_counts(self, parsed_entry_indices, truth_templates):
         truth_template_count = len(
