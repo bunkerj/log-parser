@@ -8,7 +8,7 @@ MAX_NEG_VALUE = -99999999999
 
 
 class MultinomialMixture(LogParser):
-    def __init__(self, tokenized_log_entries, num_clusters):
+    def __init__(self, tokenized_log_entries, num_clusters, verbose=False):
         super().__init__(tokenized_log_entries)
         self.num_clusters = num_clusters
         self.v_indices = self._get_vocabulary_indices(tokenized_log_entries)
@@ -17,11 +17,15 @@ class MultinomialMixture(LogParser):
         self.Theta = np.zeros((num_clusters, len(self.v_indices)))
         self.R = self._get_initial_responsibilities()
         self.labeled_indices = []
+        self.verbose = verbose
 
     def parse(self):
         self._update_parameters()
         self._run_em_procedure()
         self._merge_clusters()
+
+    def initialize_responsibilities(self, multinomial_mixture):
+        self.R = multinomial_mixture.R
 
     def label_logs(self, log_labels):
         for cluster_idx, log_indices in enumerate(log_labels.values()):
@@ -82,7 +86,8 @@ class MultinomialMixture(LogParser):
             self._update_responsibilities()
             self._update_parameters()
             likelihood = self._get_likelihood()
-            print(likelihood)
+            if self.verbose:
+                print(likelihood)
             if old_likelihood is not None and \
                     abs(old_likelihood - likelihood) < LIKELIHOOD_THRESHOLD:
                 break
