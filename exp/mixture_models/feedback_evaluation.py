@@ -2,8 +2,8 @@
 Evaluate how different initializations have an impact on impurity when using
 the multinomial mixture model.
 """
-import matplotlib.pyplot as plt
 from exp.mixture_models.utils import get_log_labels
+from exp.utils import dump_results
 from src.parsers.multinomial_mixture import MultinomialMixture
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
@@ -43,11 +43,11 @@ for num_label in LABEL_COUNTS:
                                             labeled_indices)
     unlabeled_impurities.append(unlab_impurity)
 
-plt.plot(LABEL_COUNTS, labeled_impurities)
-plt.plot(LABEL_COUNTS, unlabeled_impurities)
-plt.title('Impurity Over Number of Labels')
-plt.legend(['Labeled Impurity', 'Unlabeled Impurity'])
-plt.xlabel('Number of Labels')
-plt.ylabel('Impurity')
-plt.grid()
-plt.show()
+dump_results('feedback_evaluation.p',
+             {
+                 'labeled_impurities': labeled_impurities,
+                 'unlabeled_impurities': unlabeled_impurities,
+                 'label_counts': LABEL_COUNTS
+             })
+
+print('Done!')
