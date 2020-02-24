@@ -95,14 +95,14 @@ class MultinomialMixture(LogParser):
 
     def _update_responsibilities(self):
         G, D = self.R.shape
-        new_R = np.zeros(self.R.shape)
         for g in range(G):
-            for d in range(D):
-                new_R[g, d] = self.Pi[g] * self._get_multinomial_term(g, d)
-        for d in self.labeled_indices:
-            new_R[:, d] = self.R[:, d]
-        self.R = new_R
+            for d in self._get_non_labeled_doc_indices():
+                self.R[g, d] = self.Pi[g] * self._get_multinomial_term(g, d)
         self.R /= self.R.sum(axis=0, keepdims=True)
+
+    def _get_non_labeled_doc_indices(self):
+        D = self.R.shape[1]
+        return filter(lambda d: d not in self.labeled_indices, range(D))
 
     def _get_multinomial_term(self, k, d):
         return (self.Theta[k, :] ** self.C[d, :]).prod()
