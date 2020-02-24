@@ -2,6 +2,7 @@
 Evaluate how different initializations have an impact on impurity when using
 the multinomial mixture model.
 """
+from time import time
 from exp.mixture_models.utils import get_log_labels
 from exp.utils import dump_results
 from src.parsers.multinomial_mixture import MultinomialMixture
@@ -10,9 +11,9 @@ from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.utils import get_template_assignments
 
-N_SAMPLES = 10
-DATA_CONFIG = DataConfigs.Proxifier
-LABEL_COUNTS = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+N_SAMPLES = 5
+DATA_CONFIG = DataConfigs.Apache
+LABEL_COUNTS = [0, 200, 400, 600, 800, 1000]
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
@@ -25,6 +26,8 @@ results = {
     'unlabeled_impurities': [],
     'label_counts': LABEL_COUNTS,
 }
+
+start = time()
 
 for num_label in LABEL_COUNTS:
     print('Processing for {}...'.format(num_label))
@@ -50,6 +53,8 @@ for num_label in LABEL_COUNTS:
 
     results['labeled_impurities'].append(lab_impurity)
     results['unlabeled_impurities'].append(unlab_impurity)
+
+print('\nTime taken: {}\n'.format(time() - start))
 
 result_filename = 'feedback_evaluation_{}_{}s.p'.format(
     DATA_CONFIG['name'].lower(), N_SAMPLES)
