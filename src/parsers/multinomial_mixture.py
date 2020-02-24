@@ -1,4 +1,5 @@
 import numpy as np
+from copy import deepcopy
 from random import sample
 from src.parsers.log_parser import LogParser
 
@@ -25,7 +26,7 @@ class MultinomialMixture(LogParser):
         self._merge_clusters()
 
     def initialize_responsibilities(self, multinomial_mixture):
-        self.R = multinomial_mixture.R
+        self.R = deepcopy(multinomial_mixture.R)
 
     def label_logs(self, log_labels):
         for cluster_idx, log_indices in enumerate(log_labels.values()):
