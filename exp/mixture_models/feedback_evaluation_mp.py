@@ -4,7 +4,7 @@ the multinomial mixture model. [Using multiprocessing]
 """
 import multiprocessing as mp
 from time import time
-from exp.mixture_models.utils import get_log_labels
+from exp.mixture_models.utils import get_log_labels, get_num_true_clusters
 from exp.utils import dump_results
 from src.parsers.multinomial_mixture import MultinomialMixture
 from src.data_config import DataConfigs
@@ -19,7 +19,7 @@ LABEL_COUNTS = [0, 200, 400, 600, 800, 1000]
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
 true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
-num_true_clusters = len(set(log_data[-1] for log_data in true_assignments))
+num_true_clusters = get_num_true_clusters(true_assignments)
 evaluator = Evaluator(true_assignments)
 
 results = {

@@ -10,3 +10,7 @@ def get_log_labels(true_assignments, num_of_labels):
             log_labels[cluster] = []
         log_labels[cluster].append(log_idx)
     return log_labels
+
+
+def get_num_true_clusters(true_assignments):
+    return len(set(log_data[-1] for log_data in true_assignments))
