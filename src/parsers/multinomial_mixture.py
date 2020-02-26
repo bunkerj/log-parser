@@ -2,6 +2,7 @@ import numpy as np
 from copy import deepcopy
 from random import sample
 from src.parsers.log_parser import LogParser
+from src.utils import get_vocabulary_indices, get_token_counts
 
 LIKELIHOOD_THRESHOLD = 1
 ZERO_THRESHOLD = 0.0000001
@@ -12,8 +13,8 @@ class MultinomialMixture(LogParser):
     def __init__(self, tokenized_log_entries, num_clusters, verbose=False):
         super().__init__(tokenized_log_entries)
         self.num_clusters = num_clusters
-        self.v_indices = self._get_vocabulary_indices(tokenized_log_entries)
-        self.C = self._get_counts(tokenized_log_entries)
+        self.v_indices = get_vocabulary_indices(tokenized_log_entries)
+        self.C = get_token_counts(tokenized_log_entries, self.v_indices)
         self.Pi = np.zeros((num_clusters, 1))
         self.Theta = np.zeros((num_clusters, len(self.v_indices)))
         self.R = self._get_initial_responsibilities()
@@ -46,17 +47,6 @@ class MultinomialMixture(LogParser):
                 print(log_entry)
         print()
 
-    def _get_counts(self, tokenized_log_entries):
-        D = len(tokenized_log_entries)
-        V = len(self.v_indices)
-        C = np.zeros((D, V))
-        for log_idx, tokenized_log_entry in enumerate(tokenized_log_entries):
-            for token in tokenized_log_entry:
-                if token in self.v_indices:
-                    token_idx = self.v_indices[token]
-                    C[log_idx, token_idx] += 1
-        return C
-
     def _get_initial_responsibilities(self):
         G = self.num_clusters
         D = len(self.tokenized_log_entries)
@@ -70,16 +60,6 @@ class MultinomialMixture(LogParser):
         self.Pi /= len(self.tokenized_log_entries)
         self.Theta = self.R @ self.C + 1
         self.Theta /= self.Theta.sum(axis=1, keepdims=True)
-
-    def _get_vocabulary_indices(self, tokenized_log_entries):
-        v_indices = {}
-        for tokens in tokenized_log_entries:
-            for token in tokens:
-                if token.isalpha():
-                    v_indices[token] = 0
-        for idx, token in enumerate(v_indices):
-            v_indices[token] = idx
-        return v_indices
 
     def _run_em_procedure(self):
         old_likelihood = None

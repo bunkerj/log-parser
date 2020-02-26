@@ -95,3 +95,26 @@ def plot_dendrogram(model, **kwargs):
     linkage_matrix = np.column_stack([model.children_, model.distances_,
                                       counts]).astype(float)
     dendrogram(linkage_matrix, **kwargs)
+
+
+def get_vocabulary_indices(tokenized_log_entries):
+    v_indices = {}
+    for tokens in tokenized_log_entries:
+        for token in tokens:
+            if token.isalpha():
+                v_indices[token] = 0
+    for idx, token in enumerate(v_indices):
+        v_indices[token] = idx
+    return v_indices
+
+
+def get_token_counts(tokenized_log_entries, v_indices):
+    D = len(tokenized_log_entries)
+    V = len(v_indices)
+    C = np.zeros((D, V))
+    for log_idx, tokenized_log_entry in enumerate(tokenized_log_entries):
+        for token in tokenized_log_entry:
+            if token in v_indices:
+                token_idx = v_indices[token]
+                C[log_idx, token_idx] += 1
+    return C
