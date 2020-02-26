@@ -31,6 +31,18 @@ class DataManager:
         log_df = self._get_log_dataframe()
         return self._preprocess_raw_log_entries(log_df)
 
+    def get_tokenized_no_num_log_entries(self):
+        tokenized_log_entries = self.get_tokenized_log_entries()
+        tokenized_no_num_log_entries = []
+        for tokenized_log_entry in tokenized_log_entries:
+            tokenized_no_num_log_entry = []
+            for token in tokenized_log_entry:
+                new_token = ''.join([c for c in token if not c.isdigit()])
+                if new_token != '':
+                    tokenized_no_num_log_entry.append(new_token)
+            tokenized_no_num_log_entries.append(tokenized_no_num_log_entry)
+        return tokenized_no_num_log_entries
+
     def get_templates(self):
         raw_templates = read_csv(self.data_config['template_path'])
         templates = []
