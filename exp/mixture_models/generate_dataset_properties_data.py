@@ -4,7 +4,7 @@ providing labeled data to a clustering model.
 
 The predictors are:
 1) Vocabulary Size
-2) Average Token Frequency Entropy
+2) Average Frequency Gini Impurity
 3) True Cluster Count
 4) Starting Impurity
 5) Provided labels Count
@@ -67,7 +67,7 @@ for data_config in data_configs:
     data[name]['True Cluster Count'] = get_num_true_clusters(true_assignments)
     data[name]['Starting Impurity'] = labeled_impurities[0]
     data[name]['Provided labels Count'] = label_counts[2]
-    data[name]['Average Token Frequency Entropy'] = \
+    data[name]['Average Frequency Gini Impurity'] = \
         get_avg_gini_impurity(C_probabilities, 1)
     data[name]['Impurity Percentage Difference'] = \
         get_impurity_difference(labeled_impurities[2], unlabeled_impurities[2])
