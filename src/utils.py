@@ -101,7 +101,7 @@ def get_vocabulary_indices(tokenized_log_entries):
     v_indices = {}
     for tokens in tokenized_log_entries:
         for token in tokens:
-            if token.isalpha():
+            if not any(c.isdigit() for c in token):
                 v_indices[token] = 0
     for idx, token in enumerate(v_indices):
         v_indices[token] = idx

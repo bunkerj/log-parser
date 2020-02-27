@@ -30,7 +30,8 @@ for idx, data_config in enumerate(data_configs):
     dataset_name = data_config['name']
 
     results = load_results(
-        'feedback_evaluation_{}_5s.p'.format(dataset_name.lower()))
+        'feedback_evaluation_mp_filtered_no_num_{}_10s.p'.format(
+            dataset_name.lower()))
 
     label_counts = results['label_counts']
     labeled_impurities = results['labeled_impurities']
