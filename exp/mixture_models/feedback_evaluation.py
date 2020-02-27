@@ -11,12 +11,12 @@ from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.utils import get_template_assignments
 
-N_SAMPLES = 5
+N_SAMPLES = 10
 DATA_CONFIG = DataConfigs.Apache
 LABEL_COUNTS = [0, 200, 400, 600, 800, 1000]
 
 data_manager = DataManager(DATA_CONFIG)
-tokenized_log_entries = data_manager.get_tokenized_log_entries()
+tokenized_log_entries = data_manager.get_tokenized_no_num_log_entries()
 true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
 num_true_clusters = get_num_true_clusters(true_assignments)
 evaluator = Evaluator(true_assignments)
