@@ -34,8 +34,8 @@ for idx, data_config in enumerate(data_configs):
             dataset_name.lower()))
 
     label_counts = results['label_counts']
-    labeled_impurities = results['labeled_impurities']
-    unlabeled_impurities = results['unlabeled_impurities']
+    labeled_impurities = results['avg_labeled_impurities']
+    unlabeled_impurities = results['avg_unlabeled_impurities']
 
     ax = plt.subplot(4, 4, idx + 1)
     plt.plot(label_counts, labeled_impurities)

@@ -43,3 +43,43 @@ def get_avg_gini_impurity(probabilities_matrix, axis):
 def get_impurity_difference(labeled_impurity, unlabeled_impurity):
     abs_diff = abs(labeled_impurity - unlabeled_impurity)
     return 100 * abs_diff / labeled_impurity
+
+
+def split_on_samples(results, n_label_counts):
+    """
+    Note that the results contain the impurities in the following form:
+    [i_0, i_1, ... , i_n, ... , i_0, i_1, ... , i_n], where i_x is a sample
+    impurity for the label count with index x. This function splits this single
+    list into N lists of the following form [i_0, i_1, ... , i_n], where N is
+    the number of sample runs.
+    """
+    samples = []
+    n_samples = len(results) // n_label_counts
+    for sample_idx in range(n_samples):
+        start_idx = sample_idx * n_label_counts
+        end_idx = (sample_idx + 1) * n_label_counts
+        samples.append(results[start_idx: end_idx])
+    return samples
+
+
+def split_on_result_sources(results):
+    """
+    Returns two separate lists: one for labeled results and another for
+    unlabeled results.
+    """
+    lab_impurities = [r[0] for r in results]
+    unlab_impurities = [r[1] for r in results]
+    return lab_impurities, unlab_impurities
+
+
+def get_average_from_samples(samples):
+    """
+    Returns single list containing the average of passed samples.
+    """
+    if len(samples) == 0:
+        return None
+    average = [0] * len(samples[0])
+    for sample in samples:
+        for idx, v in enumerate(sample):
+            average[idx] += v / len(samples)
+    return average
