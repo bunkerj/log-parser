@@ -13,9 +13,9 @@ from src.utils import get_template_assignments
 from exp.mixture_models.utils import get_log_labels, get_num_true_clusters, \
     split_on_result_sources, split_on_samples, get_average_from_samples
 
-N_SAMPLES = 10
+N_SAMPLES = 15
 DATA_CONFIG = DataConfigs.Apache
-LABEL_COUNTS = list(range(0, 401, 25))
+LABEL_COUNTS = list(range(0, 601, 100))
 N_LABELS = len(LABEL_COUNTS)
 
 data_manager = DataManager(DATA_CONFIG)

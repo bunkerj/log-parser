@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from graphs.utils import load_results
 from src.data_config import DataConfigs
 
-N_SAMPLES = 10
+N_SAMPLES = 15
 DATA_CONFIG = DataConfigs.Apache
 
 dataset_name = DATA_CONFIG['name']
@@ -28,10 +28,10 @@ for sample in lab_samples:
 for sample in unlab_samples:
     plt.plot(label_percentages, sample, color='lightblue')
 
-plt.plot(label_percentages, labeled_impurities,
-         label='Labeled Mean', color='red')
 plt.plot(label_percentages, unlabeled_impurities,
          label='Unlabeled Mean', color='blue')
+plt.plot(label_percentages, labeled_impurities,
+         label='Labeled Mean', color='red')
 
 plt.title(dataset_name.capitalize())
 plt.xlabel('Label Percentage')
