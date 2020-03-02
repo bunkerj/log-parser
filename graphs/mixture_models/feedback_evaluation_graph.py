@@ -2,8 +2,8 @@
 For the specified datasets, plot the impurity as a function of labeled data
 points.
 """
-from utils import load_results
 import matplotlib.pyplot as plt
+from global_utils import load_results
 
 from src.data_config import DataConfigs
 

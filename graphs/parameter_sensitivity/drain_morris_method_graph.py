@@ -1,9 +1,8 @@
 """
 Plot the Morris sensitivity indices using a scatter plot.
 """
-
-from utils import load_results
 import matplotlib.pyplot as plt
+from global_utils import load_results
 
 
 def plot_morris_method_graph(sensitivity_indices, plot_idx, title):

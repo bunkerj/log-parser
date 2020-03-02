@@ -1,7 +1,7 @@
 import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
-from utils import load_results
+from global_utils import load_results
 from src.data_config import DataConfigs
 from scipy.stats import shapiro
 

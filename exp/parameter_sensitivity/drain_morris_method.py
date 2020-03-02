@@ -8,7 +8,7 @@ for the timings and accuracies.
 """
 import numpy as np
 from time import time
-from utils import dump_results
+from global_utils import dump_results
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
