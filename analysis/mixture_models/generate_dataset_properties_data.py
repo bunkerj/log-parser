@@ -15,11 +15,10 @@ Impurity Percentage Difference
 """
 from exp.mixture_models.utils import get_num_true_clusters, \
     get_impurity_difference, normalize_matrix
-from exp.utils import dump_results
+from utils import dump_results, load_results
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from exp.mixture_models.utils import get_avg_gini_impurity
-from graphs.utils import load_results
 from src.utils import get_template_assignments, get_vocabulary_indices, \
     get_token_counts
 

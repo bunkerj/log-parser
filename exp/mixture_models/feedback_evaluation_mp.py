@@ -4,7 +4,7 @@ the multinomial mixture model. [Using multiprocessing]
 """
 import multiprocessing as mp
 from time import time
-from exp.utils import dump_results
+from utils import dump_results
 from src.parsers.multinomial_mixture import MultinomialMixture
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator

@@ -3,7 +3,7 @@ For the specified dataset, plot the mean impurity as a function of labeled data
 points. Also plot the samples in lighter colors alongside the means.
 """
 import matplotlib.pyplot as plt
-from graphs.utils import load_results
+from utils import load_results
 from src.data_config import DataConfigs
 
 N_SAMPLES = 15

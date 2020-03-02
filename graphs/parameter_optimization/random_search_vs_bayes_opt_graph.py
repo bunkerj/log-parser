@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from graphs.utils import load_results
+from utils import load_results
 
 random_search_history = load_results(
     'average_best_random_search_full_accuracy_history.p')

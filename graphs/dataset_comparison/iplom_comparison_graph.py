@@ -7,7 +7,8 @@ In the comments, are the results as reported by the associated benchmark paper
 from Zhu et al., 2019.
 """
 
-from graphs.utils import show_dataset_comparison_graph, load_results
+from graphs.utils import show_dataset_comparison_graph
+from utils import load_results
 
 iplom_benchmark_accuracies = {      # Results from benchmark paper
     'Android': 0.712,               # 0.712

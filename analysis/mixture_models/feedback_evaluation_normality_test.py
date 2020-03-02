@@ -1,7 +1,7 @@
 import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
-from graphs.utils import load_results
+from utils import load_results
 from src.data_config import DataConfigs
 
 N_SAMPLES = 100

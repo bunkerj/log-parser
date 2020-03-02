@@ -2,7 +2,7 @@
 Plot the various parameters against both their corresponding accuracies and
 timings.
 """
-from graphs.utils import load_results
+from utils import load_results
 import matplotlib.pyplot as plt
 
 morris_data = load_results('drain_morris_data.p')

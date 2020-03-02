@@ -2,7 +2,7 @@
 Plot the Morris sensitivity indices using a scatter plot.
 """
 
-from graphs.utils import load_results
+from utils import load_results
 import matplotlib.pyplot as plt
 
 

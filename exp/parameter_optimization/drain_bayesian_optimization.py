@@ -1,6 +1,7 @@
 from random import randint
 from skopt import gp_minimize
-from exp.utils import dump_results, update_average_list
+from exp.utils import update_average_list
+from utils import dump_results
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator

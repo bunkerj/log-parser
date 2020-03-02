@@ -2,7 +2,8 @@
 Print and save the accuracies of a single Drain run on a target dataset
 (DATA_CONFIG) using random search.
 """
-from exp.utils import dump_results, update_average_list
+from exp.utils import update_average_list
+from utils import dump_results
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager

@@ -2,7 +2,8 @@
 Print and save the accuracies of the listed datasets using IPLoM with grid
 search.
 """
-from exp.utils import get_final_dataset_accuracies, dump_results
+from exp.utils import get_final_dataset_accuracies
+from utils import dump_results
 from src.parameter_searchers.parameter_grid_searcher import \
     ParameterGridSearcher
 from src.parsers.iplom import Iplom

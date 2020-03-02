@@ -1,6 +1,3 @@
-import os
-import pickle
-from constants import RESULTS_DIR
 from src.utils import get_template_assignments
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
@@ -38,13 +35,6 @@ def get_final_dataset_accuracies(Parser_class,
         final_accuracies[data_set_config['name']] = accuracy
 
     return final_accuracies
-
-
-def dump_results(name, results):
-    if not os.path.exists(RESULTS_DIR):
-        os.makedirs(RESULTS_DIR)
-    path = os.path.join(RESULTS_DIR, name)
-    pickle.dump(results, open(path, 'wb'))
 
 
 def update_average_list(current_average, new_list, n):

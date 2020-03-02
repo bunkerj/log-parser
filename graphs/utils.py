@@ -1,8 +1,5 @@
-import os
-import pickle
 import numpy as np
 import matplotlib.pyplot as plt
-from constants import RESULTS_DIR
 
 
 def show_dataset_comparison_graph(title, benchmark_accuracies,
@@ -50,8 +47,3 @@ def autolabel(ax, rects):
                     xytext=(0, 3),  # 3 points vertical offset
                     textcoords="offset points",
                     ha='center', va='bottom')
-
-
-def load_results(name):
-    path = os.path.join(RESULTS_DIR, name)
-    return pickle.load(open(path, 'rb'))
