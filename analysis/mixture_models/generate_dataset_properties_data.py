@@ -21,6 +21,8 @@ from src.helpers.data_manager import DataManager
 from exp.mixture_models.utils import get_avg_gini_impurity
 from src.utils import get_vocabulary_indices, get_token_counts
 
+N_SAMPLES = 3
+
 data_configs = [
     DataConfigs.Android,
     DataConfigs.Apache,
@@ -52,11 +54,11 @@ for data_config in data_configs:
     C = get_token_counts(tokenized_log_entries, v_indices)
     C_probabilities = normalize_matrix(C, 1)
     results = load_results(
-        'feedback_evaluation_mp_{}_5s.p'.format(name.lower()))
+        'feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES))
 
-    labeled_impurities = results['labeled_impurities']
-    unlabeled_impurities = results['unlabeled_impurities']
-    label_counts = results['label_counts']
+    labeled_impurities = results[name]['avg_labeled_impurities']
+    unlabeled_impurities = results[name]['avg_unlabeled_impurities']
+    label_counts = results[name]['label_counts']
 
     print('{}: {}'.format(name, len(v_indices)))
 
