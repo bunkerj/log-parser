@@ -94,19 +94,25 @@ class Evaluator:
         for cluster in event_counts:
             entropy = 0
             cluster_size = sum(event_counts[cluster].values())
+            true_cluster_count = len(event_counts[cluster])
             for event in event_counts[cluster]:
                 count = event_counts[cluster][event]
                 p = count / cluster_size
                 entropy += -p * math.log(p)
-            total_impurity += (cluster_size / N) * entropy
+            norm_entropy = self._get_norm_impurity(entropy, true_cluster_count)
+            total_impurity += (cluster_size / N) * norm_entropy
         return total_impurity
+
+    def _get_norm_impurity(self, entropy, true_cluster_count):
+        return entropy / math.log(true_cluster_count) \
+            if true_cluster_count > 1 else entropy
 
     def _get_event_counts(self, template_parsed, labeled_indices):
         """
-        Returns a dictionary where the key corresponds to a cluster and the
-        values are dictionaries each of which contains the counts for each
-        event found in the cluster. Note that labeled indices are completely
-        ignored.
+        Returns a dictionary where each key corresponds to a parsed cluster and
+        the values are dictionaries each of which contains the counts for each
+        true event found in the cluster. Note that labeled indices are
+        completely ignored.
         """
         event_counts = {}
         for cluster in template_parsed:
