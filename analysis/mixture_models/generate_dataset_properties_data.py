@@ -19,8 +19,7 @@ from global_utils import dump_results, load_results
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from exp.mixture_models.utils import get_avg_gini_impurity
-from src.utils import get_template_assignments, get_vocabulary_indices, \
-    get_token_counts
+from src.utils import get_vocabulary_indices, get_token_counts
 
 data_configs = [
     DataConfigs.Android,
@@ -47,7 +46,7 @@ for data_config in data_configs:
     name = data_config['name']
     data_manager = DataManager(data_config)
     tokenized_log_entries = data_manager.get_tokenized_no_num_log_entries()
-    true_assignments = get_template_assignments(data_config['assignments_path'])
+    true_assignments = data_manager.get_true_assignments()
 
     v_indices = get_vocabulary_indices(tokenized_log_entries)
     C = get_token_counts(tokenized_log_entries, v_indices)

@@ -3,7 +3,6 @@ Plot the accuracy over the similarity measure.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from src.utils import get_template_assignments
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
@@ -16,12 +15,12 @@ type1_error_ratios = []
 type2_error_ratios = []
 
 sim_thresholds = np.arange(0.01, 1.0, 0.01)
-true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
+data_manager = DataManager(DATA_CONFIG)
+tokenized_log_entries = data_manager.get_tokenized_log_entries()
+true_assignments = data_manager.get_true_assignments()
+evaluator = Evaluator(true_assignments)
 
 for sim_threshold in sim_thresholds:
-    evaluator = Evaluator(true_assignments)
-    data_manager = DataManager(DATA_CONFIG)
-    tokenized_log_entries = data_manager.get_tokenized_log_entries()
     parser = Drain(tokenized_log_entries, 8, 75, sim_threshold)
     parser.parse()
     cluster_templates = parser.cluster_templates

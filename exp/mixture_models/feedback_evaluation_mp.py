@@ -9,7 +9,6 @@ from src.parsers.multinomial_mixture import MultinomialMixture
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
-from src.utils import get_template_assignments
 from exp.mixture_models.utils import get_log_labels, get_num_true_clusters, \
     split_on_result_sources, split_on_samples, get_average_from_samples
 
@@ -20,11 +19,9 @@ N_LABELS = len(LABEL_COUNTS)
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_no_num_log_entries()
-true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
+true_assignments = data_manager.get_true_assignments()
 num_true_clusters = get_num_true_clusters(true_assignments)
 evaluator = Evaluator(true_assignments)
-
-N_logs = len(tokenized_log_entries)
 
 results = {
     'labeled_impurities': [],
@@ -58,7 +55,8 @@ if __name__ == '__main__':
 
     with mp.Pool(mp.cpu_count()) as pool:
         total_label_counts = LABEL_COUNTS * N_SAMPLES
-        mp_results = pool.map(_perform_feedback_experiment, total_label_counts)
+        mp_results = pool.map(_perform_feedback_experiment,
+                              total_label_counts)
 
     lab_impurities, unlab_impurities = split_on_result_sources(mp_results)
 
@@ -75,7 +73,7 @@ if __name__ == '__main__':
 
     print('Time taken: {}'.format(time() - start))
 
-    result_filename = 'feedback_evaluation_mp_filtered_no_num_{}_{}s.p'.format(
+    result_filename = 'feedback_evaluation_{}_{}s.p'.format(
         DATA_CONFIG['name'].lower(), N_SAMPLES)
     dump_results(result_filename, results)
 

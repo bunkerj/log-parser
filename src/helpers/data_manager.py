@@ -62,6 +62,10 @@ class DataManager:
         log_file = self.data_config['unstructured_path']
         return self._get_raw_log_full_lines(log_file, regex, headers)
 
+    def get_true_assignments(self):
+        assignments_path = self.data_config['assignments_path']
+        return read_csv(assignments_path)[1:]
+
     def print_select_raw_and_tokenized_log_entries(self, log_indices):
         log_df = self._get_log_dataframe()
         raw_log_entries = log_df['Content'].to_list()

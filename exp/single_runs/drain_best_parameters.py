@@ -6,7 +6,6 @@ from src.helpers.data_manager import DataManager
 from src.parameter_searchers.parameter_random_searcher import \
     ParameterRandomSearcher
 from src.parsers.enhanced_drain import EnhancedDrain
-from src.utils import get_template_assignments
 
 N_CALLS = 250
 DATA_CONFIG = DataConfigs.Linux
@@ -20,7 +19,7 @@ parameter_ranges_dict = {
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
-true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
+true_assignments = data_manager.get_true_assignments()
 
 parameter_searcher = ParameterRandomSearcher(EnhancedDrain,
                                              parameter_ranges_dict,

@@ -7,7 +7,6 @@ from global_utils import dump_results
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
-from src.utils import get_template_assignments
 from src.parameter_searchers.parameter_random_searcher import \
     ParameterRandomSearcher
 
@@ -17,7 +16,7 @@ DATA_CONFIG = DataConfigs.Proxifier
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
-true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
+true_assignments = data_manager.get_true_assignments()
 
 parameter_ranges_dict = {
     'max_depth': (3, 8),

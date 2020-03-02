@@ -9,7 +9,6 @@ from src.helpers.data_manager import DataManager
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
-from src.utils import get_template_assignments
 
 JUMP_SIZE = 10
 N_RUNS = 20
@@ -17,7 +16,7 @@ DATA_CONFIG = DataConfigs.BGL
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
-true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
+true_assignments = data_manager.get_true_assignments()
 
 accuracies = []
 end_indices = []

@@ -2,7 +2,6 @@
 Plot the accuracy over the maximum tree depth.
 """
 import matplotlib.pyplot as plt
-from src.utils import get_template_assignments
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
@@ -12,11 +11,12 @@ DATA_CONFIG = DataConfigs.BGL
 
 accuracies = []
 tree_depths = list(range(3, 31, 1))
-true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
+data_manager = DataManager(DATA_CONFIG)
+tokenized_log_entries = data_manager.get_tokenized_log_entries()
+true_assignments = data_manager.get_true_assignments()
 evaluator = Evaluator(true_assignments)
 
 for tree_depth in tree_depths:
-    data_manager = DataManager(DATA_CONFIG)
     tokenized_log_entries = data_manager.get_tokenized_log_entries()
     parser = Drain(tokenized_log_entries, 3, tree_depth, 0.5)
     parser.parse()
