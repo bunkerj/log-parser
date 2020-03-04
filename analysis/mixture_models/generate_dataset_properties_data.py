@@ -1,27 +1,23 @@
 """
-The goal of this script is to create a labeled dataset to analyze the effect of
-providing labeled data to a clustering model.
+The goal of this script is to create a dataset that includes key properties of
+the various datasets that are being used for clustering.
 
-The predictors are:
+The dataset properties are:
 1) Vocabulary Size
 2) Average Frequency Gini Impurity
 3) True Cluster Count
-4) Starting Impurity
-5) Provided labels Count
-
-The response variable is:
-Impurity Percentage Difference
-100 * (unlabeled impurity - labeled impurity) / (labeled impurity)
 """
-from exp.mixture_models.utils import get_num_true_clusters, \
-    get_impurity_difference, normalize_matrix
-from global_utils import dump_results, load_results
+import os
+import pandas as pd
+from constants import RESULTS_DIR
+from exp.mixture_models.utils import get_num_true_clusters, normalize_matrix
+from global_utils import load_results
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from exp.mixture_models.utils import get_avg_gini_impurity
 from src.utils import get_vocabulary_indices, get_token_counts
 
-N_SAMPLES = 3
+N_SAMPLES = 50
 
 data_configs = [
     DataConfigs.Android,
@@ -32,17 +28,22 @@ data_configs = [
     DataConfigs.HealthApp,
     DataConfigs.HPC,
     DataConfigs.Linux,
-    DataConfigs.Mac,
-    DataConfigs.OpenSSH,
-    DataConfigs.OpenStack,
-    DataConfigs.Proxifier,
-    DataConfigs.Spark,
-    DataConfigs.Thunderbird,
-    DataConfigs.Windows,
-    DataConfigs.Zookeeper,
+    # DataConfigs.Mac,
+    # DataConfigs.OpenSSH,
+    # DataConfigs.OpenStack,
+    # DataConfigs.Proxifier,
+    # DataConfigs.Spark,
+    # DataConfigs.Thunderbird,
+    # DataConfigs.Windows,
+    # DataConfigs.Zookeeper,
 ]
 
-data = {}
+data = {
+    'name': [],
+    'vocab_size': [],
+    'true_cluster_count': [],
+    'avg_freq_gini': [],
+}
 
 for data_config in data_configs:
     name = data_config['name']
@@ -56,20 +57,14 @@ for data_config in data_configs:
     results = load_results(
         'feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES))
 
-    labeled_impurities = results[name]['avg_labeled_impurities']
-    unlabeled_impurities = results[name]['avg_unlabeled_impurities']
-    label_counts = results[name]['label_counts']
-
     print('{}: {}'.format(name, len(v_indices)))
 
-    data[name] = {}
-    data[name]['Vocabulary Size'] = len(v_indices)
-    data[name]['True Cluster Count'] = get_num_true_clusters(true_assignments)
-    data[name]['Starting Impurity'] = labeled_impurities[0]
-    data[name]['Provided labels Count'] = label_counts[2]
-    data[name]['Average Frequency Gini Impurity'] = \
-        get_avg_gini_impurity(C_probabilities, 1)
-    data[name]['Impurity Percentage Difference'] = \
-        get_impurity_difference(labeled_impurities[2], unlabeled_impurities[2])
+    data['name'].append(name)
+    data['vocab_size'].append(len(v_indices))
+    data['true_cluster_count'].append(get_num_true_clusters(true_assignments))
+    data['avg_freq_gini'].append(get_avg_gini_impurity(C_probabilities, 1))
 
-dump_results('dataset_properties_data.p', data)
+path = os.path.join(RESULTS_DIR, 'dataset_properties.csv')
+
+df = pd.DataFrame(data)
+df.to_csv(path, index=False)
