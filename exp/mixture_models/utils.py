@@ -40,11 +40,6 @@ def get_avg_gini_impurity(probabilities_matrix, axis):
     return sum(entropy_values) / len(entropy_values)
 
 
-def get_impurity_difference(labeled_impurity, unlabeled_impurity):
-    abs_diff = abs(labeled_impurity - unlabeled_impurity)
-    return 100 * abs_diff / labeled_impurity
-
-
 def split_on_samples(results, n_label_counts):
     """
     Note that the results contain the impurities in the following form:
