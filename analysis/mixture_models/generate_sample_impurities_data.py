@@ -15,14 +15,14 @@ data_configs = [
     DataConfigs.HealthApp,
     DataConfigs.HPC,
     DataConfigs.Linux,
-    DataConfigs.Mac,
-    DataConfigs.OpenSSH,
-    DataConfigs.OpenStack,
-    DataConfigs.Proxifier,
-    DataConfigs.Spark,
-    DataConfigs.Thunderbird,
-    DataConfigs.Windows,
-    DataConfigs.Zookeeper,
+    # DataConfigs.Mac,
+    # DataConfigs.OpenSSH,
+    # DataConfigs.OpenStack,
+    # DataConfigs.Proxifier,
+    # DataConfigs.Spark,
+    # DataConfigs.Thunderbird,
+    # DataConfigs.Windows,
+    # DataConfigs.Zookeeper,
 ]
 
 data = {
@@ -56,7 +56,7 @@ for data_config in data_configs:
             data['lab_impurity'].append(lab_sample_value)
             data['unlab_impurity'].append(unlab_sample_value)
 
-path = os.path.join(RESULTS_DIR, 'sample_impurity_data.csv')
+path = os.path.join(RESULTS_DIR, 'sample_impurities.csv')
 
 df = pd.DataFrame(data)
 df.to_csv(path, index=False)
