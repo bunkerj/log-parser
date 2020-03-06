@@ -9,9 +9,10 @@ from src.helpers.data_manager import DataManager
 from exp.mixture_models.utils import get_avg_gini_impurity
 from src.utils import get_vocabulary_indices, get_token_counts
 from exp.mixture_models.utils import get_num_true_clusters, normalize_matrix
-from analysis.utils import get_intra_cluster_spread, \
-    get_inter_cluster_spread, \
+from analysis.utils import get_intra_cluster_spread, get_inter_cluster_spread, \
     split_counts_per_cluster
+from analysis.constants import NAME, VOCAB_SIZE, TRUE_CLUSTER_COUNT, \
+    AVG_FREQ_GINI, INTRA_CLUSTER_SPREAD, INTER_CLUSTER_SPREAD
 
 N_SAMPLES = 50
 
@@ -35,12 +36,12 @@ data_configs = [
 ]
 
 data = {
-    'name': [],
-    'vocab_size': [],
-    'true_cluster_count': [],
-    'avg_freq_gini': [],
-    'intra_cluster_spread': [],
-    'inter_cluster_spread': [],
+    NAME: [],
+    VOCAB_SIZE: [],
+    TRUE_CLUSTER_COUNT: [],
+    AVG_FREQ_GINI: [],
+    INTRA_CLUSTER_SPREAD: [],
+    INTER_CLUSTER_SPREAD: [],
 }
 
 for data_config in data_configs:
@@ -56,13 +57,13 @@ for data_config in data_configs:
 
     print('{}: {}'.format(name, len(v_indices)))
 
-    data['name'].append(name)
-    data['vocab_size'].append(len(v_indices))
-    data['true_cluster_count'].append(get_num_true_clusters(true_assignments))
-    data['avg_freq_gini'].append(get_avg_gini_impurity(C_probabilities, 1))
-    data['intra_cluster_spread'].append(
+    data[NAME].append(name)
+    data[VOCAB_SIZE].append(len(v_indices))
+    data[TRUE_CLUSTER_COUNT].append(get_num_true_clusters(true_assignments))
+    data[AVG_FREQ_GINI].append(get_avg_gini_impurity(C_probabilities, 1))
+    data[INTRA_CLUSTER_SPREAD].append(
         get_intra_cluster_spread(count_cluster_split, C))
-    data['inter_cluster_spread'].append(
+    data[INTER_CLUSTER_SPREAD].append(
         get_inter_cluster_spread(count_cluster_split, C))
 
 path = os.path.join(RESULTS_DIR, 'dataset_properties.csv')

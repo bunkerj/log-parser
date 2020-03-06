@@ -7,6 +7,8 @@ import pandas as pd
 from global_utils import load_results
 from src.data_config import DataConfigs
 from constants import RESULTS_DIR
+from analysis.constants import NAME, PERCENTAGE_LABELED, LAB_IMPURITY, \
+    UNLAB_IMPURITY
 
 N_SAMPLES = 50
 
@@ -30,10 +32,10 @@ data_configs = [
 ]
 
 data = {
-    'dataset': [],
-    'p_label': [],
-    'lab_impurity': [],
-    'unlab_impurity': [],
+    NAME: [],
+    PERCENTAGE_LABELED: [],
+    LAB_IMPURITY: [],
+    UNLAB_IMPURITY: [],
 }
 
 for data_config in data_configs:
@@ -55,10 +57,10 @@ for data_config in data_configs:
             unlab_sample_value = unlab_sample_values[label_idx]
             p_label = label_count / n_logs
 
-            data['dataset'].append(name)
-            data['p_label'].append(p_label)
-            data['lab_impurity'].append(lab_sample_value)
-            data['unlab_impurity'].append(unlab_sample_value)
+            data[NAME].append(name)
+            data[PERCENTAGE_LABELED].append(p_label)
+            data[LAB_IMPURITY].append(lab_sample_value)
+            data[UNLAB_IMPURITY].append(unlab_sample_value)
 
 path = os.path.join(RESULTS_DIR, 'sample_impurities.csv')
 

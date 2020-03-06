@@ -8,6 +8,7 @@ import pandas as pd
 from constants import RESULTS_DIR
 from global_utils import load_results
 from src.data_config import DataConfigs
+from analysis.constants import NAME, PROVIDED_LABELS_COUNT, IMPURITY_MEAN_DIFF
 
 N_SAMPLES = 50
 
@@ -31,9 +32,9 @@ data_configs = [
 ]
 
 data = {
-    'name': [],
-    'provided_labels_count': [],
-    'impurity_mean_diff': [],
+    NAME: [],
+    PROVIDED_LABELS_COUNT: [],
+    IMPURITY_MEAN_DIFF: [],
 }
 
 for data_config in data_configs:
@@ -45,9 +46,9 @@ for data_config in data_configs:
     label_counts = results[name]['label_counts']
 
     for label_idx in range(len(label_counts)):
-        data['name'].append(name)
-        data['provided_labels_count'].append(label_counts[label_idx])
-        data['impurity_mean_diff'].append(
+        data[NAME].append(name)
+        data[PROVIDED_LABELS_COUNT].append(label_counts[label_idx])
+        data[IMPURITY_MEAN_DIFF].append(
             unlabeled_impurities[label_idx] - labeled_impurities[label_idx])
 
 path = os.path.join(RESULTS_DIR, 'impurity_differences.csv')
