@@ -1,5 +1,5 @@
 import re
-from constants import PLACEHOLDER
+from global_constants import PLACEHOLDER
 from src.helpers.data_manager import DataManager
 from src.utils import write_csv
 

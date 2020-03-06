@@ -5,7 +5,7 @@ datasets.
 """
 import os
 import pandas as pd
-from constants import RESULTS_DIR
+from global_constants import RESULTS_DIR
 from global_utils import load_results
 from src.data_config import DataConfigs
 from analysis.constants import NAME, PROVIDED_LABELS_COUNT, IMPURITY_MEAN_DIFF

@@ -1,6 +1,6 @@
 from copy import copy
 from src.utils import has_digit
-from constants import PLACEHOLDER
+from global_constants import PLACEHOLDER
 from src.parsers.log_parser import LogParser
 
 

@@ -1,6 +1,6 @@
 import re
 import pandas as pd
-from constants import SPLIT_REGEX, PLACEHOLDER
+from global_constants import SPLIT_REGEX, PLACEHOLDER
 from src.utils import read_csv
 
 

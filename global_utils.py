@@ -1,7 +1,7 @@
 import os
 import pickle
 
-from constants import RESULTS_DIR
+from global_constants import RESULTS_DIR
 
 
 def dump_results(name, results):

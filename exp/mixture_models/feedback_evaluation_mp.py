@@ -11,10 +11,13 @@ from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from exp.mixture_models.utils import get_log_labels, get_num_true_clusters, \
     split_on_result_sources, split_on_samples, get_average_from_samples
+from global_constants import LABELED_IMPURITIES_SAMPLES, \
+    UNLABELED_IMPURITIES_SAMPLES, AVG_LABELED_IMPURITIES, \
+    AVG_UNLABELED_IMPURITIES, LABEL_COUNTS, N_LOGS
 
 N_SAMPLES = 3
-LABEL_COUNTS = list(range(0, 601, 100))
-N_LABELS = len(LABEL_COUNTS)
+LABEL_COUNT_VALUES = list(range(0, 601, 100))
+N_LABELS = len(LABEL_COUNT_VALUES)
 
 data_configs = [
     # DataConfigs.Android,
@@ -68,7 +71,7 @@ if __name__ == '__main__':
 
         start = time()
         with mp.Pool(mp.cpu_count()) as pool:
-            total_label_counts = LABEL_COUNTS * N_SAMPLES
+            total_label_counts = LABEL_COUNT_VALUES * N_SAMPLES
             data_config_list = [data_config] * len(total_label_counts)
             arguments = zip(total_label_counts, data_config_list)
             mp_results = pool.starmap(_perform_feedback_experiment, arguments)
@@ -86,12 +89,12 @@ if __name__ == '__main__':
             .get_tokenized_no_num_log_entries()
 
         results[name] = {}
-        results[name]['labeled_impurities_samples'] = lab_samples
-        results[name]['unlabeled_impurities_samples'] = unlab_samples
-        results[name]['avg_labeled_impurities'] = avg_lab_impurities
-        results[name]['avg_unlabeled_impurities'] = avg_unlab_impurities
-        results[name]['label_counts'] = LABEL_COUNTS
-        results[name]['n_logs'] = len(tokenized_log_entries)
+        results[name][LABELED_IMPURITIES_SAMPLES] = lab_samples
+        results[name][UNLABELED_IMPURITIES_SAMPLES] = unlab_samples
+        results[name][AVG_LABELED_IMPURITIES] = avg_lab_impurities
+        results[name][AVG_UNLABELED_IMPURITIES] = avg_unlab_impurities
+        results[name][LABEL_COUNTS] = LABEL_COUNT_VALUES
+        results[name][N_LOGS] = len(tokenized_log_entries)
 
         filename = 'feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES)
         dump_results(filename, results)

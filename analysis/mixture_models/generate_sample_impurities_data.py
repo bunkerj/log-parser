@@ -6,7 +6,7 @@ import os
 import pandas as pd
 from global_utils import load_results
 from src.data_config import DataConfigs
-from constants import RESULTS_DIR
+from global_constants import RESULTS_DIR
 from analysis.constants import NAME, PERCENTAGE_LABELED, LAB_IMPURITY, \
     UNLAB_IMPURITY
 

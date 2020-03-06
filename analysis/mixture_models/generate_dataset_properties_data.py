@@ -3,7 +3,7 @@ Generate a dataset containing features for each of the specified log datasets.
 """
 import os
 import pandas as pd
-from constants import RESULTS_DIR
+from global_constants import RESULTS_DIR
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from exp.mixture_models.utils import get_avg_gini_impurity
