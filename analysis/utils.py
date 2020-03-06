@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import norm
 
 
 def concatenate_row(matrix, array):
@@ -30,29 +31,33 @@ def get_average_row_distances_from_mean(matrix):
     3) Return the average of all of these distances.
     """
     mean = matrix.mean(axis=0, keepdims=True)
-    distances = np.sqrt(((matrix - mean) ** 2).sum(axis=1))
+    distances = norm(matrix - mean, axis=1)
     return distances.mean()
 
 
-def get_intra_cluster_spread(count_per_cluster_split):
+def get_intra_cluster_spread(count_per_cluster_split, C):
     """
     Returns a weighted average of the average distances to the mean vector for
     each cluster.
     """
+    total_count = C.shape[0]
     weighted_avg_distance_to_mean = 0
     for C_cluster in count_per_cluster_split.values():
         avg_dist_to_mean = get_average_row_distances_from_mean(C_cluster)
-        weighted_avg_distance_to_mean += avg_dist_to_mean / C_cluster.shape[0]
-    return weighted_avg_distance_to_mean
+        weighted_avg_distance_to_mean += avg_dist_to_mean * C_cluster.shape[0]
+    return weighted_avg_distance_to_mean / total_count
 
 
-def get_inter_cluster_spread(count_per_cluster_split):
+def get_inter_cluster_spread(count_per_cluster_split, C):
     """
-    Returns the average distance between the means of all clusters with respect
-    to the mean of means.
+    Returns a weighted average distance between the means of every clusters with
+    respect to the global mean.
     """
-    C_means = None
+    total_count = C.shape[0]
+    weighted_avg_distance_to_mean = 0
+    global_mean = C.mean(axis=0, keepdims=True)
     for C_cluster in count_per_cluster_split.values():
         cluster_mean = C_cluster.mean(axis=0, keepdims=True)
-        C_means = concatenate_row(C_means, cluster_mean)
-    return get_average_row_distances_from_mean(C_means)
+        distance = float(norm(global_mean - cluster_mean, axis=1))
+        weighted_avg_distance_to_mean += distance * C_cluster.shape[0]
+    return weighted_avg_distance_to_mean / total_count

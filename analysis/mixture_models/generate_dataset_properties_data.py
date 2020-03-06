@@ -62,9 +62,9 @@ for data_config in data_configs:
     data['true_cluster_count'].append(get_num_true_clusters(true_assignments))
     data['avg_freq_gini'].append(get_avg_gini_impurity(C_probabilities, 1))
     data['intra_cluster_spread'].append(
-        get_intra_cluster_spread(count_cluster_split))
+        get_intra_cluster_spread(count_cluster_split, C))
     data['inter_cluster_spread'].append(
-        get_inter_cluster_spread(count_cluster_split))
+        get_inter_cluster_spread(count_cluster_split, C))
 
 path = os.path.join(RESULTS_DIR, 'dataset_properties.csv')
 
