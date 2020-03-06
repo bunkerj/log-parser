@@ -9,6 +9,8 @@ from global_constants import RESULTS_DIR
 from global_utils import load_results
 from src.data_config import DataConfigs
 from analysis.constants import NAME, PROVIDED_LABELS_COUNT, IMPURITY_MEAN_DIFF
+from global_constants import AVG_LABELED_IMPURITIES, AVG_UNLABELED_IMPURITIES, \
+    LABEL_COUNTS
 
 N_SAMPLES = 50
 
@@ -41,9 +43,9 @@ for data_config in data_configs:
     name = data_config['name']
     results = load_results(
         'feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES))
-    labeled_impurities = results[name]['avg_labeled_impurities']
-    unlabeled_impurities = results[name]['avg_unlabeled_impurities']
-    label_counts = results[name]['label_counts']
+    labeled_impurities = results[name][AVG_LABELED_IMPURITIES]
+    unlabeled_impurities = results[name][AVG_UNLABELED_IMPURITIES]
+    label_counts = results[name][LABEL_COUNTS]
 
     for label_idx in range(len(label_counts)):
         data[NAME].append(name)

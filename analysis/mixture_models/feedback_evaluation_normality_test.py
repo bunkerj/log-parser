@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from global_utils import load_results
 from src.data_config import DataConfigs
 from scipy.stats import shapiro
+from global_constants import LABEL_COUNTS, UNLABELED_IMPURITIES_SAMPLES
 
 N_SAMPLES = 3
 LABEL_COUNT_IDX = 0
@@ -16,8 +17,8 @@ DATA_CONFIG = DataConfigs.Apache
 name = DATA_CONFIG['name']
 results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES))
 
-label_counts = results[name]['label_counts']
-unlab_samples = results[name]['unlabeled_impurities_samples']
+label_counts = results[name][LABEL_COUNTS]
+unlab_samples = results[name][UNLABELED_IMPURITIES_SAMPLES]
 unlab_sample_impurity_values = \
     np.array([sample[LABEL_COUNT_IDX] for sample in unlab_samples])
 

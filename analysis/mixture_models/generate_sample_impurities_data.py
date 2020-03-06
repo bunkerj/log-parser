@@ -9,6 +9,8 @@ from src.data_config import DataConfigs
 from global_constants import RESULTS_DIR
 from analysis.constants import NAME, PERCENTAGE_LABELED, LAB_IMPURITY, \
     UNLAB_IMPURITY
+from global_constants import N_LOGS, LABEL_COUNTS, LABELED_IMPURITIES_SAMPLES, \
+    UNLABELED_IMPURITIES_SAMPLES
 
 N_SAMPLES = 50
 
@@ -42,10 +44,10 @@ for data_config in data_configs:
     name = data_config['name']
     results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(),
                                                            N_SAMPLES))
-    n_logs = results[name]['n_logs']
-    label_counts = results[name]['label_counts']
-    lab_samples = results[name]['labeled_impurities_samples']
-    unlab_samples = results[name]['unlabeled_impurities_samples']
+    n_logs = results[name][N_LOGS]
+    label_counts = results[name][LABEL_COUNTS]
+    lab_samples = results[name][LABELED_IMPURITIES_SAMPLES]
+    unlab_samples = results[name][UNLABELED_IMPURITIES_SAMPLES]
 
     for sample_idx in range(len(lab_samples)):
         lab_sample_values = lab_samples[sample_idx]
