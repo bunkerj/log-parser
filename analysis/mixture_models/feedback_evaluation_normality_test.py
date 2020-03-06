@@ -1,3 +1,7 @@
+"""
+Perform the Shapiro-Wilk test and plot the Q-Q plot for the impurity samples
+for a given dataset at a given label percentage value.
+"""
 import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as plt

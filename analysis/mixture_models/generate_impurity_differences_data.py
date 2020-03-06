@@ -1,3 +1,8 @@
+"""
+Generate a dataset containing the difference between the unsupervised impurity
+means and the semi-supervised impurity means for each of the specified log
+datasets.
+"""
 import os
 import pandas as pd
 from constants import RESULTS_DIR
@@ -28,7 +33,7 @@ data_configs = [
 data = {
     'name': [],
     'provided_labels_count': [],
-    'impurity_pct_diff': [],
+    'impurity_mean_diff': [],
 }
 
 for data_config in data_configs:
@@ -42,7 +47,7 @@ for data_config in data_configs:
     for label_idx in range(len(label_counts)):
         data['name'].append(name)
         data['provided_labels_count'].append(label_counts[label_idx])
-        data['impurity_pct_diff'].append(
+        data['impurity_mean_diff'].append(
             unlabeled_impurities[label_idx] - labeled_impurities[label_idx])
 
 path = os.path.join(RESULTS_DIR, 'impurity_differences.csv')

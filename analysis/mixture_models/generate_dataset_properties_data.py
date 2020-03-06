@@ -1,6 +1,5 @@
 """
-The goal of this script is to create a dataset that includes key properties of
-the various datasets that are being used for clustering.
+Generate a dataset containing features for each of the specified log datasets.
 """
 import os
 import pandas as pd

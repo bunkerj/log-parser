@@ -1,3 +1,7 @@
+"""
+Generate a dataset containing the sample impurities for each of the specified
+log datasets.
+"""
 import os
 import pandas as pd
 from global_utils import load_results
