@@ -1,4 +1,7 @@
 """
+********************************* DEPRECATED *********************************
+[Only used as a performance benchmark against feedback_evaluation_mp]
+******************************************************************************
 Evaluate how different initializations have an impact on impurity when using
 the multinomial mixture model.
 """
