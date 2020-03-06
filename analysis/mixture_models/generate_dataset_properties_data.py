@@ -1,11 +1,6 @@
 """
 The goal of this script is to create a dataset that includes key properties of
 the various datasets that are being used for clustering.
-
-The dataset properties are:
-1) Vocabulary Size
-2) Average Frequency Gini Impurity
-3) True Cluster Count
 """
 import os
 import pandas as pd
@@ -15,8 +10,8 @@ from src.helpers.data_manager import DataManager
 from exp.mixture_models.utils import get_avg_gini_impurity
 from src.utils import get_vocabulary_indices, get_token_counts
 from exp.mixture_models.utils import get_num_true_clusters, normalize_matrix
-from analysis.utils import get_avg_intra_score, \
-    get_avg_inter_score, \
+from analysis.utils import get_intra_cluster_spread, \
+    get_inter_cluster_spread, \
     split_counts_per_cluster
 
 N_SAMPLES = 50
@@ -45,8 +40,8 @@ data = {
     'vocab_size': [],
     'true_cluster_count': [],
     'avg_freq_gini': [],
-    'intra_cluster_score': [],
-    'inter_cluster_score': [],
+    'intra_cluster_spread': [],
+    'inter_cluster_spread': [],
 }
 
 for data_config in data_configs:
@@ -66,8 +61,10 @@ for data_config in data_configs:
     data['vocab_size'].append(len(v_indices))
     data['true_cluster_count'].append(get_num_true_clusters(true_assignments))
     data['avg_freq_gini'].append(get_avg_gini_impurity(C_probabilities, 1))
-    data['intra_cluster_score'].append(get_avg_intra_score(count_cluster_split))
-    data['inter_cluster_score'].append(get_avg_inter_score(count_cluster_split))
+    data['intra_cluster_spread'].append(
+        get_intra_cluster_spread(count_cluster_split))
+    data['inter_cluster_spread'].append(
+        get_inter_cluster_spread(count_cluster_split))
 
 path = os.path.join(RESULTS_DIR, 'dataset_properties.csv')
 

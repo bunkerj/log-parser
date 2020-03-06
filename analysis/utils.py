@@ -10,17 +10,19 @@ def concatenate_row(matrix, array):
 
 
 def split_counts_per_cluster(C, true_assignments):
+    """
+    Returns a dictionary where each key represents a cluster and the value is a
+    matrix containing, as a row, the vector representation of each log.
+    """
     count_cluster_split = {}
     for idx in range(C.shape[0]):
-        C_cluster = None
         cluster = true_assignments[idx][-2]
-        if cluster in count_cluster_split:
-            C_cluster = count_cluster_split[cluster]
+        C_cluster = count_cluster_split.get(cluster)
         count_cluster_split[cluster] = concatenate_row(C_cluster, C[idx, :])
     return count_cluster_split
 
 
-def get_mean_squared_error(matrix):
+def get_average_row_distances_from_mean(matrix):
     """
     1) Compute the mean vector across all row.
     2) For each row, compute the distance between that row and the
@@ -32,17 +34,25 @@ def get_mean_squared_error(matrix):
     return distances.mean()
 
 
-def get_avg_intra_score(count_per_cluster_split):
-    avg_intra_cluster_score = 0
+def get_intra_cluster_spread(count_per_cluster_split):
+    """
+    Returns a weighted average of the average distances to the mean vector for
+    each cluster.
+    """
+    weighted_avg_distance_to_mean = 0
     for C_cluster in count_per_cluster_split.values():
-        intra_cluster_score = get_mean_squared_error(C_cluster)
-        avg_intra_cluster_score += intra_cluster_score / C_cluster.shape[0]
-    return avg_intra_cluster_score
+        avg_dist_to_mean = get_average_row_distances_from_mean(C_cluster)
+        weighted_avg_distance_to_mean += avg_dist_to_mean / C_cluster.shape[0]
+    return weighted_avg_distance_to_mean
 
 
-def get_avg_inter_score(count_per_cluster_split):
+def get_inter_cluster_spread(count_per_cluster_split):
+    """
+    Returns the average distance between the means of all clusters with respect
+    to the mean of means.
+    """
     C_means = None
     for C_cluster in count_per_cluster_split.values():
         cluster_mean = C_cluster.mean(axis=0, keepdims=True)
         C_means = concatenate_row(C_means, cluster_mean)
-    return get_mean_squared_error(C_means)
+    return get_average_row_distances_from_mean(C_means)
