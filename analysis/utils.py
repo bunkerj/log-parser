@@ -64,13 +64,4 @@ def get_inter_cluster_spread(count_per_cluster_split, C):
 
 
 def get_average_from_samples(samples):
-    """
-    Returns single list containing the average of passed samples.
-    """
-    if len(samples) == 0:
-        return None
-    average = [0] * len(samples[0])
-    for sample in samples:
-        for idx, v in enumerate(sample):
-            average[idx] += v / len(samples)
-    return average
+    return np.array(samples).mean(axis=0)
