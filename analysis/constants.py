@@ -5,6 +5,9 @@ TRUE_CLUSTER_COUNT = 'true_cluster_count'
 AVG_TOKEN_COUNT_ENTROPY = 'avg_token_count_entropy'
 INTRA_CLUSTER_SPREAD = 'intra_cluster_spread'
 INTER_CLUSTER_SPREAD = 'inter_cluster_spread'
+SILHOUETTE_SCORE = 'silhouette_score'
+CALINSKI_HARABASZ_SCORE = 'calinski_harabasz_score'
+DAVIES_BOULDIN_SCORE = 'davies_bouldin_score'
 
 # Mean impurity differences features
 PROVIDED_LABELS_COUNT = 'provided_labels_count'

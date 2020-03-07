@@ -9,10 +9,13 @@ from src.helpers.data_manager import DataManager
 from exp.mixture_models.utils import get_avg_entropy
 from src.utils import get_vocabulary_indices, get_token_counts
 from exp.mixture_models.utils import get_num_true_clusters, normalize_matrix
+from sklearn.metrics import silhouette_score, calinski_harabasz_score, \
+    davies_bouldin_score
 from analysis.utils import get_intra_cluster_spread, get_inter_cluster_spread, \
-    split_counts_per_cluster
+    split_counts_per_cluster, get_labels_from_true_assignments
 from analysis.constants import NAME, VOCAB_SIZE, TRUE_CLUSTER_COUNT, \
-    AVG_TOKEN_COUNT_ENTROPY, INTRA_CLUSTER_SPREAD, INTER_CLUSTER_SPREAD
+    AVG_TOKEN_COUNT_ENTROPY, INTRA_CLUSTER_SPREAD, INTER_CLUSTER_SPREAD, \
+    SILHOUETTE_SCORE, CALINSKI_HARABASZ_SCORE, DAVIES_BOULDIN_SCORE
 
 N_SAMPLES = 50
 
@@ -42,6 +45,9 @@ data = {
     AVG_TOKEN_COUNT_ENTROPY: [],
     INTRA_CLUSTER_SPREAD: [],
     INTER_CLUSTER_SPREAD: [],
+    SILHOUETTE_SCORE: [],
+    CALINSKI_HARABASZ_SCORE: [],
+    DAVIES_BOULDIN_SCORE: [],
 }
 
 for data_config in data_configs:
@@ -55,12 +61,20 @@ for data_config in data_configs:
     C_probabilities = normalize_matrix(C, 1)
     count_cluster_split = split_counts_per_cluster(C, true_assignments)
 
+    true_labels = get_labels_from_true_assignments(true_assignments)
+    si_score = silhouette_score(C, true_labels)
+    ch_score = calinski_harabasz_score(C, true_labels)
+    db_score = davies_bouldin_score(C, true_labels)
+
     print('{}: {}'.format(name, len(v_indices)))
 
     data[NAME].append(name)
     data[VOCAB_SIZE].append(len(v_indices))
     data[TRUE_CLUSTER_COUNT].append(get_num_true_clusters(true_assignments))
     data[AVG_TOKEN_COUNT_ENTROPY].append(get_avg_entropy(C_probabilities, 1))
+    data[SILHOUETTE_SCORE].append(si_score)
+    data[CALINSKI_HARABASZ_SCORE].append(ch_score)
+    data[DAVIES_BOULDIN_SCORE].append(db_score)
     data[INTRA_CLUSTER_SPREAD].append(
         get_intra_cluster_spread(count_cluster_split, C))
     data[INTER_CLUSTER_SPREAD].append(

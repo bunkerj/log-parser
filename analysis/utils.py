@@ -69,3 +69,7 @@ def get_avg_from_samples(samples):
 
 def get_var_from_samples(samples):
     return np.array(samples).var(ddof=1, axis=0)
+
+
+def get_labels_from_true_assignments(true_assignments):
+    return [ta[-2] for ta in true_assignments]
