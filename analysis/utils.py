@@ -68,4 +68,4 @@ def get_avg_from_samples(samples):
 
 
 def get_var_from_samples(samples):
-    return np.array(samples).var(axis=0)
+    return np.array(samples).var(ddof=1, axis=0)
