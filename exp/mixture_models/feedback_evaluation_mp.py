@@ -10,10 +10,9 @@ from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from exp.mixture_models.utils import get_log_labels, get_num_true_clusters, \
-    split_on_result_sources, split_on_samples, get_average_from_samples
+    split_on_result_sources, split_on_samples
 from global_constants import LABELED_IMPURITIES_SAMPLES, \
-    UNLABELED_IMPURITIES_SAMPLES, AVG_LABELED_IMPURITIES, \
-    AVG_UNLABELED_IMPURITIES, LABEL_COUNTS, N_LOGS
+    UNLABELED_IMPURITIES_SAMPLES, LABEL_COUNTS, N_LOGS
 
 N_SAMPLES = 3
 LABEL_COUNT_VALUES = list(range(0, 601, 100))
@@ -82,17 +81,12 @@ if __name__ == '__main__':
         lab_samples = split_on_samples(lab_impurities, N_LABELS)
         unlab_samples = split_on_samples(unlab_impurities, N_LABELS)
 
-        avg_lab_impurities = get_average_from_samples(lab_samples)
-        avg_unlab_impurities = get_average_from_samples(unlab_samples)
-
         tokenized_log_entries = DataManager(data_config) \
             .get_tokenized_no_num_log_entries()
 
         results[name] = {}
         results[name][LABELED_IMPURITIES_SAMPLES] = lab_samples
         results[name][UNLABELED_IMPURITIES_SAMPLES] = unlab_samples
-        results[name][AVG_LABELED_IMPURITIES] = avg_lab_impurities
-        results[name][AVG_UNLABELED_IMPURITIES] = avg_unlab_impurities
         results[name][LABEL_COUNTS] = LABEL_COUNT_VALUES
         results[name][N_LOGS] = len(tokenized_log_entries)
 

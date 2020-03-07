@@ -65,16 +65,3 @@ def split_on_result_sources(results):
     lab_impurities = [r[0] for r in results]
     unlab_impurities = [r[1] for r in results]
     return lab_impurities, unlab_impurities
-
-
-def get_average_from_samples(samples):
-    """
-    Returns single list containing the average of passed samples.
-    """
-    if len(samples) == 0:
-        return None
-    average = [0] * len(samples[0])
-    for sample in samples:
-        for idx, v in enumerate(sample):
-            average[idx] += v / len(samples)
-    return average

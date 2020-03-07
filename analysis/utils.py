@@ -61,3 +61,16 @@ def get_inter_cluster_spread(count_per_cluster_split, C):
         distance = float(norm(global_mean - cluster_mean, axis=1))
         weighted_avg_distance_to_mean += distance * C_cluster.shape[0]
     return weighted_avg_distance_to_mean / total_count
+
+
+def get_average_from_samples(samples):
+    """
+    Returns single list containing the average of passed samples.
+    """
+    if len(samples) == 0:
+        return None
+    average = [0] * len(samples[0])
+    for sample in samples:
+        for idx, v in enumerate(sample):
+            average[idx] += v / len(samples)
+    return average
