@@ -63,5 +63,9 @@ def get_inter_cluster_spread(count_per_cluster_split, C):
     return weighted_avg_distance_to_mean / total_count
 
 
-def get_average_from_samples(samples):
+def get_avg_from_samples(samples):
     return np.array(samples).mean(axis=0)
+
+
+def get_var_from_samples(samples):
+    return np.array(samples).var(axis=0)

@@ -9,6 +9,7 @@ INTER_CLUSTER_SPREAD = 'inter_cluster_spread'
 # Mean impurity differences features
 PROVIDED_LABELS_COUNT = 'provided_labels_count'
 IMPURITY_MEAN_DIFF = 'impurity_mean_diff'
+IMPURITY_VAR_SUM = 'impurity_var_sum'
 
 # Sample impurity features
 PERCENTAGE_LABELED = 'percentage_labeled'
