@@ -6,13 +6,13 @@ import pandas as pd
 from global_constants import RESULTS_DIR
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
-from exp.mixture_models.utils import get_avg_gini_impurity
+from exp.mixture_models.utils import get_avg_entropy
 from src.utils import get_vocabulary_indices, get_token_counts
 from exp.mixture_models.utils import get_num_true_clusters, normalize_matrix
 from analysis.utils import get_intra_cluster_spread, get_inter_cluster_spread, \
     split_counts_per_cluster
 from analysis.constants import NAME, VOCAB_SIZE, TRUE_CLUSTER_COUNT, \
-    AVG_FREQ_GINI, INTRA_CLUSTER_SPREAD, INTER_CLUSTER_SPREAD
+    AVG_TOKEN_COUNT_ENTROPY, INTRA_CLUSTER_SPREAD, INTER_CLUSTER_SPREAD
 
 N_SAMPLES = 50
 
@@ -39,7 +39,7 @@ data = {
     NAME: [],
     VOCAB_SIZE: [],
     TRUE_CLUSTER_COUNT: [],
-    AVG_FREQ_GINI: [],
+    AVG_TOKEN_COUNT_ENTROPY: [],
     INTRA_CLUSTER_SPREAD: [],
     INTER_CLUSTER_SPREAD: [],
 }
@@ -60,7 +60,7 @@ for data_config in data_configs:
     data[NAME].append(name)
     data[VOCAB_SIZE].append(len(v_indices))
     data[TRUE_CLUSTER_COUNT].append(get_num_true_clusters(true_assignments))
-    data[AVG_FREQ_GINI].append(get_avg_gini_impurity(C_probabilities, 1))
+    data[AVG_TOKEN_COUNT_ENTROPY].append(get_avg_entropy(C_probabilities, 1))
     data[INTRA_CLUSTER_SPREAD].append(
         get_intra_cluster_spread(count_cluster_split, C))
     data[INTER_CLUSTER_SPREAD].append(

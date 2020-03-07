@@ -1,5 +1,6 @@
 import numpy as np
 from random import sample
+from scipy.stats import entropy
 
 
 def get_log_labels(true_assignments, num_of_labels):
@@ -29,15 +30,11 @@ def normalize_matrix(matrix, axis):
     return np.apply_along_axis(normalize_vector, axis, matrix)
 
 
-def get_gini_impurity(probabilities):
-    return sum(probabilities * (1 - probabilities))
-
-
-def get_avg_gini_impurity(probabilities_matrix, axis):
-    entropy_values = np.apply_along_axis(get_gini_impurity,
+def get_avg_entropy(probabilities_matrix, axis):
+    entropy_values = np.apply_along_axis(entropy,
                                          axis,
                                          probabilities_matrix)
-    return sum(entropy_values) / len(entropy_values)
+    return entropy_values.mean()
 
 
 def split_on_samples(results, n_label_counts):

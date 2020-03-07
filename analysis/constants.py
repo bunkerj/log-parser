@@ -2,7 +2,7 @@
 NAME = 'name'
 VOCAB_SIZE = 'vocab_size'
 TRUE_CLUSTER_COUNT = 'true_cluster_count'
-AVG_FREQ_GINI = 'avg_freq_gini'
+AVG_TOKEN_COUNT_ENTROPY = 'avg_token_count_entropy'
 INTRA_CLUSTER_SPREAD = 'intra_cluster_spread'
 INTER_CLUSTER_SPREAD = 'inter_cluster_spread'
 
