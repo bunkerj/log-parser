@@ -1,5 +1,6 @@
 .idea/
 **/__pycache__/
-results/
+**/.ipynb_checkpoints/
 data/full/unstructured/
 data/full/assignments/
+results/
