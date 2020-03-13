@@ -1,7 +1,5 @@
 import numpy as np
 from numpy.linalg import norm
-from sklearn.model_selection import cross_val_score
-from src.utils import get_random_parameter_tuple
 
 
 def concatenate_row(matrix, array):
