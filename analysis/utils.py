@@ -1,5 +1,7 @@
 import numpy as np
 from numpy.linalg import norm
+from sklearn.model_selection import cross_val_score
+from src.utils import get_random_parameter_tuple
 
 
 def concatenate_row(matrix, array):
@@ -73,3 +75,18 @@ def get_var_from_samples(samples):
 
 def get_labels_from_true_assignments(true_assignments):
     return [ta[-2] for ta in true_assignments]
+
+
+def get_sa_problem(X_df):
+    X_info_df = X_df.describe()
+
+    parameter_ranges_dict = {}
+    for col in X_info_df.columns:
+        parameter_ranges_dict[col] = (
+            X_info_df[col]['min'], X_info_df[col]['max'])
+
+    return {
+        'num_vars': len(parameter_ranges_dict),
+        'names': list(parameter_ranges_dict.keys()),
+        'bounds': [parameter_ranges_dict[k] for k in parameter_ranges_dict],
+    }
