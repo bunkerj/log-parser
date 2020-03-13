@@ -91,20 +91,16 @@ def get_sa_problem(X_df):
     }
 
 
-def normalize_vector(vector):
-    n = sum(vector)
-    if n == 0:
-        return vector
-    else:
-        return vector / n
-
-
-def normalize_matrix(matrix, axis):
-    return np.apply_along_axis(normalize_vector, axis, matrix)
-
-
-def get_avg_entropy(probabilities_matrix, axis):
-    entropy_values = np.apply_along_axis(entropy,
-                                         axis,
-                                         probabilities_matrix)
+def get_avg_entropy(matrix, axis):
+    entropy_values = np.apply_along_axis(entropy, axis, matrix)
     return entropy_values.mean()
+
+
+def get_sum_entropy(matrix):
+    sum_vector = matrix.sum(axis=0)
+    return get_avg_entropy(sum_vector, 0)
+
+
+def get_flat_entropy(matrix):
+    probabilities_vector = matrix.flatten()
+    return get_avg_entropy(probabilities_vector, 0)
