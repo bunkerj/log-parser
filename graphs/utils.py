@@ -47,3 +47,18 @@ def autolabel(ax, rects):
                     xytext=(0, 3),  # 3 points vertical offset
                     textcoords="offset points",
                     ha='center', va='bottom')
+
+
+def plot_morris_method_graph(sensitivity_indices, title):
+    plt.scatter(sensitivity_indices['mu_star'], sensitivity_indices['sigma'],
+                marker='x')
+
+    for idx, name in enumerate(sensitivity_indices['names']):
+        point = (sensitivity_indices['mu_star'][idx],
+                 sensitivity_indices['sigma'][idx])
+        plt.annotate(name, point, fontsize=10, ha='center', va='bottom')
+
+    plt.ylabel(r'$\sigma$')
+    plt.xlabel(r'$\mu^*$')
+    plt.title(title)
+    plt.grid()
