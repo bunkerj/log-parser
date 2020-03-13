@@ -6,13 +6,13 @@ import pandas as pd
 from global_constants import RESULTS_DIR
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
-from exp.mixture_models.utils import get_avg_entropy
 from src.utils import get_vocabulary_indices, get_token_counts
-from exp.mixture_models.utils import get_num_true_clusters, normalize_matrix
+from exp.mixture_models.utils import get_num_true_clusters
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, \
     davies_bouldin_score
 from analysis.utils import get_intra_cluster_spread, get_inter_cluster_spread, \
-    split_counts_per_cluster, get_labels_from_true_assignments
+    split_counts_per_cluster, get_labels_from_true_assignments, \
+    normalize_matrix, get_avg_entropy
 from analysis.constants import NAME, VOCAB_SIZE, TRUE_CLUSTER_COUNT, \
     AVG_TOKEN_COUNT_ENTROPY, INTRA_CLUSTER_SPREAD, INTER_CLUSTER_SPREAD, \
     SILHOUETTE_SCORE, CALINSKI_HARABASZ_SCORE, DAVIES_BOULDIN_SCORE

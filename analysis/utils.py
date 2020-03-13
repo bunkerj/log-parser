@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
+from scipy.stats import entropy
 
 
 def concatenate_row(matrix, array):
@@ -88,3 +89,22 @@ def get_sa_problem(X_df):
         'names': list(parameter_ranges_dict.keys()),
         'bounds': [parameter_ranges_dict[k] for k in parameter_ranges_dict],
     }
+
+
+def normalize_vector(vector):
+    n = sum(vector)
+    if n == 0:
+        return vector
+    else:
+        return vector / n
+
+
+def normalize_matrix(matrix, axis):
+    return np.apply_along_axis(normalize_vector, axis, matrix)
+
+
+def get_avg_entropy(probabilities_matrix, axis):
+    entropy_values = np.apply_along_axis(entropy,
+                                         axis,
+                                         probabilities_matrix)
+    return entropy_values.mean()

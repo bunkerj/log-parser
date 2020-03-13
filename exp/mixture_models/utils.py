@@ -1,6 +1,4 @@
-import numpy as np
 from random import sample
-from scipy.stats import entropy
 
 
 def get_log_labels(true_assignments, num_of_labels):
@@ -16,25 +14,6 @@ def get_log_labels(true_assignments, num_of_labels):
 
 def get_num_true_clusters(true_assignments):
     return len(set(log_data[-1] for log_data in true_assignments))
-
-
-def normalize_vector(vector):
-    n = sum(vector)
-    if n == 0:
-        return vector
-    else:
-        return vector / n
-
-
-def normalize_matrix(matrix, axis):
-    return np.apply_along_axis(normalize_vector, axis, matrix)
-
-
-def get_avg_entropy(probabilities_matrix, axis):
-    entropy_values = np.apply_along_axis(entropy,
-                                         axis,
-                                         probabilities_matrix)
-    return entropy_values.mean()
 
 
 def split_on_samples(results, n_label_counts):
