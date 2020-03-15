@@ -7,7 +7,7 @@ In the comments, are the results as reported by the associated benchmark paper
 from Zhu et al., 2019.
 """
 
-from graphs.utils import show_dataset_comparison_graph
+from graphs.utils import plot_dataset_comparison_graph
 from global_utils import load_results
 
 iplom_benchmark_accuracies = {      # Results from benchmark paper
@@ -31,6 +31,6 @@ iplom_benchmark_accuracies = {      # Results from benchmark paper
 
 final_best_accuracies = load_results('iplom_dataset_comparison.p')
 
-show_dataset_comparison_graph('IPLoM Accuracies',
+plot_dataset_comparison_graph('IPLoM Accuracies',
                               iplom_benchmark_accuracies,
                               final_best_accuracies)

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def show_dataset_comparison_graph(title, benchmark_accuracies,
+def plot_dataset_comparison_graph(title, benchmark_accuracies,
                                   final_best_accuracies):
     relevant_benchmark_accuracies = {}
     for name in benchmark_accuracies:
