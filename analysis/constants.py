@@ -14,8 +14,10 @@ DAVIES_BOULDIN_SCORE = 'davies_bouldin_score'
 
 # Mean impurity differences features
 PROVIDED_LABELS_COUNT = 'provided_labels_count'
-IMPURITY_MEAN_DIFF = 'impurity_mean_diff'
-IMPURITY_VAR_SUM = 'impurity_var_sum'
+AVG_UNLAB_IMPURITY = 'avg_unlab_impurity'
+AVG_LAB_IMPURITY = 'avg_lab_impurity'
+VAR_UNLAB_IMPURITY = 'var_unlab_impurity'
+VAR_LAB_IMPURITY = 'var_lab_impurity'
 
 # Sample impurity features
 PERCENTAGE_LABELED = 'percentage_labeled'
