@@ -62,3 +62,23 @@ def plot_morris_method_graph(sensitivity_indices, title):
     plt.xlabel(r'$\mu^*$')
     plt.title(title)
     plt.grid()
+
+
+def plot_mean_with_ci(df):
+    t = df['provided_labels_count']
+
+    mu1 = df['avg_unlab_impurity']
+    mu2 = df['avg_lab_impurity']
+
+    sigma1 = np.sqrt(df['var_unlab_impurity'])
+    sigma2 = np.sqrt(df['var_lab_impurity'])
+
+    plt.plot(t, mu1, lw=2, label='Avg Unlab Impurity', color='blue')
+    plt.plot(t, mu2, lw=2, label='Avg Lab Impurity', color='green')
+    plt.fill_between(t, mu1 + 2 * sigma1, mu1 - 2 * sigma1, facecolor='blue',
+                     alpha=0.5)
+    plt.fill_between(t, mu2 + 2 * sigma2, mu2 - 2 * sigma2, facecolor='green',
+                     alpha=0.5)
+    plt.xlabel('Num Labels')
+    plt.ylabel('Impurity')
+    plt.grid()
