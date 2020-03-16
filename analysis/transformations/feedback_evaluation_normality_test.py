@@ -17,8 +17,8 @@ DATA_CONFIG = DataConfigs.Apache
 name = DATA_CONFIG['name']
 results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES))
 
-label_counts = results[name][LABEL_COUNTS]
-unlab_samples = results[name][UNLABELED_IMPURITIES_SAMPLES]
+label_counts = results[LABEL_COUNTS]
+unlab_samples = results[UNLABELED_IMPURITIES_SAMPLES]
 unlab_sample_impurity_values = \
     np.array([sample[LABEL_COUNT_IDX] for sample in unlab_samples])
 

@@ -48,9 +48,9 @@ for data_config in data_configs:
     name = data_config['name']
     results = load_results(
         'feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES))
-    labeled_impurity_samples = results[name][LABELED_IMPURITIES_SAMPLES]
-    unlabeled_impurity_samples = results[name][UNLABELED_IMPURITIES_SAMPLES]
-    label_count_values = results[name][LABEL_COUNTS]
+    labeled_impurity_samples = results[LABELED_IMPURITIES_SAMPLES]
+    unlabeled_impurity_samples = results[UNLABELED_IMPURITIES_SAMPLES]
+    label_count_values = results[LABEL_COUNTS]
 
     avg_lab_impurities = get_avg_from_samples(labeled_impurity_samples)
     avg_unlab_impurities = get_avg_from_samples(unlabeled_impurity_samples)

@@ -84,11 +84,12 @@ if __name__ == '__main__':
         tokenized_log_entries = DataManager(data_config) \
             .get_tokenized_no_num_log_entries()
 
-        results[name] = {}
-        results[name][LABELED_IMPURITIES_SAMPLES] = lab_samples
-        results[name][UNLABELED_IMPURITIES_SAMPLES] = unlab_samples
-        results[name][LABEL_COUNTS] = LABEL_COUNT_VALUES
-        results[name][N_LOGS] = len(tokenized_log_entries)
+        results = {
+            LABELED_IMPURITIES_SAMPLES: lab_samples,
+            UNLABELED_IMPURITIES_SAMPLES: unlab_samples,
+            LABEL_COUNTS: LABEL_COUNT_VALUES,
+            N_LOGS: len(tokenized_log_entries)
+        }
 
         filename = 'feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES)
         dump_results(filename, results)

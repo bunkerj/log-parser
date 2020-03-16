@@ -44,10 +44,10 @@ for data_config in data_configs:
     name = data_config['name']
     results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(),
                                                            N_SAMPLES))
-    n_logs = results[name][N_LOGS]
-    label_counts = results[name][LABEL_COUNTS]
-    lab_samples = results[name][LABELED_IMPURITIES_SAMPLES]
-    unlab_samples = results[name][UNLABELED_IMPURITIES_SAMPLES]
+    n_logs = results[N_LOGS]
+    label_counts = results[LABEL_COUNTS]
+    lab_samples = results[LABELED_IMPURITIES_SAMPLES]
+    unlab_samples = results[UNLABELED_IMPURITIES_SAMPLES]
 
     for sample_idx in range(len(lab_samples)):
         lab_sample_values = lab_samples[sample_idx]

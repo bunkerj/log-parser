@@ -12,12 +12,12 @@ DATA_CONFIG = DataConfigs.Apache
 name = DATA_CONFIG['name']
 results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES))
 
-n_logs = results[name]['n_logs']
-label_counts = results[name]['label_counts']
-lab_samples = results[name]['labeled_impurities_samples']
-unlab_samples = results[name]['unlabeled_impurities_samples']
-labeled_impurities = results[name]['avg_labeled_impurities']
-unlabeled_impurities = results[name]['avg_unlabeled_impurities']
+n_logs = results['n_logs']
+label_counts = results['label_counts']
+lab_samples = results['labeled_impurities_samples']
+unlab_samples = results['unlabeled_impurities_samples']
+labeled_impurities = results['avg_labeled_impurities']
+unlabeled_impurities = results['avg_unlabeled_impurities']
 
 label_percentages = [count / n_logs for count in label_counts]
 

@@ -33,9 +33,9 @@ for idx, data_config in enumerate(data_configs):
     results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(),
                                                            N_SAMPLES))
 
-    label_counts = results[name]['label_counts']
-    labeled_impurities = results[name]['avg_labeled_impurities']
-    unlabeled_impurities = results[name]['avg_unlabeled_impurities']
+    label_counts = results['label_counts']
+    labeled_impurities = results['avg_labeled_impurities']
+    unlabeled_impurities = results['avg_unlabeled_impurities']
 
     ax = plt.subplot(4, 4, idx + 1)
     plt.plot(label_counts, labeled_impurities)
