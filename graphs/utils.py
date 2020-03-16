@@ -79,6 +79,4 @@ def plot_mean_with_ci(df):
                      alpha=0.5)
     plt.fill_between(t, mu2 + 2 * sigma2, mu2 - 2 * sigma2, facecolor='green',
                      alpha=0.5)
-    plt.xlabel('Num Labels')
-    plt.ylabel('Impurity')
     plt.grid()
