@@ -1,7 +1,7 @@
 from copy import copy
 from src.utils import has_digit
 from global_constants import PLACEHOLDER
-from src.parsers.log_parser import LogParser
+from src.parsers.base.log_parser import LogParser
 
 
 class Node:

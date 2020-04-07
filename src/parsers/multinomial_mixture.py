@@ -1,7 +1,7 @@
 import numpy as np
 from copy import deepcopy
 from random import sample
-from src.parsers.log_parser import LogParser
+from src.parsers.base.log_parser import LogParser
 from src.utils import get_vocabulary_indices, get_token_counts
 
 LIKELIHOOD_THRESHOLD = 1
