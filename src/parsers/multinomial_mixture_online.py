@@ -1,6 +1,7 @@
 import numpy as np
 from src.parsers.base.log_parser_online import LogParserOnline
 from src.utils import get_vocabulary_indices
+from scipy.stats import multinomial as multi
 
 
 class MultinomialMixtureOnline(LogParserOnline):
@@ -17,14 +18,25 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.Theta = np.random.dirichlet(np.ones(len(self.v_indices)),
                                          size=num_clusters)
 
-    def initialize_parameters(self, tokenized_log_entries):
+    def perform_regular_cem(self, tokenized_log_entries, n_iter=1):
         """
-        Perform one round of CEM to initialize parameters.
+        Perform n_iter rounds of CEM to initialize parameters.
         """
+        for _ in range(n_iter):
+            for tokenized_log in tokenized_log_entries:
+                self._update_sufficient_statistics(tokenized_log)
+            self._update_parameters()
+            self.N = 0
+
+    def get_classification_likelihood(self, tokenized_log_entries):
+        cl = 0
         for tokenized_log in tokenized_log_entries:
-            self._update_sufficient_statistics(tokenized_log)
-        self._update_parameters()
-        self.N = 0
+            token_counts = self._get_token_counts(tokenized_log)
+            n = sum(token_counts)
+            g = self._get_max_posterior_cluster(token_counts)
+            cl += np.log(
+                self.Pi[g] * multi.pmf(token_counts, n, self.Theta[g, :]))
+        return cl
 
     def process_single_log(self, tokenized_log):
         self._update_sufficient_statistics(tokenized_log)
@@ -66,8 +78,9 @@ class MultinomialMixtureOnline(LogParserOnline):
     def _get_max_posterior_cluster(self, token_counts):
         cluster_scores = np.zeros(self.num_clusters)
         for g in range(self.num_clusters):
-            cluster_scores[g] = self.Pi[g] * self._multi_term(token_counts, g)
+            cluster_scores[g] = \
+                self.Pi[g] * self._unnormalized_multi(token_counts, g)
         return int(cluster_scores.argmax())
 
-    def _multi_term(self, token_counts, g):
+    def _unnormalized_multi(self, token_counts, g):
         return (self.Theta[g, :] ** token_counts).prod()
