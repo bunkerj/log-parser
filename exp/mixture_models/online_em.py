@@ -60,8 +60,8 @@ for sample_size in N_SAMPLE_SIZES:
 
     # Fit parameters on all data points within the sample
     sample_cem_parser = deepcopy(cem_parser)
-    sample_online_em_parser = deepcopy(online_em_parser)
     sample_online_cem_parser = deepcopy(online_cem_parser)
+    sample_online_em_parser = deepcopy(online_em_parser)
 
     cem_timing = time()
     sample_cem_parser.perform_offline_em(sample_log_entries)
@@ -79,17 +79,17 @@ for sample_size in N_SAMPLE_SIZES:
     evaluator = Evaluator(true_assignments)
 
     cem_clusters = sample_cem_parser.get_clusters(log_entries)
-    online_em_clusters = sample_online_em_parser.get_clusters(log_entries)
     online_cem_clusters = sample_online_cem_parser.get_clusters(log_entries)
+    online_em_clusters = sample_online_em_parser.get_clusters(log_entries)
 
     cem_accuracy = evaluator.evaluate(cem_clusters)
-    online_em_accuracy = evaluator.evaluate(online_em_clusters)
     online_cem_accuracy = evaluator.evaluate(online_cem_clusters)
+    online_em_accuracy = evaluator.evaluate(online_em_clusters)
 
     # Save accuracies and timings
     results['cem']['accuracies'].append(cem_accuracy)
-    results['online_cem']['accuracies'].append(online_em_accuracy)
-    results['online_em']['accuracies'].append(online_cem_accuracy)
+    results['online_cem']['accuracies'].append(online_cem_accuracy)
+    results['online_em']['accuracies'].append(online_em_accuracy)
     results['cem']['timings'].append(cem_timing)
     results['online_cem']['timings'].append(online_cem_timing)
     results['online_em']['timings'].append(online_em_timing)
