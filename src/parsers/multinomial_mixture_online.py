@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.special import factorial as fact
 from src.parsers.base.log_parser_online import LogParserOnline
 from src.utils import get_vocabulary_indices
 from scipy.stats import multinomial as multi
@@ -38,15 +39,26 @@ class MultinomialMixtureOnline(LogParserOnline):
             self._update_parameters()
             self.N = 0
 
-    def get_classification_likelihood(self, tokenized_log_entries):
-        cl = 0
-        for tokenized_log in tokenized_log_entries:
-            token_counts = self._get_token_counts(tokenized_log)
-            n = sum(token_counts)
-            g = self._get_responsibilities(token_counts)
-            cl += np.log(
-                self.Pi[g] * multi.pmf(token_counts, n, self.Theta[g, :]))
-        return cl
+    def get_classification_likelihood(self, token_count_list):
+        likelihood = 0
+        for token_counts in token_count_list:
+            g = self._get_best_cluster(token_counts)
+            likelihood += np.log(
+                self.Pi[g] * self._multi(token_counts, self.Theta[g, :]))
+        return likelihood
+
+    def get_classical_likelihood(self, token_count_list):
+        likelihood = 0
+        for token_counts in token_count_list:
+            sum_term = 0
+            for g in range(self.num_clusters):
+                sum_term += \
+                    self.Pi[g] * self._multi(token_counts, self.Theta[g, :])
+            likelihood = np.log(sum_term)
+        return likelihood
+
+    def find_best_initialization(self, tokenized_log_entries):
+        pass
 
     def get_clusters(self, tokenized_log_entries):
         cluster_templates = {}
@@ -97,8 +109,8 @@ class MultinomialMixtureOnline(LogParserOnline):
     def _get_responsibilities(self, token_counts):
         r = np.zeros((self.num_clusters, 1))
         for g in range(self.num_clusters):
-            r[g] = self.Pi[g] * self._unnormalized_multi(token_counts, g)
+            r[g] = self.Pi[g] * self._multi(token_counts, self.Theta[g, :])
         return r / r.sum()
 
-    def _unnormalized_multi(self, token_counts, g):
-        return (self.Theta[g, :] ** token_counts.flatten()).prod()
+    def _multi(self, x, params):
+        return multi.pmf(x, x.sum(), params)
