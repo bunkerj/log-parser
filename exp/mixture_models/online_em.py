@@ -25,35 +25,25 @@ n_true_clusters = get_num_true_clusters(true_assignments)
 
 # Find proper initialization
 initial_indices = sample(range(len(log_entries)), k=N_INITIAL)
-initial_log_entries = log_entries[initial_indices]
+initial_log_entries = [log_entries[idx] for idx in initial_indices]
 
 cem_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, True)
 online_cem_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, True)
 online_em_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, False)
 
-cem_parser.find_best_initialization(initial_log_entries)
-online_cem_parser.find_best_initialization(initial_log_entries)
-online_em_parser.find_best_initialization(initial_log_entries)
+# cem_parser.find_best_initialization(initial_log_entries)
+# online_cem_parser.find_best_initialization(initial_log_entries)
+# online_em_parser.find_best_initialization(initial_log_entries)
 
 results = {
-    'cem': {
-        'accuracies': [],
-        'timings': [],
-        'sample_sizes': N_SAMPLE_SIZES
-    },
-    'online_cem': {
-        'accuracies': [],
-        'timings': [],
-        'sample_sizes': N_SAMPLE_SIZES
-    },
-    'online_em': {
-        'accuracies': [],
-        'timings': [],
-        'sample_sizes': N_SAMPLE_SIZES
-    },
+    'sample_sizes': N_SAMPLE_SIZES,
+    'accuracies': {'cem': [], 'online_cem': [], 'online_em': []},
+    'timings': {'cem': [], 'online_cem': [], 'online_em': []},
 }
 
 for sample_size in N_SAMPLE_SIZES:
+    print('Sample size: {}...'.format(sample_size))
+
     # Randomly sample data based on sample_size
     sample_indices = sample(range(len(log_entries)), k=sample_size)
     sample_log_entries = [log_entries[idx] for idx in sample_indices]
@@ -86,12 +76,18 @@ for sample_size in N_SAMPLE_SIZES:
     online_cem_accuracy = evaluator.evaluate(online_cem_clusters)
     online_em_accuracy = evaluator.evaluate(online_em_clusters)
 
-    # Save accuracies and timings
-    results['cem']['accuracies'].append(cem_accuracy)
-    results['online_cem']['accuracies'].append(online_cem_accuracy)
-    results['online_em']['accuracies'].append(online_em_accuracy)
-    results['cem']['timings'].append(cem_timing)
-    results['online_cem']['timings'].append(online_cem_timing)
-    results['online_em']['timings'].append(online_em_timing)
+    # Record accuracies
+    results_acc = results['accuracies']
+    results_acc['cem'].append(cem_accuracy)
+    results_acc['online_cem'].append(online_cem_accuracy)
+    results_acc['online_em'].append(online_em_accuracy)
+
+    # Record timings
+    results_tim = results['timings']
+    results_tim['cem'].append(cem_timing)
+    results_tim['online_cem'].append(online_cem_timing)
+    results_tim['online_em'].append(online_em_timing)
 
 dump_results('online_em_results.p', results)
+
+print('done!')
