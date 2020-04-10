@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class LogParserOnline(ABC):
     @abstractmethod
-    def process_single_log(self, tokenized_log):
+    def perform_online_em(self, tokenized_log):
         pass
 
     @abstractmethod
