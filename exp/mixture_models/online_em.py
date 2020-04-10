@@ -31,9 +31,9 @@ cem_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, True)
 online_cem_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, True)
 online_em_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, False)
 
-# cem_parser.find_best_initialization(initial_log_entries)
-# online_cem_parser.find_best_initialization(initial_log_entries)
-# online_em_parser.find_best_initialization(initial_log_entries)
+cem_parser.find_best_initialization(initial_log_entries)
+online_cem_parser.find_best_initialization(initial_log_entries)
+online_em_parser.find_best_initialization(initial_log_entries)
 
 results = {
     'sample_sizes': N_SAMPLE_SIZES,
