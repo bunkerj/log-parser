@@ -6,7 +6,7 @@ from scipy.stats import multinomial as multi
 
 class MultinomialMixtureOnline(LogParserOnline):
     def __init__(self, num_clusters, tokenized_log_entries,
-                 is_classification=True, alpha=2, beta=2, epsilon=1):
+                 is_classification=True, alpha=2, beta=2, epsilon=0.001):
         self.epsilon = epsilon
         self.alpha = alpha
         self.beta = beta
@@ -98,7 +98,7 @@ class MultinomialMixtureOnline(LogParserOnline):
     def _should_stop_offline_em(self, current_ll, past_ll):
         if None in [current_ll, past_ll]:
             return False
-        return (current_ll - past_ll) < self.epsilon
+        return abs((current_ll - past_ll) / past_ll) < self.epsilon
 
     def _init_params(self, num_clusters, num_vocab):
         self.pi = np.random.dirichlet(np.ones(num_clusters))

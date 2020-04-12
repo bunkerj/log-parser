@@ -1,16 +1,23 @@
 import matplotlib.pyplot as plt
 from global_utils import load_results
 
-results = load_results('offline_vs_online_em_results.p')
+DIM = (2, 4)
+results = load_results('offline_vs_online_em_results2.p')
 
-offline_log_likelihood = results['offline_log_likelihood']
-online_log_likelihood = results['online_log_likelihood']
-epochs = list(range(len(offline_log_likelihood)))
+for idx, name in enumerate(results):
+    offline_log_likelihood = results[name]['offline']
+    online_log_likelihood = results[name]['online']
+    epochs = list(range(len(offline_log_likelihood)))
 
-plt.plot(epochs, offline_log_likelihood)
-plt.plot(epochs, online_log_likelihood)
-plt.legend(['Offline EM', 'Online EM'])
-plt.ylabel('Log-likelihood')
-plt.xlabel('Epoch')
-plt.grid()
+    plt.subplot(*DIM, idx + 1)
+    plt.plot(epochs, offline_log_likelihood)
+    plt.plot(epochs, online_log_likelihood)
+    plt.title(name)
+    plt.ylabel('Log-likelihood')
+    plt.xlabel('Epoch')
+    plt.grid()
+
+    if idx == 0:
+        plt.legend(['Offline EM', 'Online EM'])
+
 plt.show()
