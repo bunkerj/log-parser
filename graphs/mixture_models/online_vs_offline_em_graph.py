@@ -13,11 +13,11 @@ for idx, name in enumerate(results):
     plt.plot(epochs, offline_log_likelihood)
     plt.plot(epochs, online_log_likelihood)
     plt.title(name)
-    plt.ylabel('Log-likelihood')
-    plt.xlabel('Epoch')
     plt.grid()
 
-    if idx == 0:
+    if idx == ((DIM[0] - 1) * DIM[1]):
+        plt.ylabel('Log-likelihood')
+        plt.xlabel('Epoch')
         plt.legend(['Offline EM', 'Online EM'])
 
 plt.show()
