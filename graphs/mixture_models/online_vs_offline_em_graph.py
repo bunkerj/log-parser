@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from global_utils import load_results
 
 DIM = (2, 4)
-results = load_results('offline_vs_online_em_results2.p')
+results = load_results('offline_vs_online_em_results.p')
 
 for idx, name in enumerate(results):
     offline_log_likelihood = results[name]['offline']
