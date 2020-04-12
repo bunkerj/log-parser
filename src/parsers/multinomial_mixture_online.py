@@ -15,13 +15,13 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.v_indices = get_vocabulary_indices(tokenized_log_entries)
         self.log_likelihood_history = []
 
-        self.N = None
-        self.T_z = None
-        self.T_xz = None
+        self.n = None
+        self.t_z = None
+        self.t_xz = None
         self._init_sufficient_stats(self.num_clusters, len(self.v_indices))
 
         self.pi = None
-        self.Theta = None
+        self.theta = None
         self._init_params(self.num_clusters, len(self.v_indices))
 
     def perform_online_em(self, tokenized_log):
@@ -69,16 +69,21 @@ class MultinomialMixtureOnline(LogParserOnline):
         best_Theta = None
         for _ in range(n_iter):
             self._init_params(self.num_clusters, len(self.v_indices))
-            self._init_sufficient_stats(self.num_clusters, len(self.v_indices))
             self.perform_offline_em(tokenized_log_entries)
             ll = self.get_log_likelihood(tokenized_log_entries)
             if best_ll is None or ll > best_ll:
                 best_ll = ll
                 best_Pi = self.pi
-                best_Theta = self.Theta
+                best_Theta = self.theta
         self.pi = best_Pi
-        self.Theta = best_Theta
-        self.perform_offline_em(tokenized_log_entries)
+        self.theta = best_Theta
+        self._init_sufficient_stats(self.num_clusters, len(self.v_indices))
+
+    def get_parameters(self):
+        return self.pi, self.theta
+
+    def set_parameters(self, parameters):
+        self.pi, self.theta = parameters
 
     def get_clusters(self, tokenized_log_entries):
         cluster_templates = {}
@@ -102,20 +107,20 @@ class MultinomialMixtureOnline(LogParserOnline):
 
     def _init_params(self, num_clusters, num_vocab):
         self.pi = np.random.dirichlet(np.ones(num_clusters))
-        self.Theta = np.random.dirichlet(np.ones(num_vocab),
+        self.theta = np.random.dirichlet(np.ones(num_vocab),
                                          size=num_clusters)
 
     def _init_sufficient_stats(self, num_clusters, num_vocab):
-        self.N = 0
-        self.T_z = np.zeros((num_clusters, 1)) / num_clusters
-        self.T_xz = np.zeros((num_clusters, num_vocab)) / num_vocab
+        self.n = 0
+        self.t_z = np.zeros((num_clusters, 1)) / num_clusters
+        self.t_xz = np.zeros((num_clusters, num_vocab)) / num_vocab
 
     def _get_classification_log_likelihood(self, token_count_list):
         likelihood = 0
         for token_counts in token_count_list:
             g = self._get_best_cluster(token_counts)
             likelihood += np.log(
-                self.pi[g] * self._multi(token_counts, self.Theta[g, :]))
+                self.pi[g] * self._multi(token_counts, self.theta[g, :]))
         return likelihood
 
     def _get_classical_log_likelihood(self, token_count_list):
@@ -124,7 +129,7 @@ class MultinomialMixtureOnline(LogParserOnline):
             sum_term = 0
             for g in range(self.num_clusters):
                 sum_term += \
-                    self.pi[g] * self._multi(token_counts, self.Theta[g, :])
+                    self.pi[g] * self._multi(token_counts, self.theta[g, :])
             likelihood = np.log(sum_term)
         return likelihood
 
@@ -140,14 +145,14 @@ class MultinomialMixtureOnline(LogParserOnline):
         current_T_z = r + (self.alpha - 1)
         current_T_xz = r @ token_counts.T + (self.beta - 1)
 
-        if self.N == 0:
-            self.T_z = current_T_z
-            self.T_xz = current_T_xz
+        if self.n == 0:
+            self.t_z = current_T_z
+            self.t_xz = current_T_xz
         else:
-            self.T_z += (current_T_z - self.T_z) / (self.N + 1)
-            self.T_xz += + (current_T_xz - self.T_xz) / (self.N + 1)
+            self.t_z += (current_T_z - self.t_z) / (self.n + 1)
+            self.t_xz += + (current_T_xz - self.t_xz) / (self.n + 1)
 
-        self.N += 1
+        self.n += 1
 
     def _get_best_cluster(self, token_counts):
         r = self._get_responsibilities(token_counts)
@@ -165,13 +170,13 @@ class MultinomialMixtureOnline(LogParserOnline):
                 tokenized_log_entries]
 
     def _update_parameters(self):
-        self.pi = self.T_z / self.T_z.max()
-        self.Theta = self.T_xz / self.T_xz.sum(axis=1)[:, np.newaxis]
+        self.pi = self.t_z / self.t_z.max()
+        self.theta = self.t_xz / self.t_xz.sum(axis=1)[:, np.newaxis]
 
     def _get_responsibilities(self, token_counts):
         r = np.zeros((self.num_clusters, 1))
         for g in range(self.num_clusters):
-            r[g] = self.pi[g] * self._multi(token_counts, self.Theta[g, :])
+            r[g] = self.pi[g] * self._multi(token_counts, self.theta[g, :])
         return r / r.sum()
 
     def _multi(self, x, params):
