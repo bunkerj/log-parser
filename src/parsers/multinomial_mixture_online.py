@@ -1,4 +1,5 @@
 import numpy as np
+from copy import deepcopy
 from src.parsers.base.log_parser_online import LogParserOnline
 from src.utils import get_vocabulary_indices
 from scipy.stats import multinomial as multi
@@ -80,7 +81,7 @@ class MultinomialMixtureOnline(LogParserOnline):
         self._init_sufficient_stats(self.num_clusters, len(self.v_indices))
 
     def get_parameters(self):
-        return self.pi, self.theta
+        return deepcopy(self.pi), deepcopy(self.theta)
 
     def set_parameters(self, parameters):
         self.pi, self.theta = parameters
