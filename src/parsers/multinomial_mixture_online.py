@@ -54,10 +54,10 @@ class MultinomialMixtureOnline(LogParserOnline):
                                                len(self.v_indices))
             current_ll, past_ll = \
                 self.get_log_likelihood(tokenized_log_entries), current_ll
-            if self._should_stop_offline_em(current_ll, past_ll):
-                break
             if track_history:
                 self.log_likelihood_history.append(current_ll)
+            if self._should_stop_offline_em(current_ll, past_ll):
+                break
 
     def label_logs(self, log_labels, tokenized_log_entries):
         for cluster_idx, log_indices in enumerate(log_labels.values()):
