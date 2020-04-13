@@ -25,7 +25,7 @@ class MultinomialMixtureOnline(LogParserOnline):
 
         self.pi = None
         self.theta = None
-        self._init_params(self.num_clusters, len(self.v_indices))
+        self._init_parameters(self.num_clusters, len(self.v_indices))
 
     def perform_online_em(self, tokenized_log):
         self._update_sufficient_statistics(tokenized_log)
@@ -78,7 +78,7 @@ class MultinomialMixtureOnline(LogParserOnline):
         best_Pi = None
         best_Theta = None
         for _ in range(n_iter):
-            self._init_params(self.num_clusters, len(self.v_indices))
+            self._init_parameters(self.num_clusters, len(self.v_indices))
             self.perform_offline_em(tokenized_log_entries)
             ll = self.get_log_likelihood(tokenized_log_entries)
             if best_ll is None or ll > best_ll:
@@ -115,7 +115,7 @@ class MultinomialMixtureOnline(LogParserOnline):
             return False
         return abs((current_ll - past_ll) / past_ll) < self.epsilon
 
-    def _init_params(self, num_clusters, num_vocab):
+    def _init_parameters(self, num_clusters, num_vocab):
         self.pi = np.random.dirichlet(np.ones(num_clusters))
         self.theta = np.random.dirichlet(np.ones(num_vocab),
                                          size=num_clusters)
