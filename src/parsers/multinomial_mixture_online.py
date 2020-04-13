@@ -17,7 +17,6 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.log_likelihood_history = []
         self.labeled_indices = []
 
-        self.n = None
         self.t_z = None
         self.t_xz = None
         self.t_l = np.zeros((self.num_clusters, 1))
@@ -128,7 +127,6 @@ class MultinomialMixtureOnline(LogParserOnline):
                                          size=num_clusters)
 
     def _init_latent_sufficient_stats(self, num_clusters, num_vocab):
-        self.n = 0
         self.t_z = np.zeros((num_clusters, 1))
         self.t_xz = np.zeros((num_clusters, num_vocab))
 
@@ -159,18 +157,9 @@ class MultinomialMixtureOnline(LogParserOnline):
             r = np.zeros(r.shape)
             r[cluster_idx] = 1
 
-        current_T_z = r + (self.alpha - 1)
-        current_T_xz = r @ token_counts.T + (self.beta - 1)
-
-        if self.n == 0:
-            self.t_z = current_T_z
-            self.t_xz = current_T_xz
-        else:
-            self.t_z += (current_T_z - self.t_z) / (self.n + 1)
-            self.t_xz += + (current_T_xz - self.t_xz) / (self.n + 1)
-
-        self.n += 1
-
+        self.t_z += r + (self.alpha - 1)
+        self.t_xz += r @ token_counts.T + (self.beta - 1)
+        
     def _get_best_cluster(self, token_counts):
         r = self._get_responsibilities(token_counts)
         return int(r.argmax())
