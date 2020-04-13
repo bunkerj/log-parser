@@ -1,5 +1,5 @@
 """
-Evaluate and compare the timings and accuracies between CEM, Online EM, and
+Evaluate and compare the timings and scores between CEM, Online EM, and
 Online CEM.
 """
 import numpy as np
@@ -14,7 +14,6 @@ from src.helpers.evaluator import Evaluator
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 DATA_CONFIG = DataConfigs.Apache
-N_INITIAL = 30
 N_SAMPLE_SIZES = list(np.linspace(50, 2000, 40, dtype=np.int))
 
 # Get relevant data
@@ -23,21 +22,17 @@ log_entries = data_manager.get_tokenized_no_num_log_entries()
 true_assignments = data_manager.get_true_assignments()
 n_true_clusters = get_num_true_clusters(true_assignments)
 
-# Find proper initialization
-initial_indices = sample(range(len(log_entries)), k=N_INITIAL)
-initial_log_entries = [log_entries[idx] for idx in initial_indices]
-
 cem_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, True)
-online_cem_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, True)
-online_em_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, False)
 
-cem_parser.find_best_initialization(initial_log_entries)
-online_cem_parser.find_best_initialization(initial_log_entries)
-online_em_parser.find_best_initialization(initial_log_entries)
+online_cem_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, True)
+online_cem_parser.set_parameters(cem_parser.get_parameters())
+
+online_em_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, False)
+online_em_parser.set_parameters(cem_parser.get_parameters())
 
 results = {
     'sample_sizes': N_SAMPLE_SIZES,
-    'accuracies': {'cem': [], 'online_cem': [], 'online_em': []},
+    'scores': {'cem': [], 'online_cem': [], 'online_em': []},
     'timings': {'cem': [], 'online_cem': [], 'online_em': []},
 }
 
@@ -72,15 +67,15 @@ for sample_size in N_SAMPLE_SIZES:
     online_cem_clusters = sample_online_cem_parser.get_clusters(log_entries)
     online_em_clusters = sample_online_em_parser.get_clusters(log_entries)
 
-    cem_accuracy = evaluator.evaluate(cem_clusters)
-    online_cem_accuracy = evaluator.evaluate(online_cem_clusters)
-    online_em_accuracy = evaluator.evaluate(online_em_clusters)
+    cem_score = evaluator.get_impurity(cem_clusters, [])
+    online_cem_score = evaluator.get_impurity(online_cem_clusters, [])
+    online_em_score = evaluator.get_impurity(online_em_clusters, [])
 
     # Record accuracies
-    results_acc = results['accuracies']
-    results_acc['cem'].append(cem_accuracy)
-    results_acc['online_cem'].append(online_cem_accuracy)
-    results_acc['online_em'].append(online_em_accuracy)
+    results_acc = results['scores']
+    results_acc['cem'].append(cem_score)
+    results_acc['online_cem'].append(online_cem_score)
+    results_acc['online_em'].append(online_em_score)
 
     # Record timings
     results_tim = results['timings']
