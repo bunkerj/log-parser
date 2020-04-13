@@ -159,7 +159,7 @@ class MultinomialMixtureOnline(LogParserOnline):
 
         self.t_z += r + (self.alpha - 1)
         self.t_xz += r @ token_counts.T + (self.beta - 1)
-        
+
     def _get_best_cluster(self, token_counts):
         r = self._get_responsibilities(token_counts)
         return int(r.argmax())
@@ -176,8 +176,9 @@ class MultinomialMixtureOnline(LogParserOnline):
                 tokenized_log_entries]
 
     def _update_parameters(self):
-        self.pi = self.t_z / self.t_z.sum()
-        self.theta = self.t_xz / self.t_xz.sum(axis=1)[:, np.newaxis]
+        self.pi = (self.t_z + self.t_l) / (self.t_z + self.t_l).sum()
+        self.theta = (self.t_xz + self.t_yl) / \
+                     (self.t_xz + self.t_l).sum(axis=1)[:, np.newaxis]
 
     def _get_responsibilities(self, token_counts):
         r = np.zeros((self.num_clusters, 1))
