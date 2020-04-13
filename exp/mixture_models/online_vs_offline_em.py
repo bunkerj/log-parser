@@ -40,7 +40,8 @@ for data_config in data_configs:
     true_assignments = data_manager.get_true_assignments()
     n_true_clusters = get_num_true_clusters(true_assignments)
 
-    offline_em_parser = MultinomialMixtureOnline(log_entries, n_true_clusters,
+    offline_em_parser = MultinomialMixtureOnline(log_entries,
+                                                 n_true_clusters,
                                                  False)
     online_em_parser = deepcopy(offline_em_parser)
 
@@ -49,7 +50,8 @@ for data_config in data_configs:
     results[name]['offline'] = offline_ll_history
 
     online_em_parser.perform_online_batch_em(log_entries,
-                                             len(offline_ll_history) - 1, True)
+                                             len(offline_ll_history) - 1,
+                                             True)
     online_ll_history = online_em_parser.get_log_likelihood_history()
     results[name]['online'] = online_ll_history
 
