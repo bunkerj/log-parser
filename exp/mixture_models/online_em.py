@@ -22,12 +22,12 @@ log_entries = data_manager.get_tokenized_no_num_log_entries()
 true_assignments = data_manager.get_true_assignments()
 n_true_clusters = get_num_true_clusters(true_assignments)
 
-cem_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, True)
+cem_parser = MultinomialMixtureOnline(log_entries, n_true_clusters, True)
 
-online_cem_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, True)
+online_cem_parser = MultinomialMixtureOnline(log_entries, n_true_clusters, True)
 online_cem_parser.set_parameters(cem_parser.get_parameters())
 
-online_em_parser = MultinomialMixtureOnline(n_true_clusters, log_entries, False)
+online_em_parser = MultinomialMixtureOnline(log_entries, n_true_clusters, False)
 online_em_parser.set_parameters(cem_parser.get_parameters())
 
 results = {

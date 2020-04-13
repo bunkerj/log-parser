@@ -6,7 +6,7 @@ from scipy.stats import multinomial as multi
 
 
 class MultinomialMixtureOnline(LogParserOnline):
-    def __init__(self, num_clusters, tokenized_log_entries,
+    def __init__(self, tokenized_log_entries, num_clusters,
                  is_classification=True, alpha=2, beta=2, epsilon=0.001):
         self.epsilon = epsilon
         self.alpha = alpha

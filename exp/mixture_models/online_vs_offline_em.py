@@ -40,7 +40,7 @@ for data_config in data_configs:
     true_assignments = data_manager.get_true_assignments()
     n_true_clusters = get_num_true_clusters(true_assignments)
 
-    offline_em_parser = MultinomialMixtureOnline(n_true_clusters, log_entries,
+    offline_em_parser = MultinomialMixtureOnline(log_entries, n_true_clusters,
                                                  False)
     online_em_parser = deepcopy(offline_em_parser)
 
