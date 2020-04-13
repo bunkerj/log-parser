@@ -187,7 +187,7 @@ class MultinomialMixtureOnline(LogParserOnline):
                 tokenized_log_entries]
 
     def _update_parameters(self):
-        self.pi = self.t_z / self.t_z.max()
+        self.pi = self.t_z / self.t_z.sum()
         self.theta = self.t_xz / self.t_xz.sum(axis=1)[:, np.newaxis]
 
     def _get_responsibilities(self, token_counts):
