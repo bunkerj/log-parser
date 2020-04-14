@@ -133,7 +133,7 @@ class MultinomialMixtureOnline(LogParserOnline):
         for token_counts in token_count_list:
             g = self._get_best_cluster(token_counts)
             likelihood += np.log(
-                self.pi[g] * self._multi(token_counts, self.theta[g, :]))
+                self.pi[g] * multi(token_counts, self.theta[g, :]))
         return likelihood
 
     def _get_classical_log_likelihood(self, token_count_list):
@@ -141,8 +141,7 @@ class MultinomialMixtureOnline(LogParserOnline):
         for token_counts in token_count_list:
             sum_term = 0
             for g in range(self.num_clusters):
-                sum_term += \
-                    self.pi[g] * self._multi(token_counts, self.theta[g, :])
+                sum_term += self.pi[g] * multi(token_counts, self.theta[g, :])
             likelihood = np.log(sum_term)
         return float(likelihood)
 
