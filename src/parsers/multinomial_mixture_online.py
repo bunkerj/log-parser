@@ -76,15 +76,17 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.t_zl = self.t_l + self.alpha - 1
         self.t_xzyl = self.t_yl + self.beta - 1
 
-    def find_best_initialization(self, tokenized_log_entries, n_init=10):
+    def find_best_initialization(self, init_log_entries, n_init=10):
         best_ll = None
         best_Pi = None
         best_Theta = None
 
         for _ in range(n_init):
             self._init_parameters(self.num_clusters, len(self.v_indices))
-            self.perform_offline_em(tokenized_log_entries)
-            ll = self.get_log_likelihood(tokenized_log_entries)
+            for tokenized_log in init_log_entries:
+                self._update_sufficient_statistics(tokenized_log)
+            self._update_parameters()
+            ll = self.get_log_likelihood(init_log_entries)
             if best_ll is None or ll > best_ll:
                 best_ll = ll
                 best_Pi = self.pi
@@ -94,7 +96,7 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.pi = best_Pi
         self.theta = best_Theta
 
-        for tokenized_log in tokenized_log_entries:
+        for tokenized_log in init_log_entries:
             self._update_sufficient_statistics(tokenized_log, True)
 
     def get_parameters(self):
