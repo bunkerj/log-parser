@@ -1,8 +1,8 @@
 import numpy as np
 from copy import deepcopy
+from global_utils import multi
 from src.parsers.base.log_parser_online import LogParserOnline
 from src.utils import get_vocabulary_indices
-from scipy.stats import multinomial as multi
 
 
 class MultinomialMixtureOnline(LogParserOnline):
@@ -38,7 +38,6 @@ class MultinomialMixtureOnline(LogParserOnline):
             for tokenized_log in tokenized_log_entries:
                 self._update_sufficient_statistics(tokenized_log)
                 self._update_parameters()
-            self.init_sufficient_stats()
             self._update_likelihood_hist(tokenized_log_entries, track_history)
 
     def perform_offline_em(self, tokenized_log_entries, track_history=False):
@@ -90,10 +89,10 @@ class MultinomialMixtureOnline(LogParserOnline):
                 best_ll = ll
                 best_Pi = self.pi
                 best_Theta = self.theta
+            self.init_sufficient_stats()
 
         self.pi = best_Pi
         self.theta = best_Theta
-        self.init_sufficient_stats()
 
         for tokenized_log in tokenized_log_entries:
             self._update_sufficient_statistics(tokenized_log, True)
@@ -145,7 +144,7 @@ class MultinomialMixtureOnline(LogParserOnline):
                 sum_term += \
                     self.pi[g] * self._multi(token_counts, self.theta[g, :])
             likelihood = np.log(sum_term)
-        return likelihood
+        return float(likelihood)
 
     def _update_sufficient_statistics(self, tokenized_log, is_labeled=False):
         token_counts = self._get_token_counts(tokenized_log)
@@ -185,9 +184,5 @@ class MultinomialMixtureOnline(LogParserOnline):
     def _get_responsibilities(self, token_counts):
         r = np.zeros((self.num_clusters, 1))
         for g in range(self.num_clusters):
-            r[g] = self.pi[g] * self._multi(token_counts, self.theta[g, :])
+            r[g] = self.pi[g] * multi(token_counts, self.theta[g, :])
         return r / r.sum()
-
-    def _multi(self, x, params):
-        x_flat = x.flatten()
-        return multi.pmf(x_flat, x_flat.sum(), params)
