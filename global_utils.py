@@ -20,10 +20,17 @@ def load_results(name):
 
 def multi(x, params):
     x_flat = x.flatten()
-    params_flat = params.flatten()
+    params_flat = np.maximum(params, 0).flatten()
     coeff = gammaln(x_flat.sum() + 1) - np.sum(gammaln(x_flat + 1))
-    valid_indices = np.nonzero(params_flat)
-    log_result = coeff + (x_flat[valid_indices] * np.log(
-        params_flat[valid_indices])).sum()
+
+    valid_indices_x = np.nonzero(x_flat)
+    valid_indices_params = np.nonzero(params_flat)
+
+    if not np.all(np.isin(valid_indices_x, valid_indices_params)):
+        return 0.0
+
+    log_result = coeff + (x_flat[valid_indices_x] * np.log(
+        params_flat[valid_indices_x])).sum()
     result = np.exp(log_result)
+
     return result
