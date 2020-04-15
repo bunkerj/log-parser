@@ -1,5 +1,6 @@
 import numpy as np
 from copy import deepcopy
+from global_constants import MAX_NEG_VALUE
 from global_utils import multi
 from src.parsers.base.log_parser_online import LogParserOnline
 from src.utils import get_vocabulary_indices
@@ -97,7 +98,7 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.theta = best_Theta
 
         for tokenized_log in init_log_entries:
-            self._update_sufficient_statistics(tokenized_log, True)
+            self._update_sufficient_statistics(tokenized_log, False)
 
     def get_parameters(self):
         return deepcopy(self.pi), deepcopy(self.theta)
@@ -136,7 +137,7 @@ class MultinomialMixtureOnline(LogParserOnline):
             g = self._get_best_cluster(token_counts)
             likelihood += np.log(
                 self.pi[g] * multi(token_counts, self.theta[g, :]))
-        return likelihood
+        return float(likelihood)
 
     def _get_classical_log_likelihood(self, token_count_list):
         likelihood = 0
@@ -144,7 +145,10 @@ class MultinomialMixtureOnline(LogParserOnline):
             sum_term = 0
             for g in range(self.num_clusters):
                 sum_term += self.pi[g] * multi(token_counts, self.theta[g, :])
-            likelihood += np.log(sum_term)
+            if sum_term > 0:
+                likelihood += np.log(sum_term)
+            else:
+                likelihood += MAX_NEG_VALUE
         return float(likelihood)
 
     def _update_sufficient_statistics(self, tokenized_log, is_labeled=False):
