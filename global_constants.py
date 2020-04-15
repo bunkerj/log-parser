@@ -3,6 +3,8 @@ RESULTS_DIR = 'results'
 # SPLIT_REGEX = r'[\s=:,]'  # For IPLoM consistency
 SPLIT_REGEX = r'[\s]'  # For Drain consistency
 
+MAX_NEG_VALUE = -99999999999
+
 
 class MAP:
     ONE_TO_ONE = 'ONE_TO_ONE'
