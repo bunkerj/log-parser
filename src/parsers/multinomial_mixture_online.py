@@ -144,7 +144,7 @@ class MultinomialMixtureOnline(LogParserOnline):
             sum_term = 0
             for g in range(self.num_clusters):
                 sum_term += self.pi[g] * multi(token_counts, self.theta[g, :])
-            likelihood = np.log(sum_term)
+            likelihood += np.log(sum_term)
         return float(likelihood)
 
     def _update_sufficient_statistics(self, tokenized_log, is_labeled=False):
