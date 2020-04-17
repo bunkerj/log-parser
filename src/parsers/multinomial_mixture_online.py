@@ -42,6 +42,7 @@ class MultinomialMixtureOnline(LogParserOnline):
             self._update_likelihood_hist(tokenized_log_entries, track_history)
 
     def perform_offline_em(self, tokenized_log_entries, track_history=False):
+        self.init_sufficient_stats()
         self._update_likelihood_hist(tokenized_log_entries, track_history)
         current_ll, past_ll = None, None
         while True:
@@ -61,7 +62,7 @@ class MultinomialMixtureOnline(LogParserOnline):
             for log_idx in log_indices:
                 self.labeled_indices.append(log_idx)
                 tokenized_log = tokenized_log_entries[log_idx]
-                self._update_sufficient_statistics(tokenized_log, True)
+                self._update_sufficient_statistics(tokenized_log, cluster_idx)
 
     def get_log_likelihood(self, tokenized_log_entries):
         token_count_list = self._get_token_count_list(tokenized_log_entries)
@@ -98,7 +99,7 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.theta = best_Theta
 
         for tokenized_log in init_log_entries:
-            self._update_sufficient_statistics(tokenized_log, False)
+            self._update_sufficient_statistics(tokenized_log)
 
     def get_parameters(self):
         return deepcopy(self.pi), deepcopy(self.theta)
@@ -151,21 +152,23 @@ class MultinomialMixtureOnline(LogParserOnline):
                 likelihood += MAX_NEG_VALUE
         return float(likelihood)
 
-    def _update_sufficient_statistics(self, tokenized_log, is_labeled=False):
+    def _update_sufficient_statistics(self, tokenized_log, cluster_idx=-1):
         token_counts = self._get_token_counts(tokenized_log)
-        r = self._get_responsibilities(token_counts)
 
-        if self.is_classification:
-            cluster_idx = int(r.argmax())
-            r = np.zeros(r.shape)
+        if cluster_idx == -1:
+            r = self._get_responsibilities(token_counts)
+            if self.is_classification:
+                g = int(r.argmax())
+                r = np.zeros(r.shape)
+                r[g] = 1
+        else:
+            r = np.zeros((self.num_clusters, 1))
             r[cluster_idx] = 1
-
-        if is_labeled:
             self.t_l += r
             self.t_yl += r @ token_counts.T
-        else:
-            self.t_zl += r
-            self.t_xzyl += r @ token_counts.T
+
+        self.t_zl += r
+        self.t_xzyl += r @ token_counts.T
 
     def _get_best_cluster(self, token_counts):
         r = self._get_responsibilities(token_counts)
