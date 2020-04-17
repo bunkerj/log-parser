@@ -1,4 +1,5 @@
 import numpy as np
+from random import sample
 from copy import deepcopy
 from global_constants import MAX_NEG_VALUE
 from global_utils import multi
@@ -74,12 +75,13 @@ class MultinomialMixtureOnline(LogParserOnline):
     def get_log_likelihood_history(self):
         return self.log_likelihood_history
 
-    def find_best_initialization(self, init_log_entries, n_init=10):
+    def find_best_initialization(self, log_entries, n_init, n_runs=10):
         best_ll = None
-        best_Pi = None
-        best_Theta = None
+        best_pi = None
+        best_theta = None
+        init_log_entries = self._get_init_log_entries(log_entries, n_init)
 
-        for _ in range(n_init):
+        for _ in range(n_runs):
             self._init_parameters(self.num_clusters, len(self.v_indices))
             for tokenized_log in init_log_entries:
                 self._update_sufficient_statistics(tokenized_log)
@@ -87,12 +89,12 @@ class MultinomialMixtureOnline(LogParserOnline):
             ll = self.get_log_likelihood(init_log_entries)
             if best_ll is None or ll > best_ll:
                 best_ll = ll
-                best_Pi = self.pi
-                best_Theta = self.theta
+                best_pi = self.pi
+                best_theta = self.theta
             self._init_sufficient_stats()
 
-        self.pi = best_Pi
-        self.theta = best_Theta
+        self.pi = best_pi
+        self.theta = best_theta
 
         for tokenized_log in init_log_entries:
             self._update_sufficient_statistics(tokenized_log)
@@ -112,6 +114,10 @@ class MultinomialMixtureOnline(LogParserOnline):
                 cluster_templates[cluster_idx] = []
             cluster_templates[cluster_idx].append(log_idx)
         return cluster_templates
+
+    def _get_init_log_entries(self, log_entries, n_init):
+        init_indices = sample(range(len(log_entries)), k=n_init)
+        return [log_entries[idx] for idx in init_indices]
 
     def _init_sufficient_stats(self):
         self.t_zl = self.t_l + self.alpha - 1

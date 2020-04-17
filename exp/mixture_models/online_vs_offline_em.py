@@ -1,7 +1,6 @@
 """
 Log-likelihood comparison between online and offline EM.
 """
-from random import sample
 from copy import deepcopy
 from exp.mixture_models.utils import get_num_true_clusters
 from global_utils import dump_results
@@ -43,16 +42,13 @@ for data_config in data_configs:
     true_assignments = data_manager.get_true_assignments()
     n_true_clusters = get_num_true_clusters(true_assignments)
 
-    init_indices = sample(range(len(log_entries)), k=N_INIT)
-    init_log_entries = [log_entries[idx] for idx in init_indices]
-
     online_em_parser = MultinomialMixtureOnline(log_entries,
                                                 n_true_clusters,
                                                 False,
                                                 epsilon=0.01,
                                                 alpha=1.05,
                                                 beta=1.05)
-    online_em_parser.find_best_initialization(init_log_entries)
+    online_em_parser.find_best_initialization(log_entries, n_init=N_INIT)
     offline_em_parser = deepcopy(online_em_parser)
 
     offline_em_parser.perform_offline_em(log_entries, track_history=True)
