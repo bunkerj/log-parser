@@ -53,9 +53,7 @@ for data_config in data_configs:
                                                 alpha=1.05,
                                                 beta=1.05)
     online_em_parser.find_best_initialization(init_log_entries)
-
     offline_em_parser = deepcopy(online_em_parser)
-    offline_em_parser.init_sufficient_stats()
 
     offline_em_parser.perform_offline_em(log_entries, track_history=True)
     offline_ll_history = offline_em_parser.get_log_likelihood_history()

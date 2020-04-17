@@ -22,7 +22,7 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.t_xzyl = None
         self.t_l = np.zeros((self.num_clusters, 1))
         self.t_yl = np.zeros((self.num_clusters, len(self.v_indices)))
-        self.init_sufficient_stats()
+        self._init_sufficient_stats()
 
         self.pi = None
         self.theta = None
@@ -42,14 +42,14 @@ class MultinomialMixtureOnline(LogParserOnline):
             self._update_likelihood_hist(tokenized_log_entries, track_history)
 
     def perform_offline_em(self, tokenized_log_entries, track_history=False):
-        self.init_sufficient_stats()
+        self._init_sufficient_stats()
         self._update_likelihood_hist(tokenized_log_entries, track_history)
         current_ll, past_ll = None, None
         while True:
             for tokenized_log in tokenized_log_entries:
                 self._update_sufficient_statistics(tokenized_log)
             self._update_parameters()
-            self.init_sufficient_stats()
+            self._init_sufficient_stats()
             current_ll, past_ll = \
                 self.get_log_likelihood(tokenized_log_entries), current_ll
             if track_history:
@@ -74,10 +74,6 @@ class MultinomialMixtureOnline(LogParserOnline):
     def get_log_likelihood_history(self):
         return self.log_likelihood_history
 
-    def init_sufficient_stats(self):
-        self.t_zl = self.t_l + self.alpha - 1
-        self.t_xzyl = self.t_yl + self.beta - 1
-
     def find_best_initialization(self, init_log_entries, n_init=10):
         best_ll = None
         best_Pi = None
@@ -93,7 +89,7 @@ class MultinomialMixtureOnline(LogParserOnline):
                 best_ll = ll
                 best_Pi = self.pi
                 best_Theta = self.theta
-            self.init_sufficient_stats()
+            self._init_sufficient_stats()
 
         self.pi = best_Pi
         self.theta = best_Theta
@@ -116,6 +112,10 @@ class MultinomialMixtureOnline(LogParserOnline):
                 cluster_templates[cluster_idx] = []
             cluster_templates[cluster_idx].append(log_idx)
         return cluster_templates
+
+    def _init_sufficient_stats(self):
+        self.t_zl = self.t_l + self.alpha - 1
+        self.t_xzyl = self.t_yl + self.beta - 1
 
     def _update_likelihood_hist(self, tokenized_log_entries, track_history):
         if track_history:
