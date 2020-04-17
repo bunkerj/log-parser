@@ -45,7 +45,8 @@ for training_size in TRAINING_SIZES:
         training_log_entries = [log_entries[idx] for idx in training_indices]
 
         # Fit parameters on all training logs
-        cem_parser = MultinomialMixtureOnline(log_entries, n_true_clusters,
+        cem_parser = MultinomialMixtureOnline(log_entries,
+                                              n_true_clusters,
                                               is_classification=False,
                                               alpha=1.05,
                                               beta=1.05)
@@ -61,6 +62,9 @@ for training_size in TRAINING_SIZES:
                                                     is_classification=False,
                                                     alpha=1.05,
                                                     beta=1.05)
+
+        online_cem_parser.set_parameters(cem_parser.get_parameters())
+        online_em_parser.set_parameters(cem_parser.get_parameters())
 
         cem_timing_tmp = time()
         cem_parser.perform_offline_em(training_log_entries)
