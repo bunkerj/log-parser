@@ -22,6 +22,8 @@ log_entries = data_manager.get_tokenized_no_num_log_entries()
 true_assignments = data_manager.get_true_assignments()
 n_true_clusters = get_num_true_clusters(true_assignments)
 
+ev = Evaluator(true_assignments)
+
 results = {
     'training_sizes': TRAINING_SIZES,
     'scores': {'em': [], 'cem': [], 'online_em': [], 'online_cem': []},
@@ -75,6 +77,7 @@ for training_size in TRAINING_SIZES:
         online_cem_parser.set_parameters(em_parser.get_parameters())
         online_em_parser.set_parameters(em_parser.get_parameters())
 
+        # Run and get timings
         em_timing_tmp = time()
         em_parser.perform_offline_em(training_log_entries)
         em_timing += (time() - em_timing_tmp) / N_SAMPLE
@@ -92,8 +95,6 @@ for training_size in TRAINING_SIZES:
         online_cem_timing += (time() - online_cem_timing_tmp) / N_SAMPLE
 
         # Perform accuracy evaluations
-        ev = Evaluator(true_assignments)
-
         em_clusters = em_parser.get_clusters(log_entries)
         cem_clusters = cem_parser.get_clusters(log_entries)
         online_em_clusters = online_em_parser.get_clusters(log_entries)
