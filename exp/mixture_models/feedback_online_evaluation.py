@@ -11,8 +11,10 @@ from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 N_INIT = 50
-N_SAMPLES = 20
-DATA_CONFIG = DataConfigs.HPC
+N_SAMPLES = 10
+IS_CLASS = False
+IS_ONLINE = False
+DATA_CONFIG = DataConfigs.HealthApp
 LABEL_COUNTS = [0, 200, 400, 600, 800, 1000]
 
 data_manager = DataManager(DATA_CONFIG)
@@ -47,12 +49,12 @@ for sample_idx in range(N_SAMPLES):
         print(label_count)
         lab_parser = MultinomialMixtureOnline(tokenized_log_entries,
                                               num_true_clusters,
-                                              is_classification=False,
+                                              is_classification=IS_CLASS,
                                               alpha=1.05,
                                               beta=1.05)
         unlab_parser = MultinomialMixtureOnline(tokenized_log_entries,
                                                 num_true_clusters,
-                                                is_classification=False,
+                                                is_classification=IS_CLASS,
                                                 alpha=1.05,
                                                 beta=1.05)
         unlab_parser.set_parameters(lab_parser.get_parameters())
@@ -62,14 +64,20 @@ for sample_idx in range(N_SAMPLES):
         labeled_indices = lab_parser.labeled_indices
 
         lab_timing = time()
-        lab_parser.perform_online_batch_em(tokenized_log_entries)
+        if IS_ONLINE:
+            lab_parser.perform_online_batch_em(tokenized_log_entries)
+        else:
+            lab_parser.perform_offline_em(tokenized_log_entries)
         results['avg_labeled_timing'] += (time() - lab_timing) / N_SAMPLES
 
         lab_cluster_templ = lab_parser.get_clusters(tokenized_log_entries)
         lab_impurity = ev.get_impurity(lab_cluster_templ, labeled_indices)
 
         unlab_timing = time()
-        unlab_parser.perform_online_batch_em(tokenized_log_entries)
+        if IS_ONLINE:
+            unlab_parser.perform_online_batch_em(tokenized_log_entries)
+        else:
+            unlab_parser.perform_offline_em(tokenized_log_entries)
         results['avg_unlabeled_timing'] += (time() - unlab_timing) / N_SAMPLES
 
         unlab_cluster_templ = unlab_parser.get_clusters(tokenized_log_entries)
@@ -92,8 +100,10 @@ for label_idx in range(len(LABEL_COUNTS)):
 results['labeled_impurities_samples'] = lab_impurities_samples
 results['unlabeled_impurities_samples'] = unlab_impurities_samples
 
-result_filename = 'feedback_online_evaluation_{}_{}s.p'.format(
-    DATA_CONFIG['name'].lower(), N_SAMPLES)
-dump_results(result_filename, results)
+result_filename = 'feedback_{}line_{}em_evaluation_{}_{}s.p'.format(
+    'on' if IS_ONLINE else 'off',
+    'c' if IS_CLASS else '',
+    DATA_CONFIG['name'].lower(),
+    N_SAMPLES)
 
-print('Done!')
+dump_results(result_filename, results)
