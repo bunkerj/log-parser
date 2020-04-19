@@ -119,6 +119,6 @@ for training_size in TRAINING_SIZES:
     results_tim['online_em'].append(online_em_timing)
     results_tim['online_cem'].append(online_cem_timing)
 
-dump_results('online_em_results2_hpc_20s.p', results)
+dump_results('online_em_results.p', results)
 
 print('done!')
