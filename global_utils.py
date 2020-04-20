@@ -1,6 +1,7 @@
 import os
 import pickle
 import numpy as np
+from random import shuffle
 from scipy.special import gammaln
 
 from global_constants import RESULTS_DIR
@@ -16,6 +17,12 @@ def dump_results(name, results):
 def load_results(name):
     path = os.path.join(RESULTS_DIR, name)
     return pickle.load(open(path, 'rb'))
+
+
+def shuffle_same_order(*arrays):
+    c = list(zip(*arrays))
+    shuffle(c)
+    return list(zip(*c))
 
 
 def multi(x, params):
