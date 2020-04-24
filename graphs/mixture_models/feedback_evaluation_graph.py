@@ -4,8 +4,9 @@ points.
 """
 import matplotlib.pyplot as plt
 from global_utils import load_results
-
 from src.data_config import DataConfigs
+
+N_SAMPLES = 3
 
 data_configs = [
     DataConfigs.Android,
@@ -27,11 +28,10 @@ data_configs = [
 ]
 
 for idx, data_config in enumerate(data_configs):
-    dataset_name = data_config['name']
+    name = data_config['name']
 
-    results = load_results(
-        'feedback_evaluation_mp_filtered_no_num_{}_10s.p'.format(
-            dataset_name.lower()))
+    results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(),
+                                                           N_SAMPLES))
 
     label_counts = results['label_counts']
     labeled_impurities = results['avg_labeled_impurities']
@@ -40,9 +40,7 @@ for idx, data_config in enumerate(data_configs):
     ax = plt.subplot(4, 4, idx + 1)
     plt.plot(label_counts, labeled_impurities)
     plt.plot(label_counts, unlabeled_impurities)
-    ax.text(.5, .9, dataset_name,
-            horizontalalignment='center',
-            transform=ax.transAxes)
+    ax.text(.5, .9, name, horizontalalignment='center', transform=ax.transAxes)
     if idx == 3:
         plt.legend(['Labeled', 'Unlabeled'])
     plt.grid()

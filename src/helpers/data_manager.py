@@ -1,6 +1,6 @@
 import re
 import pandas as pd
-from constants import SPLIT_REGEX, PLACEHOLDER
+from global_constants import SPLIT_REGEX, PLACEHOLDER
 from src.utils import read_csv
 
 
@@ -61,6 +61,10 @@ class DataManager:
         headers, regex = self._generate_logformat_regex()
         log_file = self.data_config['unstructured_path']
         return self._get_raw_log_full_lines(log_file, regex, headers)
+
+    def get_true_assignments(self):
+        assignments_path = self.data_config['assignments_path']
+        return read_csv(assignments_path)[1:]
 
     def print_select_raw_and_tokenized_log_entries(self, log_indices):
         log_df = self._get_log_dataframe()

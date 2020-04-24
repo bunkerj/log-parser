@@ -6,7 +6,6 @@ from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
 from src.parsers.drain import Drain
-from src.utils import get_template_assignments
 
 N_RUNS = 5
 N_CALLS = 10
@@ -16,7 +15,7 @@ PARAMETER_BOUNDS = [(3, 8), (20, 100), (0.1, 0.6)]
 
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
-true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
+true_assignments = data_manager.get_true_assignments()
 evaluator = Evaluator(true_assignments)
 
 

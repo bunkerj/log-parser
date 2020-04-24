@@ -1,26 +1,29 @@
+"""
+Perform the Shapiro-Wilk test and plot the Q-Q plot for the impurity samples
+for a given dataset at a given label percentage value.
+"""
 import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 from global_utils import load_results
 from src.data_config import DataConfigs
 from scipy.stats import shapiro
+from global_constants import LABEL_COUNTS, UNLABELED_IMPURITIES_SAMPLES
 
-N_SAMPLES = 100
+N_SAMPLES = 3
 LABEL_COUNT_IDX = 0
 DATA_CONFIG = DataConfigs.Apache
 
-dataset_name = DATA_CONFIG['name']
-results = load_results(
-    'feedback_evaluation_mp_filtered_no_num_{}_{}s.p'.format(
-        dataset_name.lower(), N_SAMPLES))
+name = DATA_CONFIG['name']
+results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES))
 
-label_counts = results['label_counts']
-unlab_samples = results['unlabeled_impurities_samples']
+label_counts = results[LABEL_COUNTS]
+unlab_samples = results[UNLABELED_IMPURITIES_SAMPLES]
 unlab_sample_impurity_values = \
     np.array([sample[LABEL_COUNT_IDX] for sample in unlab_samples])
 
 title = '{} Unlabeled Impurities with {} Labels and {} Samples' \
-    .format(dataset_name.capitalize(), label_counts[LABEL_COUNT_IDX], N_SAMPLES)
+    .format(name.capitalize(), label_counts[LABEL_COUNT_IDX], N_SAMPLES)
 
 _, p = shapiro(unlab_sample_impurity_values)
 

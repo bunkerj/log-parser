@@ -9,36 +9,45 @@ from src.parsers.multinomial_mixture import MultinomialMixture
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
-from src.utils import get_template_assignments
 from exp.mixture_models.utils import get_log_labels, get_num_true_clusters, \
-    split_on_result_sources, split_on_samples, get_average_from_samples
+    split_on_result_sources, split_on_samples
+from global_constants import LABELED_IMPURITIES_SAMPLES, \
+    UNLABELED_IMPURITIES_SAMPLES, LABEL_COUNTS, N_LOGS
 
-N_SAMPLES = 15
-DATA_CONFIG = DataConfigs.Apache
-LABEL_COUNTS = list(range(0, 601, 100))
-N_LABELS = len(LABEL_COUNTS)
+N_SAMPLES = 3
+LABEL_COUNT_VALUES = list(range(0, 601, 100))
+N_LABELS = len(LABEL_COUNT_VALUES)
 
-data_manager = DataManager(DATA_CONFIG)
-tokenized_log_entries = data_manager.get_tokenized_no_num_log_entries()
-true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
-num_true_clusters = get_num_true_clusters(true_assignments)
-evaluator = Evaluator(true_assignments)
+data_configs = [
+    # DataConfigs.Android,
+    DataConfigs.Apache,
+    # DataConfigs.BGL,
+    # DataConfigs.Hadoop,
+    # DataConfigs.HDFS,
+    # DataConfigs.HealthApp,
+    # DataConfigs.HPC,
+    # DataConfigs.Linux,
+    # DataConfigs.Mac,
+    # DataConfigs.OpenSSH,
+    # DataConfigs.OpenStack,
+    # DataConfigs.Proxifier,
+    # DataConfigs.Spark,
+    # DataConfigs.Thunderbird,
+    # DataConfigs.Windows,
+    # DataConfigs.Zookeeper,
+]
 
-N_logs = len(tokenized_log_entries)
 
-results = {
-    'labeled_impurities': [],
-    'unlabeled_impurities': [],
-    'label_counts': LABEL_COUNTS,
-    'n_logs': len(tokenized_log_entries),
-}
+def _perform_feedback_experiment(num_label, passed_data_config):
+    print(passed_data_config['name'])
+    data_manager = DataManager(passed_data_config)
+    log_entries = data_manager.get_tokenized_no_num_log_entries()
+    true_assignments = data_manager.get_true_assignments()
+    num_true_clusters = get_num_true_clusters(true_assignments)
+    evaluator = Evaluator(true_assignments)
 
-
-def _perform_feedback_experiment(num_label):
-    lab_parser = MultinomialMixture(tokenized_log_entries,
-                                    num_true_clusters)
-    unlab_parser = MultinomialMixture(tokenized_log_entries,
-                                      num_true_clusters)
+    lab_parser = MultinomialMixture(log_entries, num_true_clusters)
+    unlab_parser = MultinomialMixture(log_entries, num_true_clusters)
     unlab_parser.initialize_responsibilities(lab_parser)
     log_labels = get_log_labels(true_assignments, num_label)
     lab_parser.label_logs(log_labels)
@@ -54,29 +63,35 @@ def _perform_feedback_experiment(num_label):
 
 
 if __name__ == '__main__':
-    start = time()
+    results = {}
+    for data_config in data_configs:
+        name = data_config['name']
+        print('Running for {}...'.format(name))
 
-    with mp.Pool(mp.cpu_count()) as pool:
-        total_label_counts = LABEL_COUNTS * N_SAMPLES
-        mp_results = pool.map(_perform_feedback_experiment, total_label_counts)
+        start = time()
+        with mp.Pool(mp.cpu_count()) as pool:
+            total_label_counts = LABEL_COUNT_VALUES * N_SAMPLES
+            data_config_list = [data_config] * len(total_label_counts)
+            arguments = zip(total_label_counts, data_config_list)
+            mp_results = pool.starmap(_perform_feedback_experiment, arguments)
+        print('Time taken: {}'.format(time() - start))
 
-    lab_impurities, unlab_impurities = split_on_result_sources(mp_results)
+        lab_impurities, unlab_impurities = split_on_result_sources(mp_results)
 
-    lab_samples = split_on_samples(lab_impurities, N_LABELS)
-    unlab_samples = split_on_samples(unlab_impurities, N_LABELS)
+        lab_samples = split_on_samples(lab_impurities, N_LABELS)
+        unlab_samples = split_on_samples(unlab_impurities, N_LABELS)
 
-    avg_lab_impurities = get_average_from_samples(lab_samples)
-    avg_unlab_impurities = get_average_from_samples(unlab_samples)
+        tokenized_log_entries = DataManager(data_config) \
+            .get_tokenized_no_num_log_entries()
 
-    results['labeled_impurities_samples'] = lab_samples
-    results['unlabeled_impurities_samples'] = unlab_samples
-    results['avg_labeled_impurities'] = avg_lab_impurities
-    results['avg_unlabeled_impurities'] = avg_unlab_impurities
+        results = {
+            LABELED_IMPURITIES_SAMPLES: lab_samples,
+            UNLABELED_IMPURITIES_SAMPLES: unlab_samples,
+            LABEL_COUNTS: LABEL_COUNT_VALUES,
+            N_LOGS: len(tokenized_log_entries)
+        }
 
-    print('Time taken: {}'.format(time() - start))
-
-    result_filename = 'feedback_evaluation_mp_filtered_no_num_{}_{}s.p'.format(
-        DATA_CONFIG['name'].lower(), N_SAMPLES)
-    dump_results(result_filename, results)
+        filename = 'feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES)
+        dump_results(filename, results)
 
     print('Done!')

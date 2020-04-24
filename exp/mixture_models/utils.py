@@ -1,4 +1,3 @@
-import numpy as np
 from random import sample
 
 
@@ -15,34 +14,6 @@ def get_log_labels(true_assignments, num_of_labels):
 
 def get_num_true_clusters(true_assignments):
     return len(set(log_data[-1] for log_data in true_assignments))
-
-
-def normalize_vector(vector):
-    n = sum(vector)
-    if n == 0:
-        return vector
-    else:
-        return vector / n
-
-
-def normalize_matrix(matrix, axis):
-    return np.apply_along_axis(normalize_vector, axis, matrix)
-
-
-def get_gini_impurity(probabilities):
-    return sum(probabilities * (1 - probabilities))
-
-
-def get_avg_gini_impurity(probabilities_matrix, axis):
-    entropy_values = np.apply_along_axis(get_gini_impurity,
-                                         axis,
-                                         probabilities_matrix)
-    return sum(entropy_values) / len(entropy_values)
-
-
-def get_impurity_difference(labeled_impurity, unlabeled_impurity):
-    abs_diff = abs(labeled_impurity - unlabeled_impurity)
-    return 100 * abs_diff / labeled_impurity
 
 
 def split_on_samples(results, n_label_counts):
@@ -70,16 +41,3 @@ def split_on_result_sources(results):
     lab_impurities = [r[0] for r in results]
     unlab_impurities = [r[1] for r in results]
     return lab_impurities, unlab_impurities
-
-
-def get_average_from_samples(samples):
-    """
-    Returns single list containing the average of passed samples.
-    """
-    if len(samples) == 0:
-        return None
-    average = [0] * len(samples[0])
-    for sample in samples:
-        for idx, v in enumerate(sample):
-            average[idx] += v / len(samples)
-    return average

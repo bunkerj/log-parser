@@ -1,8 +1,8 @@
-from src.parsers.log_parser import LogParser
+from src.parsers.base.log_parser import LogParser
 from src.utils import print_items, get_n_sorted, delete_indices_from_list
 from src.helpers.mapping_finder import MappingFinder
 from src.helpers.partitions import Partitions
-from constants import MAP, PLACEHOLDER
+from global_constants import MAP, PLACEHOLDER
 from copy import deepcopy
 
 

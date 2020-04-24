@@ -6,13 +6,11 @@ import matplotlib.pyplot as plt
 from global_utils import load_results
 from src.data_config import DataConfigs
 
-N_SAMPLES = 15
+N_SAMPLES = 3
 DATA_CONFIG = DataConfigs.Apache
 
-dataset_name = DATA_CONFIG['name']
-results = load_results(
-    'feedback_evaluation_mp_filtered_no_num_{}_{}s.p'.format(
-        dataset_name.lower(), N_SAMPLES))
+name = DATA_CONFIG['name']
+results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES))
 
 n_logs = results['n_logs']
 label_counts = results['label_counts']
@@ -33,7 +31,7 @@ plt.plot(label_percentages, unlabeled_impurities,
 plt.plot(label_percentages, labeled_impurities,
          label='Labeled Mean', color='red')
 
-plt.title(dataset_name.capitalize())
+plt.title(name.capitalize())
 plt.xlabel('Label Percentage')
 plt.ylabel('Normalized Impurity')
 plt.legend()

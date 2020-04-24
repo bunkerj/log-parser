@@ -1,17 +1,17 @@
 import numpy as np
 from copy import deepcopy
 from random import sample
-from src.parsers.log_parser import LogParser
+from src.parsers.base.log_parser import LogParser
 from src.utils import get_vocabulary_indices, get_token_counts
-
-LIKELIHOOD_THRESHOLD = 1
-ZERO_THRESHOLD = 0.0000001
-MAX_NEG_VALUE = -99999999999
+from global_utils import multi
+from global_constants import MAX_NEG_VALUE
 
 
 class MultinomialMixture(LogParser):
-    def __init__(self, tokenized_log_entries, num_clusters, verbose=False):
+    def __init__(self, tokenized_log_entries, num_clusters,
+                 verbose=False, epsilon=0.001):
         super().__init__(tokenized_log_entries)
+        self.epsilon = epsilon
         self.num_clusters = num_clusters
         self.v_indices = get_vocabulary_indices(tokenized_log_entries)
         self.C = get_token_counts(tokenized_log_entries, self.v_indices)
@@ -20,10 +20,11 @@ class MultinomialMixture(LogParser):
         self.R = self._get_initial_responsibilities()
         self.labeled_indices = []
         self.verbose = verbose
+        self.log_likelihood_history = []
 
-    def parse(self):
+    def parse(self, track_history=False):
         self._update_parameters()
-        self._run_em_procedure()
+        self._run_em_procedure(track_history)
         self._merge_clusters()
 
     def initialize_responsibilities(self, multinomial_mixture):
@@ -58,21 +59,28 @@ class MultinomialMixture(LogParser):
     def _update_parameters(self):
         self.Pi = self.R.sum(axis=1, keepdims=True)
         self.Pi /= len(self.tokenized_log_entries)
-        self.Theta = self.R @ self.C + 1
+        self.Theta = self.R @ self.C
         self.Theta /= self.Theta.sum(axis=1, keepdims=True)
 
-    def _run_em_procedure(self):
-        old_likelihood = None
-        while True:
+    def _run_em_procedure(self, track_history):
+        if track_history:
+            self.log_likelihood_history.append(self._get_likelihood())
+        current_ll, past_ll = None, None
+        for _ in range(8):
             self._update_responsibilities()
             self._update_parameters()
-            likelihood = self._get_likelihood()
+            current_ll, past_ll = self._get_likelihood(), current_ll
             if self.verbose:
-                print(likelihood)
-            if old_likelihood is not None and \
-                    abs(old_likelihood - likelihood) < LIKELIHOOD_THRESHOLD:
+                print(current_ll)
+            if track_history:
+                self.log_likelihood_history.append(current_ll)
+            if self._should_stop_em(current_ll, past_ll):
                 break
-            old_likelihood = likelihood
+
+    def _should_stop_em(self, current_ll, past_ll):
+        if None in [current_ll, past_ll]:
+            return False
+        return abs((current_ll - past_ll) / past_ll) < self.epsilon
 
     def _update_responsibilities(self):
         G, D = self.R.shape
@@ -85,8 +93,8 @@ class MultinomialMixture(LogParser):
         D = self.R.shape[1]
         return filter(lambda d: d not in self.labeled_indices, range(D))
 
-    def _get_multinomial_term(self, k, d):
-        return (self.Theta[k, :] ** self.C[d, :]).prod()
+    def _get_multinomial_term(self, g, d):
+        return multi(self.C[d, :], self.Theta[g, :])
 
     def _get_likelihood(self):
         G, D = self.R.shape
@@ -95,7 +103,7 @@ class MultinomialMixture(LogParser):
             sum_term = 0
             for g in range(G):
                 sum_term += self.Pi[g] * self._get_multinomial_term(g, d)
-            if sum_term > ZERO_THRESHOLD:
+            if sum_term > 0:
                 likelihood += np.log(sum_term)
             else:
                 likelihood += MAX_NEG_VALUE

@@ -5,7 +5,6 @@ settings.
 import numpy as np
 import matplotlib.pyplot as plt
 from copy import copy
-from src.utils import get_template_assignments
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
@@ -26,11 +25,10 @@ parameter_ranges_dict = {
 }
 
 accuracies = {}
-true_assignments = get_template_assignments(DATA_CONFIG['assignments_path'])
-evaluator = Evaluator(true_assignments)
-
 data_manager = DataManager(DATA_CONFIG)
 tokenized_log_entries = data_manager.get_tokenized_log_entries()
+true_assignments = data_manager.get_true_assignments()
+evaluator = Evaluator(true_assignments)
 
 for parameter_field in parameter_ranges_dict:
     parameter_range = parameter_ranges_dict[parameter_field]
