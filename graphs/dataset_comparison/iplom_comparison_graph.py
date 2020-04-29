@@ -29,7 +29,7 @@ iplom_benchmark_accuracies = {      # Results from benchmark paper
     'Zookeeper': 0.962,             # 0.962
 }
 
-final_best_accuracies = load_results('iplom_dataset_comparison.p')
+final_best_accuracies = load_results('iplom_comparison.p')
 
 plot_dataset_comparison_graph('IPLoM Accuracies',
                               iplom_benchmark_accuracies,

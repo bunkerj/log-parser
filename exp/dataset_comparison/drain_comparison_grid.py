@@ -9,35 +9,43 @@ from src.parameter_searchers.parameter_grid_searcher import \
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 
-data_set_configs = [
-    DataConfigs.Android,
-    DataConfigs.Apache,
-    DataConfigs.BGL,
-    DataConfigs.Hadoop,
-    DataConfigs.HDFS,
-    DataConfigs.HealthApp,
-    DataConfigs.HPC,
-    DataConfigs.Linux,
-    DataConfigs.Mac,
-    DataConfigs.OpenSSH,
-    DataConfigs.OpenStack,
-    DataConfigs.Proxifier,
-    DataConfigs.Spark,
-    DataConfigs.Thunderbird,
-    DataConfigs.Windows,
-    DataConfigs.Zookeeper,
-]
 
-parameter_ranges_dict = {
-    'max_depth': (3, 8, 1),
-    'max_child': (100, 101, 100),
-    'sim_threshold': (0.1, 0.9, 0.05),
-}
+def run_drain_comparison_grid(data_set_configs, parameter_ranges_dict, name):
+    parameter_searcher = ParameterGridSearcher(Drain, parameter_ranges_dict)
+    final_best_accuracies = \
+        get_final_dataset_accuracies(Drain,
+                                     data_set_configs,
+                                     parameter_searcher=parameter_searcher)
 
-parameter_searcher = ParameterGridSearcher(Drain, parameter_ranges_dict)
-final_best_accuracies = \
-    get_final_dataset_accuracies(Drain,
-                                 data_set_configs,
-                                 parameter_searcher=parameter_searcher)
+    dump_results(name, final_best_accuracies)
 
-dump_results('drain_dataset_comparison_grid.p', final_best_accuracies)
+
+if __name__ == '__main__':
+    data_set_configs = [
+        DataConfigs.Android,
+        DataConfigs.Apache,
+        DataConfigs.BGL,
+        DataConfigs.Hadoop,
+        DataConfigs.HDFS,
+        DataConfigs.HealthApp,
+        DataConfigs.HPC,
+        DataConfigs.Linux,
+        DataConfigs.Mac,
+        DataConfigs.OpenSSH,
+        DataConfigs.OpenStack,
+        DataConfigs.Proxifier,
+        DataConfigs.Spark,
+        DataConfigs.Thunderbird,
+        DataConfigs.Windows,
+        DataConfigs.Zookeeper,
+    ]
+
+    parameter_ranges_dict = {
+        'max_depth': (3, 8, 1),
+        'max_child': (100, 101, 100),
+        'sim_threshold': (0.1, 0.9, 0.05),
+    }
+
+    name = 'drain_dataset_comparison_grid.p'
+
+    run_drain_comparison_grid(data_set_configs, parameter_ranges_dict, name)
