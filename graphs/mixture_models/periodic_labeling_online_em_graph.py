@@ -1,12 +1,7 @@
 import matplotlib.pyplot as plt
 from global_utils import load_results
-from src.data_config import DataConfigs
 
-N_SAMPLES = 20
-DATA_CONFIG = DataConfigs.BGL_FULL
-
-result_filename = 'periodic_labeling_online_em_{}_{}s.p'.format(
-    DATA_CONFIG['name'].lower(), N_SAMPLES)
+result_filename = 'periodic_labeling_online_em.p'
 results = load_results(result_filename)
 
 iterations = list(results['lab_online_em'].keys())
