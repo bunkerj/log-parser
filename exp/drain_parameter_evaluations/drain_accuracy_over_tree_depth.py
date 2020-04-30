@@ -8,7 +8,7 @@ from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 
 
-def run_drain_accuracy_over_tree_depth(data_config, tree_depths, name):
+def run_drain_accuracy_over_tree_depth(data_config, tree_depths):
     accuracies = []
     data_manager = DataManager(data_config)
     tokenized_log_entries = data_manager.get_tokenized_log_entries()
@@ -20,17 +20,15 @@ def run_drain_accuracy_over_tree_depth(data_config, tree_depths, name):
         parser.parse()
         accuracies.append(evaluator.evaluate(parser.cluster_templates))
 
-    results = {
+    return {
         'tree_depths': tree_depths,
         'accuracies': accuracies,
     }
-
-    dump_results(name, results)
 
 
 if __name__ == '__main__':
     data_config = DataConfigs.BGL
     tree_depths = list(range(3, 31, 1))
-    name = 'drain_accuracy_over_tree_depth.p'
 
-    run_drain_accuracy_over_tree_depth(data_config, tree_depths, name)
+    results = run_drain_accuracy_over_tree_depth(data_config, tree_depths)
+    dump_results('drain_accuracy_over_tree_depth.p', results)

@@ -10,7 +10,7 @@ from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 
 
-def run_drain_exp(data_config, enhanced_drain_params, name):
+def run_drain_exp(data_config, enhanced_drain_params):
     data_manager = DataManager(data_config)
     tokenized_log_entries = data_manager.get_tokenized_log_entries()
     true_assignments = data_manager.get_true_assignments()
@@ -25,19 +25,17 @@ def run_drain_exp(data_config, enhanced_drain_params, name):
     accuracy = evaluator.evaluate(parser.cluster_templates)
     minutes_to_eval = (time() - start_time) / 60
 
-    results = {
+    return {
         'accuracy': accuracy,
         'mins_to_parse': minutes_to_parse,
         'mins_to_eval': minutes_to_eval,
         'parser': parser,
     }
 
-    dump_results(name, results)
-
 
 if __name__ == '__main__':
     data_config = DataConfigs.Proxifier
     enhanced_drain_params = (8.39, 34, 0.24, 0.18)
-    name = 'enhanced_drain_exp.p'
 
-    run_drain_exp(data_config, enhanced_drain_params, name)
+    results = run_drain_exp(data_config, enhanced_drain_params)
+    dump_results('enhanced_drain_exp.p', results)

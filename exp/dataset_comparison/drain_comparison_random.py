@@ -10,8 +10,8 @@ from src.parameter_searchers.parameter_random_searcher import \
 from src.parsers.enhanced_drain import EnhancedDrain
 
 
-def run_drain_comparison_random(n_calls, data_set_configs,
-                                parameter_ranges_dict, name):
+def run_drain_comparison_random(data_set_configs, n_calls,
+                                parameter_ranges_dict):
     parameter_searcher = ParameterRandomSearcher(EnhancedDrain,
                                                  parameter_ranges_dict,
                                                  n_calls=n_calls)
@@ -19,8 +19,7 @@ def run_drain_comparison_random(n_calls, data_set_configs,
         get_final_dataset_accuracies(EnhancedDrain,
                                      data_set_configs,
                                      parameter_searcher)
-
-    dump_results(name, final_best_accuracies)
+    return final_best_accuracies
 
 
 if __name__ == '__main__':
@@ -52,7 +51,7 @@ if __name__ == '__main__':
         'edit_ratio_threshold': (0, 0.5),
     }
 
-    name = 'drain_comparison_random.p'
-
-    run_drain_comparison_random(n_calls, data_set_configs,
-                                parameter_ranges_dict, name)
+    results = run_drain_comparison_random(data_set_configs,
+                                          n_calls,
+                                          parameter_ranges_dict)
+    dump_results('drain_comparison_random.p', results)

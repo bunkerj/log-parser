@@ -9,8 +9,7 @@ from src.parameter_searchers.parameter_random_searcher import \
 from src.parsers.enhanced_drain import EnhancedDrain
 
 
-def run_drain_best_parameters(n_calls, data_config, parameter_ranges_dict,
-                              name):
+def run_drain_best_parameters(data_config, n_calls, parameter_ranges_dict):
     data_manager = DataManager(data_config)
     tokenized_log_entries = data_manager.get_tokenized_log_entries()
     true_assignments = data_manager.get_true_assignments()
@@ -19,9 +18,7 @@ def run_drain_best_parameters(n_calls, data_config, parameter_ranges_dict,
                                                  parameter_ranges_dict,
                                                  n_calls=n_calls, verbose=True)
     parameter_searcher.search(tokenized_log_entries, true_assignments)
-    parameters = tuple(parameter_searcher.get_optimal_parameter_tuple())
-
-    dump_results(name, parameters)
+    return tuple(parameter_searcher.get_optimal_parameter_tuple())
 
 
 if __name__ == '__main__':
@@ -33,6 +30,7 @@ if __name__ == '__main__':
         'sim_threshold': (0.1, 0.8),
         'edit_ratio_threshold': (0, 1),
     }
-    name = 'drain_best_parameters.p'
 
-    run_drain_best_parameters(n_calls, data_config, parameter_ranges_dict, name)
+    results = run_drain_best_parameters(data_config, n_calls,
+                                        parameter_ranges_dict)
+    dump_results('drain_best_parameters.p', results)

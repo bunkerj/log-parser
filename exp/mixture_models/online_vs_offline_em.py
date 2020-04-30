@@ -9,9 +9,8 @@ from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 
-def run_online_vs_offline_em(n_init, data_configs, name):
+def run_online_vs_offline_em(data_configs, n_init):
     results = {}
-
     for data_config in data_configs:
         name = data_config['name']
         results[name] = {'offline': None, 'online': None}
@@ -42,7 +41,7 @@ def run_online_vs_offline_em(n_init, data_configs, name):
         online_ll_history = online_em_parser.get_log_likelihood_history()
         results[name]['online'] = online_ll_history
 
-    dump_results(name, results)
+    return results
 
 
 if __name__ == '__main__':
@@ -57,6 +56,6 @@ if __name__ == '__main__':
         DataConfigs.HPC,
         DataConfigs.Linux,
     ]
-    name = 'offline_vs_online_em_results.p'
 
-    run_online_vs_offline_em(n_init, data_configs, name)
+    results = run_online_vs_offline_em(data_configs, n_init)
+    dump_results('offline_vs_online_em_results.p', results)

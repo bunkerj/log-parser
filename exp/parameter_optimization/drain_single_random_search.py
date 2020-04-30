@@ -11,7 +11,7 @@ from src.parameter_searchers.parameter_random_searcher import \
     ParameterRandomSearcher
 
 
-def run_drain_single_random_search(n_calls, n_runs, data_config, name):
+def run_drain_single_random_search(data_config, n_calls, n_runs):
     data_manager = DataManager(data_config)
     tokenized_log_entries = data_manager.get_tokenized_log_entries()
     true_assignments = data_manager.get_true_assignments()
@@ -31,7 +31,7 @@ def run_drain_single_random_search(n_calls, n_runs, data_config, name):
             current_best_accuracy_history,
             n_runs)
 
-    dump_results(name, average_best_accuracy_history)
+    return average_best_accuracy_history
 
 
 if __name__ == '__main__':
@@ -43,6 +43,6 @@ if __name__ == '__main__':
         'max_child': (20, 100),
         'sim_threshold': (0.1, 0.6),
     }
-    name = 'drain_single_random_search.p'
 
-    run_drain_single_random_search(n_calls, n_runs, data_config, name)
+    results = run_drain_single_random_search(data_config, n_calls, n_runs)
+    dump_results('drain_single_random_search.p', results)

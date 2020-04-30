@@ -10,14 +10,13 @@ from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 
 
-def run_drain_comparison_grid(data_set_configs, parameter_ranges_dict, name):
+def run_drain_comparison_grid(data_set_configs, parameter_ranges_dict):
     parameter_searcher = ParameterGridSearcher(Drain, parameter_ranges_dict)
     final_best_accuracies = \
         get_final_dataset_accuracies(Drain,
                                      data_set_configs,
                                      parameter_searcher=parameter_searcher)
-
-    dump_results(name, final_best_accuracies)
+    return final_best_accuracies
 
 
 if __name__ == '__main__':
@@ -46,6 +45,6 @@ if __name__ == '__main__':
         'sim_threshold': (0.1, 0.9, 0.05),
     }
 
-    name = 'drain_comparison_grid.p'
-
-    run_drain_comparison_grid(data_set_configs, parameter_ranges_dict, name)
+    results = run_drain_comparison_grid(data_set_configs,
+                                        parameter_ranges_dict)
+    dump_results('drain_comparison_grid.p', results)

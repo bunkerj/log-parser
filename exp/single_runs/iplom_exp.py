@@ -11,7 +11,7 @@ from src.helpers.evaluator import Evaluator
 DATA_CONFIG = DataConfigs.OpenStack
 
 
-def run_iplom_exp(iplom_params, name):
+def run_iplom_exp(iplom_params):
     data_manager = DataManager(DATA_CONFIG)
     tokenized_log_entries = data_manager.get_tokenized_log_entries()
     parser = Iplom(tokenized_log_entries, **iplom_params)
@@ -21,12 +21,10 @@ def run_iplom_exp(iplom_params, name):
     evaluator = Evaluator(true_assignments)
     accuracy = evaluator.evaluate(parser.cluster_templates)
 
-    results = {
+    return {
         'accuracy': accuracy,
         'parser': parser,
     }
-
-    dump_results(name, results)
 
 
 if __name__ == '__main__':
@@ -37,6 +35,6 @@ if __name__ == '__main__':
         'upper_bound': 0.9,
         'goodness_threshold': 0.35,
     }
-    name = 'iplom_exp.p'
 
-    run_iplom_exp(iplom_params, name)
+    results = run_iplom_exp(iplom_params)
+    dump_results('iplom_exp.p', results)

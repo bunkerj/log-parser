@@ -13,7 +13,7 @@ from src.helpers.evaluator import Evaluator
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 
-def run_online_em(n_sample, data_config, training_sizes, name):
+def run_online_em(data_config, n_sample, training_sizes):
     # Get relevant data
     data_manager = DataManager(data_config)
     log_entries = data_manager.get_tokenized_no_num_log_entries()
@@ -120,15 +120,14 @@ def run_online_em(n_sample, data_config, training_sizes, name):
         results_tim['online_em'].append(online_em_timing)
         results_tim['online_cem'].append(online_cem_timing)
 
-    dump_results(name, results)
-
     print('done!')
+    return results
 
 
 if __name__ == '__main__':
     n_sample = 3
     data_config = DataConfigs.HPC
     training_sizes = list(np.linspace(30, 2000, 5, dtype=np.int))
-    name = 'online_em_results.p'
 
-    run_online_em(n_sample, data_config, training_sizes, name)
+    results = run_online_em(data_config, n_sample, training_sizes)
+    dump_results('online_em_results.p', results)

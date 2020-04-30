@@ -8,13 +8,10 @@ from src.parsers.iplom import Iplom
 from src.data_config import DataConfigs
 
 
-def run_iplom_comparison(data_set_configs, fixed_configs, name):
-    final_best_accuracies = \
-        get_final_dataset_accuracies(Iplom,
-                                     data_set_configs,
-                                     fixed_configs=fixed_configs)
-
-    dump_results(name, final_best_accuracies)
+def run_iplom_comparison(data_set_configs, fixed_configs):
+    return get_final_dataset_accuracies(Iplom,
+                                        data_set_configs,
+                                        fixed_configs=fixed_configs)
 
 
 if __name__ == '__main__':
@@ -56,6 +53,6 @@ if __name__ == '__main__':
         'Zookeeper': (0, 0, 0.7, 0.9, 0.4),
     }
 
-    name = 'iplom_comparison.p'
-
-    run_iplom_comparison(data_set_configs, fixed_configs, name)
+    results = run_iplom_comparison(data_set_configs,
+                                   fixed_configs)
+    dump_results('iplom_comparison.p', results)

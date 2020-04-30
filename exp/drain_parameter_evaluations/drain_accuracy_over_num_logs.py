@@ -11,7 +11,7 @@ from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 
 
-def run_drain_accuracy_over_num_logs(jump_size, n_runs, data_config, name):
+def run_drain_accuracy_over_num_logs(data_config, jump_size, n_runs):
     data_manager = DataManager(data_config)
     tokenized_log_entries = data_manager.get_tokenized_log_entries()
     true_assignments = data_manager.get_true_assignments()
@@ -40,18 +40,16 @@ def run_drain_accuracy_over_num_logs(jump_size, n_runs, data_config, name):
 
     print('Final Drain Accuracy: {}'.format(accuracies[-1]))
 
-    results = {
+    return {
         'accuracies': accuracies,
         'end_indices': end_indices,
     }
-
-    dump_results(name, results)
 
 
 if __name__ == '__main__':
     jump_size = 10
     n_runs = 20
     data_config = DataConfigs.BGL
-    name = 'drain_accuracy_over_num_logs.p'
 
-    run_drain_accuracy_over_num_logs(jump_size, n_runs, data_config, name)
+    results = run_drain_accuracy_over_num_logs(data_config, jump_size, n_runs)
+    dump_results('drain_accuracy_over_num_logs.p', results)

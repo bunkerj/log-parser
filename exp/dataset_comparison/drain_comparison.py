@@ -8,7 +8,7 @@ from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 
 
-def run_drain_comparison(data_set_configs, name):
+def run_drain_comparison(data_set_configs):
     fixed_configs = {
         'Android': (5, 100, 0.2),
         'Apache': (3, 100, 0.5),
@@ -32,8 +32,7 @@ def run_drain_comparison(data_set_configs, name):
         get_final_dataset_accuracies(Drain,
                                      data_set_configs,
                                      fixed_configs=fixed_configs)
-
-    dump_results(name, final_best_accuracies)
+    return final_best_accuracies
 
 
 if __name__ == '__main__':
@@ -56,6 +55,5 @@ if __name__ == '__main__':
         DataConfigs.Zookeeper,
     ]
 
-    name = 'drain_comparison.p'
-
-    run_drain_comparison(data_set_configs, name)
+    results = run_drain_comparison(data_set_configs)
+    dump_results('drain_comparison.p', results)

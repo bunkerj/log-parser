@@ -34,29 +34,26 @@ def run_drain_parameter_sensitivity(data_config,
             accuracies[parameter_field].append(
                 evaluator.evaluate(parser.cluster_templates))
 
-    boxplot_data = [
+    return [
         accuracies['max_depth'],
         accuracies['max_child'],
         accuracies['sim_threshold'],
     ]
 
-    dump_results('drain_parameter_sensitivity.p', boxplot_data)
-
 
 if __name__ == '__main__':
     data_config = DataConfigs.BGL
-
     base_config = {
         'max_depth': 3,
         'max_child': 100,
         'sim_threshold': 0.5
     }
-
     parameter_ranges_dict = {
         'max_depth': (2, 22, 2),
         'max_child': (10, 110, 10),
         'sim_threshold': (0.1, 0.90, 0.08),
     }
 
-    run_drain_parameter_sensitivity(data_config, base_config,
-                                    parameter_ranges_dict)
+    results = run_drain_parameter_sensitivity(data_config, base_config,
+                                              parameter_ranges_dict)
+    dump_results('drain_parameter_sensitivity.p', results)

@@ -17,8 +17,8 @@ from SALib.analyze.morris import analyze
 from SALib.sample.morris import sample
 
 
-def run_drain_morris_method(num_levels, conf_level, n_trajectories, data_config,
-                            parameter_ranges_dict, name):
+def run_drain_morris_method(data_config, num_levels, conf_level, n_trajectories,
+                            parameter_ranges_dict):
     data_manager = DataManager(data_config)
     tokenized_log_entries = data_manager.get_tokenized_log_entries()
     true_assignments = data_manager.get_true_assignments()
@@ -67,7 +67,7 @@ def run_drain_morris_method(num_levels, conf_level, n_trajectories, data_config,
                 conf_level=conf_level,
                 num_levels=num_levels)
 
-    dump_results(name, morris_data)
+    return morris_data
 
 
 if __name__ == '__main__':
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         'Max Child': (20, 100),
         'Sim Threshold': (0.1, 0.9),
     }
-    name = 'drain_morris_method.p'
 
-    run_drain_morris_method(num_levels, conf_level, n_trajectories, data_config,
-                            parameter_ranges_dict, name)
+    results = run_drain_morris_method(data_config, num_levels, conf_level,
+                                      n_trajectories, parameter_ranges_dict)
+    dump_results('drain_morris_method.p', results)

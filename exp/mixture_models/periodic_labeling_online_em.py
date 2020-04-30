@@ -15,9 +15,9 @@ from src.helpers.evaluator import Evaluator
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 
-def run_periodic_labeling_online_em(n_init, n_restarts, n_samples, n_labels,
-                                    n_test, label_interval, eval_interval,
-                                    n_logs, name):
+def run_periodic_labeling_online_em(data_config, n_init, n_restarts, n_samples,
+                                    n_labels, n_test, label_interval,
+                                    eval_interval, n_logs):
     data_manager = DataManager(data_config)
     log_entries = data_manager.get_tokenized_no_num_log_entries()
     true_assignments = data_manager.get_true_assignments()
@@ -88,8 +88,7 @@ def run_periodic_labeling_online_em(n_init, n_restarts, n_samples, n_labels,
         print('End streaming.')
 
     print('Time taken: {}'.format(time() - start_time))
-
-    dump_results(name, res)
+    return res
 
 
 if __name__ == '__main__':
@@ -102,8 +101,9 @@ if __name__ == '__main__':
     eval_interval = 2500
     n_logs = 10000
     data_config = DataConfigs.BGL_FULL
-    name = 'periodic_labeling_online_em.p'
 
-    run_periodic_labeling_online_em(n_init, n_restarts, n_samples, n_labels,
-                                    n_test, label_interval, eval_interval,
-                                    n_logs, name)
+    results = run_periodic_labeling_online_em(data_config, n_init, n_restarts,
+                                              n_samples, n_labels, n_test,
+                                              label_interval, eval_interval,
+                                              n_logs)
+    dump_results('periodic_labeling_online_em.p', results)

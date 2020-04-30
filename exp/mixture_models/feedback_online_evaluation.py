@@ -15,8 +15,8 @@ from global_constants import N_LOGS, LABELED_IMPURITIES_SAMPLES, \
     AVG_UNLABELED_IMPURITIES, AVG_LABELED_TIMING, AVG_UNLABELED_TIMING
 
 
-def run_feedback_online_evaluation(n_samples, is_class, is_online,
-                                   data_config, label_counts, name):
+def run_feedback_online_evaluation(data_config, n_samples, is_class, is_online,
+                                   label_counts):
     data_manager = DataManager(data_config)
     tokenized_log_entries = data_manager.get_tokenized_no_num_log_entries()
     true_assignments = data_manager.get_true_assignments()
@@ -93,7 +93,7 @@ def run_feedback_online_evaluation(n_samples, is_class, is_online,
     results[LABELED_IMPURITIES_SAMPLES] = lab_impurities_samples
     results[UNLABELED_IMPURITIES_SAMPLES] = unlab_impurities_samples
 
-    dump_results(name, results)
+    return results
 
 
 if __name__ == '__main__':
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     is_online = False
     data_config = DataConfigs.Apache
     label_counts = [0, 200, 400, 600, 800, 1000]
-    name = 'feedback_offline_em_evaluation.p'
 
-    run_feedback_online_evaluation(n_samples, is_class, is_online,
-                                   data_config, label_counts, name)
+    results = run_feedback_online_evaluation(data_config, n_samples, is_class,
+                                             is_online, label_counts)
+    dump_results('feedback_offline_em_evaluation.p', results)

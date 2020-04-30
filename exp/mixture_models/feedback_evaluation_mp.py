@@ -40,8 +40,9 @@ def perform_single_experiment(num_label, passed_data_config):
     return lab_impurity, unlab_impurity
 
 
-def run_feedback_evaluation_mp(n_samples, label_count_values, n_labels, name):
+def run_feedback_evaluation_mp(data_configs, n_samples, label_count_values):
     results = {}
+    n_labels = len(label_count_values)
     for data_config in data_configs:
         dataset_name = data_config['name']
         print('Running for {}...'.format(dataset_name))
@@ -73,19 +74,18 @@ def run_feedback_evaluation_mp(n_samples, label_count_values, n_labels, name):
 
         results[dataset_name] = dataset_results
 
-    dump_results(name, results)
-
     print('Done!')
+    return results
 
 
 if __name__ == '__main__':
     n_samples = 3
     label_count_values = list(range(0, 601, 100))
-    n_labels = len(label_count_values)
     data_configs = [
         DataConfigs.Apache,
         DataConfigs.Proxifier,
     ]
-    name = 'feedback_evaluation_mp.p'
 
-    run_feedback_evaluation_mp(n_samples, label_count_values, n_labels, name)
+    results = run_feedback_evaluation_mp(data_configs, n_samples,
+                                         label_count_values)
+    dump_results('feedback_evaluation_mp.p', results)

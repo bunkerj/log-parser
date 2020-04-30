@@ -8,8 +8,8 @@ from src.helpers.evaluator import Evaluator
 from src.parsers.drain import Drain
 
 
-def run_drain_bayesian_optimization(n_runs, n_calls, acq_func, data_config,
-                                    parameter_bounds, name):
+def run_drain_bayesian_optimization(data_config, n_runs, n_calls, acq_func,
+                                    parameter_bounds):
     data_manager = DataManager(data_config)
     tokenized_log_entries = data_manager.get_tokenized_log_entries()
     true_assignments = data_manager.get_true_assignments()
@@ -42,7 +42,7 @@ def run_drain_bayesian_optimization(n_runs, n_calls, acq_func, data_config,
             current_best_accuracy_history,
             n_runs)
 
-    dump_results(name, average_best_accuracy_history)
+    return average_best_accuracy_history
 
 
 if __name__ == '__main__':
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     acq_func = 'EI'
     data_config = DataConfigs.BGL_FULL
     parameter_bounds = [(3, 8), (20, 100), (0.1, 0.6)]
-    name = 'drain_bayesian_optimization.p'
 
-    run_drain_bayesian_optimization(n_runs, n_calls, acq_func, data_config,
-                                    parameter_bounds, name)
+    results = run_drain_bayesian_optimization(data_config, n_runs, n_calls,
+                                              acq_func, parameter_bounds)
+    dump_results('drain_bayesian_optimization.p', results)
