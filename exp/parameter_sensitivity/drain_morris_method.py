@@ -80,7 +80,7 @@ if __name__ == '__main__':
         'Max Child': (20, 100),
         'Sim Threshold': (0.1, 0.9),
     }
-    name = 'drain_morris_data.p'
+    name = 'drain_morris_method.p'
 
     run_drain_morris_method(num_levels, conf_level, n_trajectories, data_config,
                             parameter_ranges_dict, name)

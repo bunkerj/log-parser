@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from global_utils import load_results
 from graphs.utils import plot_morris_method_graph
 
-morris_data = load_results('drain_morris_data.p')
+morris_data = load_results('drain_morris_method.p')
 sensitivity_indices = morris_data['accuracy_sens_indices']
 
 plt.subplot(1, 2, 1)

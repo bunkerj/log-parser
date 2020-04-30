@@ -5,7 +5,7 @@ timings.
 import matplotlib.pyplot as plt
 from global_utils import load_results
 
-morris_data = load_results('drain_morris_data.p')
+morris_data = load_results('drain_morris_method.p')
 
 
 def plot_graphs_for_single_metric(data, metric_name, row_idx, n_rows):
