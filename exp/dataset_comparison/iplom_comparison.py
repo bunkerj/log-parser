@@ -17,7 +17,7 @@ def run_iplom_comparison(data_set_configs, fixed_configs, name):
     dump_results(name, final_best_accuracies)
 
 
-if __name__ == '__name__':
+if __name__ == '__main__':
     data_set_configs = [
         DataConfigs.Android,
         DataConfigs.Apache,

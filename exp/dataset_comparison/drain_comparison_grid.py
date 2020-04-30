@@ -46,6 +46,6 @@ if __name__ == '__main__':
         'sim_threshold': (0.1, 0.9, 0.05),
     }
 
-    name = 'drain_dataset_comparison_grid.p'
+    name = 'drain_comparison_grid.p'
 
     run_drain_comparison_grid(data_set_configs, parameter_ranges_dict, name)

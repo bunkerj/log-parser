@@ -52,7 +52,7 @@ if __name__ == '__main__':
         'edit_ratio_threshold': (0, 0.5),
     }
 
-    name = 'drain_enhanced_dataset_comparison_random.p'
+    name = 'drain_comparison_random.p'
 
     run_drain_comparison_random(n_calls, data_set_configs,
                                 parameter_ranges_dict, name)

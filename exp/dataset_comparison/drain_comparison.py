@@ -56,6 +56,6 @@ if __name__ == '__main__':
         DataConfigs.Zookeeper,
     ]
 
-    name = 'drain_dataset_comparison.p'
+    name = 'drain_comparison.p'
 
     run_drain_comparison(data_set_configs, name)
