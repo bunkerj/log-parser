@@ -12,8 +12,6 @@ from analysis.constants import NAME, PERCENTAGE_LABELED, LAB_IMPURITY, \
 from global_constants import N_LOGS, LABEL_COUNTS, LABELED_IMPURITIES_SAMPLES, \
     UNLABELED_IMPURITIES_SAMPLES
 
-N_SAMPLES = 50
-
 data_configs = [
     DataConfigs.Android,
     DataConfigs.Apache,
@@ -42,12 +40,13 @@ data = {
 
 for data_config in data_configs:
     name = data_config['name']
-    results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(),
-                                                           N_SAMPLES))
-    n_logs = results[N_LOGS]
-    label_counts = results[LABEL_COUNTS]
-    lab_samples = results[LABELED_IMPURITIES_SAMPLES]
-    unlab_samples = results[UNLABELED_IMPURITIES_SAMPLES]
+    results = load_results('feedback_evaluation_mp.p')
+    dataset_results = results[name]
+
+    n_logs = dataset_results[N_LOGS]
+    label_counts = dataset_results[LABEL_COUNTS]
+    lab_samples = dataset_results[LABELED_IMPURITIES_SAMPLES]
+    unlab_samples = dataset_results[UNLABELED_IMPURITIES_SAMPLES]
 
     for sample_idx in range(len(lab_samples)):
         lab_sample_values = lab_samples[sample_idx]

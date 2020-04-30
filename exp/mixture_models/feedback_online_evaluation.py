@@ -3,12 +3,16 @@ Evaluate how different initializations have an impact on impurity when using
 the online multinomial mixture model.
 """
 from time import time
-from exp.mixture_models.utils import get_log_labels, get_num_true_clusters
 from global_utils import dump_results
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
+from exp.mixture_models.utils import get_log_labels, get_num_true_clusters, \
+    get_avg
+from global_constants import N_LOGS, LABELED_IMPURITIES_SAMPLES, \
+    UNLABELED_IMPURITIES_SAMPLES, LABEL_COUNTS, AVG_LABELED_IMPURITIES, \
+    AVG_UNLABELED_IMPURITIES, AVG_LABELED_TIMING, AVG_UNLABELED_TIMING
 
 
 def run_feedback_online_evaluation(n_samples, is_class, is_online,
@@ -20,14 +24,14 @@ def run_feedback_online_evaluation(n_samples, is_class, is_online,
     ev = Evaluator(true_assignments)
 
     results = {
-        'n_logs': len(tokenized_log_entries),
-        'avg_labeled_impurities': [],
-        'avg_unlabeled_impurities': [],
-        'avg_labeled_timing': 0,
-        'avg_unlabeled_timing': 0,
-        'labeled_impurities_samples': [],
-        'unlabeled_impurities_samples': [],
-        'label_counts': label_counts,
+        N_LOGS: len(tokenized_log_entries),
+        AVG_LABELED_IMPURITIES: [],
+        AVG_UNLABELED_IMPURITIES: [],
+        AVG_LABELED_TIMING: 0,
+        AVG_UNLABELED_TIMING: 0,
+        LABELED_IMPURITIES_SAMPLES: [],
+        UNLABELED_IMPURITIES_SAMPLES: [],
+        LABEL_COUNTS: label_counts,
     }
     lab_impurities_samples = []
     unlab_impurities_samples = []
@@ -64,7 +68,7 @@ def run_feedback_online_evaluation(n_samples, is_class, is_online,
                 lab_parser.perform_online_batch_em(tokenized_log_entries)
             else:
                 lab_parser.perform_offline_em(tokenized_log_entries)
-            results['avg_labeled_timing'] += (time() - lab_time) / n_samples
+            results[AVG_LABELED_TIMING] += (time() - lab_time) / n_samples
 
             lab_cluster_t = lab_parser.get_clusters(tokenized_log_entries)
             lab_impurity = ev.get_impurity(lab_cluster_t, labeled_indices)
@@ -74,7 +78,7 @@ def run_feedback_online_evaluation(n_samples, is_class, is_online,
                 unlab_parser.perform_online_batch_em(tokenized_log_entries)
             else:
                 unlab_parser.perform_offline_em(tokenized_log_entries)
-            results['avg_unlabeled_timing'] += (time() - unlab_time) / n_samples
+            results[AVG_UNLABELED_TIMING] += (time() - unlab_time) / n_samples
 
             unlab_cluster_t = unlab_parser.get_clusters(tokenized_log_entries)
             unlab_impurity = ev.get_impurity(unlab_cluster_t, labeled_indices)
@@ -84,19 +88,10 @@ def run_feedback_online_evaluation(n_samples, is_class, is_online,
 
     print('\nTime taken: {}\n'.format(time() - start))
 
-    for label_idx in range(len(label_counts)):
-        avg_lab_impurity = 0
-        avg_unlab_impurity = 0
-        for sample_idx in range(n_samples):
-            avg_lab_impurity += lab_impurities_samples[sample_idx][label_idx]
-            avg_unlab_impurity += unlab_impurities_samples[sample_idx][
-                label_idx]
-        results['avg_labeled_impurities'].append(avg_lab_impurity / n_samples)
-        results['avg_unlabeled_impurities'].append(
-            avg_unlab_impurity / n_samples)
-
-    results['labeled_impurities_samples'] = lab_impurities_samples
-    results['unlabeled_impurities_samples'] = unlab_impurities_samples
+    results[AVG_LABELED_IMPURITIES] = get_avg(lab_impurities_samples)
+    results[AVG_UNLABELED_IMPURITIES] = get_avg(unlab_impurities_samples)
+    results[LABELED_IMPURITIES_SAMPLES] = lab_impurities_samples
+    results[UNLABELED_IMPURITIES_SAMPLES] = unlab_impurities_samples
 
     dump_results(name, results)
 

@@ -5,16 +5,15 @@ datasets.
 """
 import os
 import pandas as pd
-from analysis.utils import get_avg_from_samples, get_var_from_samples
+from analysis.utils import get_var_from_samples
 from global_constants import RESULTS_DIR, N_LOGS
 from global_utils import load_results
 from src.data_config import DataConfigs
 from analysis.constants import NAME, AVG_UNLAB_IMPURITY, AVG_LAB_IMPURITY, \
     VAR_UNLAB_IMPURITY, VAR_LAB_IMPURITY, PERCENTAGE_LABELED
 from global_constants import LABEL_COUNTS, LABELED_IMPURITIES_SAMPLES, \
-    UNLABELED_IMPURITIES_SAMPLES
-
-N_SAMPLES = 50
+    UNLABELED_IMPURITIES_SAMPLES, AVG_LABELED_IMPURITIES, \
+    AVG_UNLABELED_IMPURITIES
 
 data_configs = [
     DataConfigs.Android,
@@ -46,15 +45,16 @@ data = {
 
 for data_config in data_configs:
     name = data_config['name']
-    results = load_results(
-        'feedback_eval_{}_{}s.p'.format(name.lower(), N_SAMPLES))
-    labeled_impurity_samples = results[LABELED_IMPURITIES_SAMPLES]
-    unlabeled_impurity_samples = results[UNLABELED_IMPURITIES_SAMPLES]
-    label_count_values = results[LABEL_COUNTS]
-    n_logs = results[N_LOGS]
+    results = load_results('feedback_evaluation_mp.p')
+    dataset_results = results['name']
 
-    avg_lab_impurities = get_avg_from_samples(labeled_impurity_samples)
-    avg_unlab_impurities = get_avg_from_samples(unlabeled_impurity_samples)
+    labeled_impurity_samples = dataset_results[LABELED_IMPURITIES_SAMPLES]
+    unlabeled_impurity_samples = dataset_results[UNLABELED_IMPURITIES_SAMPLES]
+    label_count_values = dataset_results[LABEL_COUNTS]
+    n_logs = dataset_results[N_LOGS]
+
+    avg_lab_impurities = dataset_results[AVG_LABELED_IMPURITIES]
+    avg_unlab_impurities = dataset_results[AVG_UNLABELED_IMPURITIES]
     var_lab_impurities = get_var_from_samples(labeled_impurity_samples)
     var_unlab_impurities = get_var_from_samples(unlabeled_impurity_samples)
 

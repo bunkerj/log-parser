@@ -5,39 +5,25 @@ points.
 import matplotlib.pyplot as plt
 from global_utils import load_results
 from src.data_config import DataConfigs
-
-N_SAMPLES = 3
+from global_constants import LABEL_COUNTS, AVG_LABELED_IMPURITIES, \
+    AVG_UNLABELED_IMPURITIES
 
 data_configs = [
-    DataConfigs.Android,
     DataConfigs.Apache,
-    DataConfigs.BGL,
-    DataConfigs.Hadoop,
-    DataConfigs.HDFS,
-    DataConfigs.HealthApp,
-    DataConfigs.HPC,
-    DataConfigs.Linux,
-    DataConfigs.Mac,
-    DataConfigs.OpenSSH,
-    DataConfigs.OpenStack,
     DataConfigs.Proxifier,
-    DataConfigs.Spark,
-    DataConfigs.Thunderbird,
-    DataConfigs.Windows,
-    DataConfigs.Zookeeper,
 ]
+
+results = load_results('feedback_evaluation_mp.p')
 
 for idx, data_config in enumerate(data_configs):
     name = data_config['name']
 
-    results = load_results('feedback_eval_{}_{}s.p'.format(name.lower(),
-                                                           N_SAMPLES))
+    dataset_results = results[name]
+    label_counts = dataset_results[LABEL_COUNTS]
+    labeled_impurities = dataset_results[AVG_LABELED_IMPURITIES]
+    unlabeled_impurities = dataset_results[AVG_UNLABELED_IMPURITIES]
 
-    label_counts = results['label_counts']
-    labeled_impurities = results['avg_labeled_impurities']
-    unlabeled_impurities = results['avg_unlabeled_impurities']
-
-    ax = plt.subplot(4, 4, idx + 1)
+    ax = plt.subplot(1, 2, idx + 1)
     plt.plot(label_counts, labeled_impurities)
     plt.plot(label_counts, unlabeled_impurities)
     ax.text(.5, .9, name, horizontalalignment='center', transform=ax.transAxes)

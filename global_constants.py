@@ -14,7 +14,11 @@ class MAP:
 
 
 # Mixture experiment results constants
+N_LOGS = 'n_logs'
+LABEL_COUNTS = 'label_counts'
+AVG_LABELED_TIMING = 'avg_labeled_timing'
+AVG_UNLABELED_TIMING = 'avg_unlabeled_timing'
+AVG_LABELED_IMPURITIES = 'avg_labeled_impurities'
+AVG_UNLABELED_IMPURITIES = 'avg_unlabeled_impurities'
 LABELED_IMPURITIES_SAMPLES = 'labeled_impurities_samples'
 UNLABELED_IMPURITIES_SAMPLES = 'unlabeled_impurities_samples'
-LABEL_COUNTS = 'label_counts'
-N_LOGS = 'n_logs'
