@@ -7,47 +7,51 @@ from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
 from src.parsers.drain import Drain
 
-N_RUNS = 5
-N_CALLS = 10
-ACQ_FUNC = 'EI'
-DATA_CONFIG = DataConfigs.BGL_FULL
-PARAMETER_BOUNDS = [(3, 8), (20, 100), (0.1, 0.6)]
 
-data_manager = DataManager(DATA_CONFIG)
-tokenized_log_entries = data_manager.get_tokenized_log_entries()
-true_assignments = data_manager.get_true_assignments()
-evaluator = Evaluator(true_assignments)
+def run_drain_bayesian_optimization(n_runs, n_calls, acq_func, data_config,
+                                    parameter_bounds, name):
+    data_manager = DataManager(data_config)
+    tokenized_log_entries = data_manager.get_tokenized_log_entries()
+    true_assignments = data_manager.get_true_assignments()
+    evaluator = Evaluator(true_assignments)
+
+    average_best_accuracy_history = [0] * n_calls
+
+    def get_cumulative_best_accuracies(loss_func_evaluations):
+        return [-min(loss_func_evaluations[:i]) for i in
+                range(1, len(loss_func_evaluations) + 1)]
+
+    def loss_function(parameters):
+        parser = Drain(tokenized_log_entries, *parameters)
+        parser.parse()
+        return -evaluator.evaluate(parser.cluster_templates)
+
+    for run in range(n_runs):
+        res = gp_minimize(loss_function,
+                          parameter_bounds,
+                          acq_func=acq_func,
+                          n_calls=n_calls,
+                          n_random_starts=5,
+                          random_state=randint(1, 1000000))
+
+        current_best_accuracy_history = \
+            get_cumulative_best_accuracies(res.func_vals)
+
+        average_best_accuracy_history = update_average_list(
+            average_best_accuracy_history,
+            current_best_accuracy_history,
+            n_runs)
+
+    dump_results(name, average_best_accuracy_history)
 
 
-def get_cumulative_best_accuracies(loss_func_evaluations):
-    return [-min(loss_func_evaluations[:i]) for i in
-            range(1, len(loss_func_evaluations) + 1)]
+if __name__ == '__main__':
+    n_runs = 5
+    n_calls = 10
+    acq_func = 'EI'
+    data_config = DataConfigs.BGL_FULL
+    parameter_bounds = [(3, 8), (20, 100), (0.1, 0.6)]
+    name = 'drain_bayesian_optimization.p'
 
-
-def loss_function(parameters):
-    parser = Drain(tokenized_log_entries, *parameters)
-    parser.parse()
-    return -evaluator.evaluate(parser.cluster_templates)
-
-
-average_best_accuracy_history = [0] * N_CALLS
-
-for run in range(N_RUNS):
-    res = gp_minimize(loss_function,
-                      PARAMETER_BOUNDS,
-                      acq_func=ACQ_FUNC,
-                      n_calls=N_CALLS,
-                      n_random_starts=5,
-                      random_state=randint(1, 1000000))
-
-    current_best_accuracy_history = \
-        get_cumulative_best_accuracies(res.func_vals)
-
-    average_best_accuracy_history = update_average_list(
-        average_best_accuracy_history,
-        current_best_accuracy_history,
-        N_RUNS)
-
-filename_template = 'average_best_bayes_opt_full_accuracy_history_{}.p'
-dump_results(filename_template.format(ACQ_FUNC),
-             average_best_accuracy_history)
+    run_drain_bayesian_optimization(n_runs, n_calls, acq_func, data_config,
+                                    parameter_bounds, name)
