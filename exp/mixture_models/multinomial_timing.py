@@ -1,26 +1,38 @@
 import numpy as np
 from time import time
 from scipy.stats import multinomial as multi_scipy
-from global_utils import multi as multi_custom_pmf
+from global_utils import dump_results, multi as multi_custom_pmf
 
-N_SAMPLES = 500000
-N_CLASSES = 200
-N_EXPERIMENTS = 1000
 
-total_params = np.random.dirichlet(np.ones(N_CLASSES), size=N_SAMPLES)
-samples = np.zeros((N_SAMPLES, N_CLASSES))
-for idx, params in enumerate(total_params):
-    samples[idx, :] = np.random.multinomial(N_EXPERIMENTS, params)
+def run_multinomial_timing(n_samples, n_classes, n_experiments, name):
+    params = np.random.dirichlet(np.ones(n_classes), size=n_samples)
+    samples = np.zeros((n_samples, n_classes))
+    for idx, single_multi_params in enumerate(params):
+        samples[idx, :] = np.random.multinomial(n_experiments,
+                                                single_multi_params)
 
-custom_multi_time = time()
-for idx in range(N_SAMPLES):
-    result = multi_custom_pmf(samples[idx, :], total_params[idx, :])
-custom_multi_time = time() - custom_multi_time
+    custom_multi_time = time()
+    for idx in range(n_samples):
+        multi_custom_pmf(samples[idx, :], params[idx, :])
+    custom_multi_time = time() - custom_multi_time
 
-scipy_multi_time = time()
-for idx in range(N_SAMPLES):
-    multi_scipy.pmf(samples[idx, :], sum(samples[idx, :]), total_params[idx, :])
-scipy_multi_time = time() - scipy_multi_time
+    scipy_multi_time = time()
+    for idx in range(n_samples):
+        multi_scipy.pmf(samples[idx, :], sum(samples[idx, :]), params[idx, :])
+    scipy_multi_time = time() - scipy_multi_time
 
-print('Scipy implementation: {}'.format(scipy_multi_time))
-print('Custom implementation: {}'.format(custom_multi_time))
+    results = {
+        'custom_time': custom_multi_time,
+        'scipy_time': scipy_multi_time,
+    }
+
+    dump_results(name, results)
+
+
+if __name__ == '__main__':
+    n_samples = 500000
+    n_classes = 200
+    n_experiments = 1000
+    name = 'multinomial_timing.p'
+
+    run_multinomial_timing(n_samples, n_classes, n_experiments, name)
