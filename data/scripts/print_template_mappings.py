@@ -2,7 +2,7 @@
 Print template assignments of a given dataset configuration. The specified
 dataset is subsampled by the increment specified by JUMP_SIZE.
 """
-from data.full.utils import read_template_assignments_from_file
+from data.scripts.utils import read_template_assignments_from_file
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 

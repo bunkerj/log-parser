@@ -3,7 +3,7 @@ Create a new dataset and template assignment files that contains N_SAMPLES
 number of samples from the original dataset and template assignment files.
 """
 from numpy.random import choice
-from data.full.utils import subsample_file, get_file_length
+from data.scripts.utils import subsample_file, get_file_length
 
 N_SAMPLES = 50000
 

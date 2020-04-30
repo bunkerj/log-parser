@@ -6,7 +6,7 @@ The new dataset is created by filtering the base dataset lines that do not have
 a template assignment (i.e has a template index of -1).
 """
 from src.data_config import DataConfigs
-from data.full.utils import read_template_assignments_from_file
+from data.scripts.utils import read_template_assignments_from_file
 from src.helpers.data_manager import DataManager
 
 DATA_CONFIG = DataConfigs.BGL_FULL

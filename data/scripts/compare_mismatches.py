@@ -9,7 +9,7 @@ proper match in the reference file.
 """
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
-from data.full.utils import read_template_assignments_from_file
+from data.scripts.utils import read_template_assignments_from_file
 
 PATH = 'data/full/assignments/BGL_filtered_assignments.csv'
 REF_PATH = 'data/full/assignments/BGL_assignments.csv'
