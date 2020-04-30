@@ -1,30 +1,36 @@
 """
 Plot the accuracy over the maximum tree depth.
 """
-import matplotlib.pyplot as plt
+from global_utils import dump_results
 from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 
-DATA_CONFIG = DataConfigs.BGL
 
-accuracies = []
-tree_depths = list(range(3, 31, 1))
-data_manager = DataManager(DATA_CONFIG)
-tokenized_log_entries = data_manager.get_tokenized_log_entries()
-true_assignments = data_manager.get_true_assignments()
-evaluator = Evaluator(true_assignments)
-
-for tree_depth in tree_depths:
+def run_drain_accuracy_over_tree_depth(data_config, tree_depths, name):
+    accuracies = []
+    data_manager = DataManager(data_config)
     tokenized_log_entries = data_manager.get_tokenized_log_entries()
-    parser = Drain(tokenized_log_entries, 3, tree_depth, 0.5)
-    parser.parse()
-    accuracies.append(evaluator.evaluate(parser.cluster_templates))
+    true_assignments = data_manager.get_true_assignments()
+    evaluator = Evaluator(true_assignments)
 
-plt.plot(tree_depths, accuracies)
-plt.title('Drain Accuracy Over Tree Depth')
-plt.ylabel('Percentage Accuracy')
-plt.xlabel('Tree Depth')
-plt.grid()
-plt.show()
+    for tree_depth in tree_depths:
+        parser = Drain(tokenized_log_entries, 3, tree_depth, 0.5)
+        parser.parse()
+        accuracies.append(evaluator.evaluate(parser.cluster_templates))
+
+    results = {
+        'tree_depths': tree_depths,
+        'accuracies': accuracies,
+    }
+
+    dump_results(name, results)
+
+
+if __name__ == '__main__':
+    data_config = DataConfigs.BGL
+    tree_depths = list(range(3, 31, 1))
+    name = 'drain_accuracy_over_tree_depth.p'
+
+    run_drain_accuracy_over_tree_depth(data_config, tree_depths, name)
