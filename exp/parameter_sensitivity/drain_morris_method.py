@@ -16,63 +16,71 @@ from src.helpers.data_manager import DataManager
 from SALib.analyze.morris import analyze
 from SALib.sample.morris import sample
 
-NUM_LEVELS = 4
-CONF_LEVEL = 0.95
-N_TRAJECTORIES = 100
-DATA_CONFIG = DataConfigs.BGL_FULL
 
-parameter_ranges_dict = {
-    'Max Depth': (3, 8),
-    'Max Child': (20, 100),
-    'Sim Threshold': (0.1, 0.9),
-}
+def run_drain_morris_method(num_levels, conf_level, n_trajectories, data_config,
+                            parameter_ranges_dict, name):
+    data_manager = DataManager(data_config)
+    tokenized_log_entries = data_manager.get_tokenized_log_entries()
+    true_assignments = data_manager.get_true_assignments()
+    evaluator = Evaluator(true_assignments)
 
-data_manager = DataManager(DATA_CONFIG)
-tokenized_log_entries = data_manager.get_tokenized_log_entries()
-true_assignments = data_manager.get_true_assignments()
-evaluator = Evaluator(true_assignments)
+    problem = {
+        'num_vars': len(parameter_ranges_dict),
+        'names': list(parameter_ranges_dict.keys()),
+        'bounds': [parameter_ranges_dict[k] for k in parameter_ranges_dict],
+    }
 
-problem = {
-    'num_vars': len(parameter_ranges_dict),
-    'names': list(parameter_ranges_dict.keys()),
-    'bounds': [parameter_ranges_dict[k] for k in parameter_ranges_dict],
-}
+    morris_data = {
+        'timing': [],
+        'accuracy': [],
+        'parameter_names': list(parameter_ranges_dict.keys()),
+        'parameters': sample(problem, n_trajectories, num_levels=num_levels),
+        'accuracy_sens_indices': None,
+        'timing_sens_indices': None,
+    }
 
-morris_data = {
-    'timing': [],
-    'accuracy': [],
-    'parameter_names': list(parameter_ranges_dict.keys()),
-    'parameters': sample(problem, N_TRAJECTORIES, num_levels=NUM_LEVELS),
-    'accuracy_sens_indices': None,
-    'timing_sens_indices': None,
-}
+    for idx, parameter_tuple in enumerate(morris_data['parameters']):
+        print('Run {}/{}'.format(idx + 1, len(morris_data['parameters'])))
 
-for idx, parameter_tuple in enumerate(morris_data['parameters']):
-    print('Run {}/{}'.format(idx + 1, len(morris_data['parameters'])))
+        parser = Drain(tokenized_log_entries, *parameter_tuple)
 
-    parser = Drain(tokenized_log_entries, *parameter_tuple)
+        start_time = time()
+        parser.parse()
+        minutes_to_parse = (time() - start_time) / 60
 
-    start_time = time()
-    parser.parse()
-    minutes_to_parse = (time() - start_time) / 60
+        accuracy = evaluator.evaluate(parser.cluster_templates)
 
-    accuracy = evaluator.evaluate(parser.cluster_templates)
+        morris_data['timing'].append(minutes_to_parse)
+        morris_data['accuracy'].append(accuracy)
 
-    morris_data['timing'].append(minutes_to_parse)
-    morris_data['accuracy'].append(accuracy)
+    morris_data['accuracy_sens_indices'] = \
+        analyze(problem,
+                morris_data['parameters'],
+                np.array(morris_data['accuracy']),
+                conf_level=conf_level,
+                num_levels=num_levels)
 
-morris_data['accuracy_sens_indices'] = \
-    analyze(problem,
-            morris_data['parameters'],
-            np.array(morris_data['accuracy']),
-            conf_level=CONF_LEVEL,
-            num_levels=NUM_LEVELS)
+    morris_data['timing_sens_indices'] = \
+        analyze(problem,
+                morris_data['parameters'],
+                np.array(morris_data['timing']),
+                conf_level=conf_level,
+                num_levels=num_levels)
 
-morris_data['timing_sens_indices'] = \
-    analyze(problem,
-            morris_data['parameters'],
-            np.array(morris_data['timing']),
-            conf_level=CONF_LEVEL,
-            num_levels=NUM_LEVELS)
+    dump_results(name, morris_data)
 
-dump_results('drain_morris_data.p', morris_data)
+
+if __name__ == '__main__':
+    num_levels = 4
+    conf_level = 0.95
+    n_trajectories = 100
+    data_config = DataConfigs.Apache
+    parameter_ranges_dict = {
+        'Max Depth': (3, 8),
+        'Max Child': (20, 100),
+        'Sim Threshold': (0.1, 0.9),
+    }
+    name = 'drain_morris_data.p'
+
+    run_drain_morris_method(num_levels, conf_level, n_trajectories, data_config,
+                            parameter_ranges_dict, name)
