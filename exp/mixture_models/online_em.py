@@ -130,4 +130,4 @@ if __name__ == '__main__':
     training_sizes = list(np.linspace(30, 2000, 5, dtype=np.int))
 
     results = run_online_em(data_config, n_sample, training_sizes)
-    dump_results('online_em_results.p', results)
+    dump_results('online_em.p', results)

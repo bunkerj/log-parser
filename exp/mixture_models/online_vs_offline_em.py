@@ -58,4 +58,4 @@ if __name__ == '__main__':
     ]
 
     results = run_online_vs_offline_em(data_configs, n_init)
-    dump_results('offline_vs_online_em_results.p', results)
+    dump_results('offline_vs_online_em.p', results)

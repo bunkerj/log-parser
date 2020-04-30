@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from global_utils import load_results
 
-results = load_results('online_em_results.p')
+results = load_results('online_em.p')
 
 training_sizes = results['training_sizes']
 results_scores = results['scores']
