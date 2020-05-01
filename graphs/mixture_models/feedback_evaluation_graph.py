@@ -27,7 +27,7 @@ for idx, data_config in enumerate(data_configs):
     plt.plot(label_counts, labeled_impurities)
     plt.plot(label_counts, unlabeled_impurities)
     ax.text(.5, .9, name, horizontalalignment='center', transform=ax.transAxes)
-    if idx == 3:
+    if idx == 1:
         plt.legend(['Labeled', 'Unlabeled'])
     plt.grid()
 
