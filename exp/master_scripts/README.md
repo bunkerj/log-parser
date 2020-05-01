@@ -1,1 +1,0 @@
-This directory contains scripts that are responsible for running suites of experiments.

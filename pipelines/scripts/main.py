@@ -1,8 +1,8 @@
 import numpy as np
 from src.data_config import DataConfigs
-from exp.master_scripts.utils import query_results_dir
+from pipelines.utils import query_results_dir
 from exp.mixture_models.online_em import run_online_em
-from exp.master_scripts.experiments_pipeline import ExperimentsPipeline
+from pipelines.experiments_pipeline import ExperimentsPipeline
 from exp.mixture_models.feedback_evaluation_mp import run_feedback_evaluation_mp
 
 if __name__ == '__main__':
