@@ -3,12 +3,12 @@ from src.helpers.data_manager import DataManager
 
 
 def get_final_dataset_accuracies(Parser_class,
-                                 data_set_configs,
+                                 dataset_configs,
                                  parameter_searcher=None,
                                  fixed_configs=None):
     final_accuracies = {}
-    for data_set_config in data_set_configs:
-        data_manager = DataManager(data_set_config)
+    for dataset_config in dataset_configs:
+        data_manager = DataManager(dataset_config)
         tokenized_log_entries = data_manager.get_tokenized_log_entries()
         true_assignments = data_manager.get_true_assignments()
 
@@ -16,7 +16,7 @@ def get_final_dataset_accuracies(Parser_class,
             parameter_searcher.search(tokenized_log_entries, true_assignments)
             parameters = parameter_searcher.get_optimal_parameter_tuple()
         elif fixed_configs is not None:
-            parameters = fixed_configs[data_set_config['name']]
+            parameters = fixed_configs[dataset_config['name']]
         else:
             raise Exception('Invalid configuration setup')
 
@@ -28,9 +28,9 @@ def get_final_dataset_accuracies(Parser_class,
         accuracy = evaluator.evaluate(parser.cluster_templates)
 
         print('{}: Final {} Accuracy: {}'.format(parameters,
-                                                 data_set_config['name'],
+                                                 dataset_config['name'],
                                                  accuracy))
-        final_accuracies[data_set_config['name']] = accuracy
+        final_accuracies[dataset_config['name']] = accuracy
 
     return final_accuracies
 

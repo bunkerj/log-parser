@@ -10,17 +10,17 @@ from src.parsers.drain import Drain
 from src.data_config import DataConfigs
 
 
-def run_drain_comparison_grid(data_set_configs, parameter_ranges_dict):
+def run_drain_comparison_grid(dataset_configs, parameter_ranges_dict):
     parameter_searcher = ParameterGridSearcher(Drain, parameter_ranges_dict)
     final_best_accuracies = \
         get_final_dataset_accuracies(Drain,
-                                     data_set_configs,
+                                     dataset_configs,
                                      parameter_searcher=parameter_searcher)
     return final_best_accuracies
 
 
 if __name__ == '__main__':
-    data_set_configs = [
+    dataset_configs = [
         DataConfigs.Android,
         DataConfigs.Apache,
         DataConfigs.BGL,
@@ -45,6 +45,6 @@ if __name__ == '__main__':
         'sim_threshold': (0.1, 0.9, 0.05),
     }
 
-    results = run_drain_comparison_grid(data_set_configs,
+    results = run_drain_comparison_grid(dataset_configs,
                                         parameter_ranges_dict)
     dump_results('drain_comparison_grid.p', results)
