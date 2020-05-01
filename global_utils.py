@@ -3,19 +3,19 @@ import pickle
 import numpy as np
 from random import shuffle
 from scipy.special import gammaln
-
 from global_constants import RESULTS_DIR
 
 
-def dump_results(name, results):
-    if not os.path.exists(RESULTS_DIR):
-        os.makedirs(RESULTS_DIR)
-    path = os.path.join(RESULTS_DIR, name)
+def dump_results(name, results, results_dir):
+    results_dir = RESULTS_DIR if results_dir is None else results_dir
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+    path = os.path.join(results_dir, name)
     pickle.dump(results, open(path, 'wb'))
 
 
-def load_results(name):
-    path = os.path.join(RESULTS_DIR, name)
+def load_results(name, results_dir=RESULTS_DIR):
+    path = os.path.join(results_dir, name)
     return pickle.load(open(path, 'rb'))
 
 
