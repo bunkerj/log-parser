@@ -8,4 +8,4 @@ DATA_CONFIG = DataConfigs.HPC
 INDICES = (401, 562, 699)
 
 data_manager = DataManager(DATA_CONFIG)
-data_manager.print_select_raw_and_tokenized_log_entries(INDICES)
+data_manager.print_select_raw_and_tokenized_logs(INDICES)

@@ -18,7 +18,7 @@ from global_constants import N_LOGS, LABELED_IMPURITIES_SAMPLES, \
 def run_feedback_online_evaluation(data_config, n_samples, is_class, is_online,
                                    label_counts):
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_no_num_log_entries()
+    tokenized_log_entries = data_manager.get_tokenized_no_num_logs()
     true_assignments = data_manager.get_true_assignments()
     num_true_clusters = get_num_true_clusters(true_assignments)
     ev = Evaluator(true_assignments)

@@ -12,7 +12,7 @@ from src.helpers.data_manager import DataManager
 
 def run_drain_exp(data_config, enhanced_drain_params):
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_log_entries()
+    tokenized_log_entries = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     parser = EnhancedDrain(tokenized_log_entries, *enhanced_drain_params)
 

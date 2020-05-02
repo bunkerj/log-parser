@@ -17,7 +17,7 @@ class TemplateAssigner:
 
     def _get_template_assignments(self):
         data_manager = DataManager(self.data_config)
-        tokenized_log_entries = data_manager.get_tokenized_log_entries()
+        tokenized_log_entries = data_manager.get_tokenized_logs()
         templates = data_manager.get_templates()
         sorted_templates = sorted(templates,
                                   reverse=True,

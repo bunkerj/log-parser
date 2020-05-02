@@ -13,7 +13,7 @@ from src.parameter_searchers.parameter_random_searcher import \
 
 def run_drain_single_random_search(data_config, n_calls, n_runs):
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_log_entries()
+    tokenized_log_entries = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     average_best_accuracy_history = [0] * n_calls
 

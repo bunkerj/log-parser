@@ -11,7 +11,7 @@ from src.parsers.drain import Drain
 def run_drain_bayesian_optimization(data_config, n_runs, n_calls, acq_func,
                                     parameter_bounds):
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_log_entries()
+    tokenized_log_entries = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     evaluator = Evaluator(true_assignments)
 

@@ -14,7 +14,7 @@ assignment_path = DATA_CONFIG['assignments_path']
 
 template_assignments = read_template_assignments_from_file(assignment_path,
                                                            JUMP_SIZE)
-tokenized_log_entries = data_manager.get_tokenized_log_entries()[::JUMP_SIZE]
+tokenized_log_entries = data_manager.get_tokenized_logs()[::JUMP_SIZE]
 
 n = len(template_assignments)
 

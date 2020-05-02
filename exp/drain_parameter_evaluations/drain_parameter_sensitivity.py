@@ -16,7 +16,7 @@ def run_drain_parameter_sensitivity(data_config,
                                     parameter_ranges_dict):
     accuracies = {}
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_log_entries()
+    tokenized_log_entries = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     evaluator = Evaluator(true_assignments)
 

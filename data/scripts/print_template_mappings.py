@@ -11,7 +11,7 @@ DATA_CONFIG = DataConfigs.BGL_FULL
 
 data_manager = DataManager(DATA_CONFIG)
 templates = data_manager.get_templates()
-tokenized_log_entries = data_manager.get_tokenized_log_entries()[::JUMP_SIZE]
+tokenized_log_entries = data_manager.get_tokenized_logs()[::JUMP_SIZE]
 assignments = read_template_assignments_from_file(
     DATA_CONFIG['assignments_path'], JUMP_SIZE)
 

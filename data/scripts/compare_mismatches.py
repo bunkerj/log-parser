@@ -18,7 +18,7 @@ template_assignments = read_template_assignments_from_file(PATH)
 template_assignments_ref = read_template_assignments_from_file(REF_PATH)
 
 data_manager = DataManager(DataConfigs.BGL_FULL)
-tokenized_log_entries = data_manager.get_tokenized_log_entries()
+tokenized_log_entries = data_manager.get_tokenized_logs()
 
 total_mismatches = 0
 mismatch_ref_template_indices = set()

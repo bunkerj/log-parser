@@ -9,7 +9,7 @@ def get_final_dataset_accuracies(Parser_class,
     final_accuracies = {}
     for dataset_config in dataset_configs:
         data_manager = DataManager(dataset_config)
-        tokenized_log_entries = data_manager.get_tokenized_log_entries()
+        tokenized_log_entries = data_manager.get_tokenized_logs()
         true_assignments = data_manager.get_true_assignments()
 
         if parameter_searcher is not None:

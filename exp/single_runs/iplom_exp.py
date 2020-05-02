@@ -13,7 +13,7 @@ DATA_CONFIG = DataConfigs.OpenStack
 
 def run_iplom_exp(iplom_params):
     data_manager = DataManager(DATA_CONFIG)
-    tokenized_log_entries = data_manager.get_tokenized_log_entries()
+    tokenized_log_entries = data_manager.get_tokenized_logs()
     parser = Iplom(tokenized_log_entries, **iplom_params)
     parser.parse()
 

@@ -27,21 +27,15 @@ class DataManager:
     def __init__(self, data_config):
         self.data_config = data_config
 
-    def get_tokenized_log_entries(self):
-        raw_logs = self._get_raw_log_entries()
+    def get_tokenized_logs(self):
+        raw_logs = self._get_raw_logs()
         return self._preprocess_raw_logs(raw_logs)
 
-    def get_tokenized_no_num_log_entries(self):
-        tokenized_log_entries = self.get_tokenized_log_entries()
-        tokenized_no_num_log_entries = []
-        for tokenized_log_entry in tokenized_log_entries:
-            tokenized_no_num_log_entry = []
-            for token in tokenized_log_entry:
-                new_token = ''.join([c for c in token if not c.isdigit()])
-                if new_token != '':
-                    tokenized_no_num_log_entry.append(new_token)
-            tokenized_no_num_log_entries.append(tokenized_no_num_log_entry)
-        return tokenized_no_num_log_entries
+    def get_tokenized_no_num_logs(self):
+        logs = []
+        for tokenized_logs in self.get_tokenized_logs():
+            logs.append(self._get_tokenized_no_num_log(tokenized_logs))
+        return logs
 
     def get_templates(self):
         raw_templates = read_csv(self.data_config['template_path'])
@@ -66,16 +60,24 @@ class DataManager:
         assignments_path = self.data_config['assignments_path']
         return read_csv(assignments_path)[1:]
 
-    def print_select_raw_and_tokenized_log_entries(self, log_indices):
-        raw_logs = self._get_raw_log_entries()
-        tokenized_log_entries = self._preprocess_raw_logs(raw_logs)
+    def print_select_raw_and_tokenized_logs(self, log_indices):
+        raw_logs = self._get_raw_logs()
+        tokenized_logs = self._preprocess_raw_logs(raw_logs)
 
         for idx in log_indices:
             print('Log Id: {}'.format(idx))
             print('\t{}'.format(raw_logs[idx]))
-            print('\t{}\n'.format(tokenized_log_entries[idx]))
+            print('\t{}\n'.format(tokenized_logs[idx]))
 
-    def _get_raw_log_entries(self):
+    def _get_tokenized_no_num_log(self, tokenized_log_entry):
+        tokenized_no_num_log_entry = []
+        for token in tokenized_log_entry:
+            new_token = ''.join([c for c in token if not c.isdigit()])
+            if new_token != '':
+                tokenized_no_num_log_entry.append(new_token)
+        return tokenized_no_num_log_entry
+
+    def _get_raw_logs(self):
         headers, regex = self._generate_logformat_regex()
         log_file = self.data_config['unstructured_path']
         return self._log_to_df(log_file, regex, headers)['Content'].to_list()
@@ -88,7 +90,7 @@ class DataManager:
         return regex
 
     def _preprocess_raw_logs(self, raw_logs):
-        tokenized_log_entries = []
+        tokenized_logs = []
         for raw_log_msg in raw_logs:
             for currentRex in self.data_config['regex']:
                 # # For Drain consistency
@@ -97,8 +99,8 @@ class DataManager:
                                      raw_log_msg)  # For IPLoM consistency
             # log_entry = raw_log_msg.strip().split()  # For Drain consistency
             log_entry = get_split_list(raw_log_msg)
-            tokenized_log_entries.append(log_entry)
-        return tokenized_log_entries
+            tokenized_logs.append(log_entry)
+        return tokenized_logs
 
     def _generate_logformat_regex(self):
         headers = []

@@ -15,7 +15,7 @@ def run_drain_accuracy_breakdown_over_similarity(data_config, sim_thresholds):
     type2_error_ratios = []
 
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_log_entries()
+    tokenized_log_entries = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     evaluator = Evaluator(true_assignments)
 

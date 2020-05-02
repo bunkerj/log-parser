@@ -19,7 +19,7 @@ from global_constants import LABELED_IMPURITIES_SAMPLES, \
 def perform_single_experiment(num_label, passed_data_config):
     print(passed_data_config['name'])
     data_manager = DataManager(passed_data_config)
-    log_entries = data_manager.get_tokenized_no_num_log_entries()
+    log_entries = data_manager.get_tokenized_no_num_logs()
     true_assignments = data_manager.get_true_assignments()
     num_true_clusters = get_num_true_clusters(true_assignments)
     evaluator = Evaluator(true_assignments)
@@ -61,7 +61,7 @@ def run_feedback_evaluation_mp(data_configs, n_samples, label_count_values):
         unlab_samples = split_on_samples(unlab_impurities, n_labels)
 
         tokenized_log_entries = DataManager(data_config) \
-            .get_tokenized_no_num_log_entries()
+            .get_tokenized_no_num_logs()
 
         dataset_results = {
             AVG_LABELED_IMPURITIES: get_avg(lab_samples),
