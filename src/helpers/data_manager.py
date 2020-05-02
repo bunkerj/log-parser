@@ -1,7 +1,7 @@
 import re
 import pandas as pd
-from global_constants import SPLIT_REGEX, PLACEHOLDER
 from src.utils import read_csv
+from global_constants import SPLIT_REGEX, PLACEHOLDER
 
 
 def get_split_list(template):
@@ -28,8 +28,8 @@ class DataManager:
         self.data_config = data_config
 
     def get_tokenized_log_entries(self):
-        log_df = self._get_log_dataframe()
-        return self._preprocess_raw_log_entries(log_df)
+        raw_logs = self._get_raw_log_entries()
+        return self._preprocess_raw_logs(raw_logs)
 
     def get_tokenized_no_num_log_entries(self):
         tokenized_log_entries = self.get_tokenized_log_entries()
@@ -67,19 +67,18 @@ class DataManager:
         return read_csv(assignments_path)[1:]
 
     def print_select_raw_and_tokenized_log_entries(self, log_indices):
-        log_df = self._get_log_dataframe()
-        raw_log_entries = log_df['Content'].to_list()
-        tokenized_log_entries = self._preprocess_raw_log_entries(log_df)
+        raw_logs = self._get_raw_log_entries()
+        tokenized_log_entries = self._preprocess_raw_logs(raw_logs)
 
         for idx in log_indices:
             print('Log Id: {}'.format(idx))
-            print('\t{}'.format(raw_log_entries[idx]))
+            print('\t{}'.format(raw_logs[idx]))
             print('\t{}\n'.format(tokenized_log_entries[idx]))
 
-    def _get_log_dataframe(self):
+    def _get_raw_log_entries(self):
         headers, regex = self._generate_logformat_regex()
         log_file = self.data_config['unstructured_path']
-        return self._log_to_dataframe(log_file, regex, headers)
+        return self._log_to_df(log_file, regex, headers)['Content'].to_list()
 
     def _get_template_regex(self, template):
         regex = re.escape(template)
@@ -88,9 +87,9 @@ class DataManager:
         regex = '^{}$'.format(regex)
         return regex
 
-    def _preprocess_raw_log_entries(self, logdf):
+    def _preprocess_raw_logs(self, raw_logs):
         tokenized_log_entries = []
-        for raw_log_msg in logdf['Content']:
+        for raw_log_msg in raw_logs:
             for currentRex in self.data_config['regex']:
                 # # For Drain consistency
                 # raw_log_msg = re.sub(currentRex, PLACEHOLDER, raw_log_msg)
@@ -116,7 +115,7 @@ class DataManager:
         regex = re.compile('^{}$'.format(regex))
         return headers, regex
 
-    def _log_to_dataframe(self, log_file, regex, headers):
+    def _log_to_df(self, log_file, regex, headers):
         log_messages = self._get_raw_log_full_lines(log_file, regex, headers)
         log_df = pd.DataFrame(log_messages, columns=headers)
         log_df.insert(0, 'LineId', None)
