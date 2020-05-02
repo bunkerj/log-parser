@@ -7,11 +7,11 @@ from copy import deepcopy
 
 
 class Iplom(LogParser):
-    def __init__(self, tokenized_log_entries, file_threshold,
+    def __init__(self, tokenized_logs, file_threshold,
                  partition_threshold,
                  lower_bound, upper_bound, goodness_threshold):
-        super().__init__(tokenized_log_entries)
-        self.partitions = Partitions(self.tokenized_log_entries)
+        super().__init__(tokenized_logs)
+        self.partitions = Partitions(self.tokenized_logs)
         self.file_threshold = file_threshold
         self.partition_threshold = partition_threshold
         self.lower_bound = lower_bound
@@ -30,13 +30,13 @@ class Iplom(LogParser):
 
     def print_cluster_templates(self):
         """
-        Prints each template and their respective log entries.
+        Prints each template and their respective logs.
         """
         for template in self.cluster_templates:
             print(template)
             log_indices = self.cluster_templates[template]
-            log_entries = self._get_log_entries_from_indices(log_indices)
-            print_items(log_entries)
+            logs = self._get_logs_from_indices(log_indices)
+            print_items(logs)
 
     def get_partition_contents_list(self):
         """
@@ -44,42 +44,42 @@ class Iplom(LogParser):
         """
         partitions = []
         for partition_item in self.partitions:
-            partitions.append(self._get_tokenized_log_entries_from_indices(
+            partitions.append(self._get_tokenized_logs_from_indices(
                 partition_item.log_indices))
         partition_contents = []
         for partition in sorted(partitions, key=lambda p: len(p[0]),
                                 reverse=False):
-            for entry in partition:
-                partition_contents.append(entry)
+            for log in partition:
+                partition_contents.append(log)
             partition_contents.append('----------------------------')
         return partition_contents
 
-    def _get_log_entries_from_indices(self, log_indices):
+    def _get_logs_from_indices(self, log_indices):
         """
-        Returns string log entry corresponding to the passed log indices.
+        Returns log string corresponding to the passed log indices.
         """
-        return [' '.join(tokenized_log_entry) for tokenized_log_entry in
-                self._get_tokenized_log_entries_from_indices(log_indices)]
+        return [' '.join(tokenized_log) for tokenized_log in
+                self._get_tokenized_logs_from_indices(log_indices)]
 
-    def _get_tokenized_log_entries_from_indices(self, log_indices):
+    def _get_tokenized_logs_from_indices(self, log_indices):
         """
         Returns a lists containing lists of tokens corresponding to the passed
         log indices.
         """
-        return [self.tokenized_log_entries[log_id] for log_id in log_indices]
+        return [self.tokenized_logs[log_id] for log_id in log_indices]
 
     def _partition_by_count(self):
         """
         Splits partitions by token count.
         """
         count_dict = {}
-        for idx, log_entry in enumerate(self.tokenized_log_entries):
-            n = len(log_entry)
+        for idx, log in enumerate(self.tokenized_logs):
+            n = len(log)
             if n not in count_dict:
                 count_dict[n] = []
             count_dict[n].append(idx)
 
-        count_partitions = Partitions(self.tokenized_log_entries)
+        count_partitions = Partitions(self.tokenized_logs)
         for count in count_dict:
             count_partitions.add(count_dict[count], 1)
 
@@ -89,21 +89,20 @@ class Iplom(LogParser):
         """
         Splits partitions by the least unique token position.
         """
-        position_partitions = Partitions(self.tokenized_log_entries)
+        position_partitions = Partitions(self.tokenized_logs)
 
         for partition_item in self.partitions:
             outlier_log_indices = []
             log_indices = partition_item.log_indices
-            tokenized_log_entries = \
-                self._get_tokenized_log_entries_from_indices(log_indices)
+            tokenized_logs = \
+                self._get_tokenized_logs_from_indices(log_indices)
             least_unique_token_index = self._get_least_unique_token_index(
-                tokenized_log_entries)
+                tokenized_logs)
             child_partitions = self._get_position_subpartitions_dict(
                 least_unique_token_index, log_indices)
             for token in child_partitions:
                 child_partition = child_partitions[token]
-                partition_support = len(child_partition) / len(
-                    tokenized_log_entries)
+                partition_support = len(child_partition) / len(tokenized_logs)
                 if partition_support < self.partition_threshold:
                     outlier_log_indices.extend(child_partition)
                 else:
@@ -120,24 +119,24 @@ class Iplom(LogParser):
                                          log_indices):
         """
         Returns a dict where the key corresponds to the token while
-        the value is a list of log entry indices.
+        the value is a list of log indices.
         """
         positions_partitions = {}
         for log_idx in log_indices:
-            log_entry = self.tokenized_log_entries[log_idx]
-            token = log_entry[least_unique_token_index]
+            log = self.tokenized_logs[log_idx]
+            token = log[least_unique_token_index]
             if token not in positions_partitions:
                 positions_partitions[token] = []
             positions_partitions[token].append(log_idx)
         return positions_partitions
 
-    def _get_least_unique_token_index(self, tokenized_log_entries):
+    def _get_least_unique_token_index(self, tokenized_logs):
         """
         Returns: (1) the index corresponding to the token position with the
         least number of unique tokens as well as (2) the set of corresponding
         tokens.
         """
-        unique_tokens = self._get_unique_tokens(tokenized_log_entries)
+        unique_tokens = self._get_unique_tokens(tokenized_logs)
         least_unique_col_idx = None
         least_unique_col_count = None
         for idx in unique_tokens:
@@ -148,30 +147,30 @@ class Iplom(LogParser):
                 least_unique_col_count = count
         return least_unique_col_idx
 
-    def _get_unique_tokens(self, tokenized_log_entries):
+    def _get_unique_tokens(self, tokenized_logs):
         """
         Returns a dict where the key is the token position
         and the value is a set of unique tokens.
         """
         unique_tokens = {}
-        for log_entry in tokenized_log_entries:
-            for token_idx in range(len(log_entry)):
+        for log in tokenized_logs:
+            for token_idx in range(len(log)):
                 if token_idx not in unique_tokens:
                     unique_tokens[token_idx] = set()
-                unique_tokens[token_idx].add(log_entry[token_idx])
+                unique_tokens[token_idx].add(log[token_idx])
         return unique_tokens
 
     def _partition_by_bijections(self):
         """
         Splits partitions by seeking bijective relationships.
         """
-        bijection_partitions = Partitions(self.tokenized_log_entries)
+        bijection_partitions = Partitions(self.tokenized_logs)
         for partition_item in self.partitions:
             log_indices = deepcopy(partition_item.log_indices)
             p_in = deepcopy(
-                self._get_tokenized_log_entries_from_indices(log_indices))
+                self._get_tokenized_logs_from_indices(log_indices))
 
-            # Check for goodness threshold and token entry size
+            # Check for goodness threshold and token size
             partition_goodness = self._get_partition_goodness(p_in)
             if partition_goodness >= self.goodness_threshold or len(
                     p_in[0]) < 2:
@@ -221,9 +220,9 @@ class Iplom(LogParser):
 
                 # Split into new partitions based on split_pos
                 indices_to_delete = []
-                for idx, tokenized_log_entry in enumerate(p_in):
-                    if tokenized_log_entry[p1] == token:
-                        split_token = tokenized_log_entry[split_pos]
+                for idx, tokenized_log in enumerate(p_in):
+                    if tokenized_log[p1] == token:
+                        split_token = tokenized_log[split_pos]
                         if split_token not in tmp_partitions[split_pos]:
                             tmp_partitions[split_pos][split_token] = []
                         tmp_partitions[split_pos][split_token].append(
@@ -258,8 +257,8 @@ class Iplom(LogParser):
                 domain_set = mapping_finder.domain_set
                 tmp_log_indices = []
                 indices_to_delete = []
-                for idx, tokenized_log_entry in enumerate(p_in):
-                    if tokenized_log_entry[p1] in domain_set:
+                for idx, tokenized_log in enumerate(p_in):
+                    if tokenized_log[p1] in domain_set:
                         tmp_log_indices.append(log_indices[idx])
                         indices_to_delete.append(idx)
                 delete_indices_from_list(log_indices, indices_to_delete)
@@ -279,10 +278,10 @@ class Iplom(LogParser):
         for token_idx in range(token_count):
             reference_token = None
             is_unique = True
-            for log_entry in p_in:
+            for log in p_in:
                 if reference_token is None:
-                    reference_token = log_entry[token_idx]
-                elif reference_token != log_entry[token_idx]:
+                    reference_token = log[token_idx]
+                elif reference_token != log[token_idx]:
                     is_unique = False
                     break
             if is_unique:
@@ -292,13 +291,13 @@ class Iplom(LogParser):
 
     def _prune_partitions(self):
         """
-        Places all log entries from partitions with a file support
+        Places all logs from partitions with a file support
         less than the threshold into a single partition.
         """
         # highest_pruned_step = -1
         # pruned_log_indices = []
-        pruned_partitions = Partitions(self.tokenized_log_entries)
-        total_line_count = len(self.tokenized_log_entries)
+        pruned_partitions = Partitions(self.tokenized_logs)
+        total_line_count = len(self.tokenized_logs)
 
         for partition_item in self.partitions:
             log_indices = partition_item.log_indices
@@ -319,15 +318,15 @@ class Iplom(LogParser):
 
         self.partitions = pruned_partitions
 
-    def _determine_p1_and_p2(self, tokenized_log_entries, step):
+    def _determine_p1_and_p2(self, tokenized_logs, step):
         """
         Returns the indices of the two most frequent unique token count
         positions.
         """
-        if len(tokenized_log_entries[0]) == 2:
+        if len(tokenized_logs[0]) == 2:
             return 0, 1
-        elif len(tokenized_log_entries[0]) > 2:
-            unique_tokens = self._get_unique_tokens(tokenized_log_entries)
+        elif len(tokenized_logs[0]) > 2:
+            unique_tokens = self._get_unique_tokens(tokenized_logs)
             card_to_idx_map = self._get_cardinality_to_index_map(unique_tokens)
             card_to_freq_tuples = self._get_cardinality_to_freq_tuple(
                 card_to_idx_map)
@@ -371,7 +370,7 @@ class Iplom(LogParser):
                                card_to_idx_map[sec_min_tuple[0]][0]])
 
         else:
-            raise Exception('Invalid log entry length')
+            raise Exception('Invalid log length')
 
     def _get_cardinality_to_freq_tuple(self, cardinality_to_idx_map):
         """
@@ -400,9 +399,9 @@ class Iplom(LogParser):
         Returns mapping between tokens in domain to tokens in codomain.
         """
         token_mapping = {}
-        for log_entry in p_in:
-            domain_token = log_entry[domain_idx]
-            codomain_token = log_entry[codomain_idx]
+        for log in p_in:
+            domain_token = log[domain_idx]
+            codomain_token = log[codomain_idx]
             if domain_token not in token_mapping:
                 token_mapping[domain_token] = set()
             token_mapping[domain_token].add(codomain_token)
@@ -438,8 +437,8 @@ class Iplom(LogParser):
         Return the number of lines with tokens from s_temp.
         """
         line_count = 0
-        for log_entry in p_in:
-            if log_entry[token_idx] in s_temp:
+        for log in p_in:
+            if log[token_idx] in s_temp:
                 line_count += 1
         return line_count
 
@@ -449,31 +448,31 @@ class Iplom(LogParser):
         """
         for partition_item in self.partitions:
             log_indices = partition_item.log_indices
-            log_entries = self._get_tokenized_log_entries_from_indices(
+            logs = self._get_tokenized_logs_from_indices(
                 log_indices)
             constant_token_indices = self._get_constant_token_indices(
-                log_entries)
+                logs)
             cluster_template_tokens = []
-            for idx in range(len(log_entries[0])):
+            for idx in range(len(logs[0])):
                 if idx in constant_token_indices:
-                    token = log_entries[0][idx]
+                    token = logs[0][idx]
                     cluster_template_tokens.append(token)
                 else:
                     cluster_template_tokens.append(PLACEHOLDER)
             cluster_template_string = ' '.join(cluster_template_tokens)
             self.cluster_templates[cluster_template_string] = log_indices
 
-    def _get_constant_token_indices(self, log_entries):
+    def _get_constant_token_indices(self, logs):
         """
         Gets the token indices that represent constant tokens for a given
         partition.
         """
-        reference_tokens = log_entries[0]
+        reference_tokens = logs[0]
         constant_token_indices = set()
         for idx in range(len(reference_tokens)):
             is_constant = True
-            for log_entry in log_entries:
-                if log_entry[idx] != reference_tokens[idx]:
+            for log in logs:
+                if log[idx] != reference_tokens[idx]:
                     is_constant = False
                     break
             if is_constant:

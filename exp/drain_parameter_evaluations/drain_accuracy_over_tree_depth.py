@@ -11,12 +11,12 @@ from src.helpers.data_manager import DataManager
 def run_drain_accuracy_over_tree_depth(data_config, tree_depths):
     accuracies = []
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_logs()
+    tokenized_logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     evaluator = Evaluator(true_assignments)
 
     for tree_depth in tree_depths:
-        parser = Drain(tokenized_log_entries, 3, tree_depth, 0.5)
+        parser = Drain(tokenized_logs, 3, tree_depth, 0.5)
         parser.parse()
         accuracies.append(evaluator.evaluate(parser.cluster_templates))
 

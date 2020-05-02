@@ -8,14 +8,14 @@ from src.utils import get_vocabulary_indices
 
 
 class MultinomialMixtureOnline(LogParserOnline):
-    def __init__(self, tokenized_log_entries, num_clusters,
+    def __init__(self, tokenized_logs, num_clusters,
                  is_classification=True, alpha=1, beta=1, epsilon=0.01):
         self.epsilon = epsilon
         self.alpha = alpha
         self.beta = beta
         self.num_clusters = num_clusters
         self.is_classification = is_classification
-        self.v_indices = get_vocabulary_indices(tokenized_log_entries)
+        self.v_indices = get_vocabulary_indices(tokenized_logs)
         self.log_likelihood_history = []
         self.labeled_indices = []
 
@@ -33,40 +33,40 @@ class MultinomialMixtureOnline(LogParserOnline):
         self._update_sufficient_statistics(tokenized_log)
         self._update_parameters()
 
-    def perform_online_batch_em(self, tokenized_log_entries, fixed_iter=1,
+    def perform_online_batch_em(self, tokenized_logs, fixed_iter=1,
                                 track_history=False):
-        self._update_likelihood_hist(tokenized_log_entries, track_history)
+        self._update_likelihood_hist(tokenized_logs, track_history)
         for _ in range(fixed_iter):
-            for tokenized_log in tokenized_log_entries:
+            for tokenized_log in tokenized_logs:
                 self._update_sufficient_statistics(tokenized_log)
                 self._update_parameters()
-            self._update_likelihood_hist(tokenized_log_entries, track_history)
+            self._update_likelihood_hist(tokenized_logs, track_history)
 
-    def perform_offline_em(self, tokenized_log_entries, track_history=False):
+    def perform_offline_em(self, tokenized_logs, track_history=False):
         self._init_sufficient_stats()
-        self._update_likelihood_hist(tokenized_log_entries, track_history)
+        self._update_likelihood_hist(tokenized_logs, track_history)
         current_ll, past_ll = None, None
         while True:
-            for tokenized_log in tokenized_log_entries:
+            for tokenized_log in tokenized_logs:
                 self._update_sufficient_statistics(tokenized_log)
             self._update_parameters()
             self._init_sufficient_stats()
             current_ll, past_ll = \
-                self.get_log_likelihood(tokenized_log_entries), current_ll
+                self.get_log_likelihood(tokenized_logs), current_ll
             if track_history:
                 self.log_likelihood_history.append(current_ll)
             if self._should_stop_offline_em(current_ll, past_ll):
                 break
 
-    def label_logs(self, log_labels, tokenized_log_entries):
+    def label_logs(self, log_labels, tokenized_logs):
         for cluster_idx, log_indices in enumerate(log_labels.values()):
             for log_idx in log_indices:
                 self.labeled_indices.append(log_idx)
-                tokenized_log = tokenized_log_entries[log_idx]
+                tokenized_log = tokenized_logs[log_idx]
                 self._update_sufficient_statistics(tokenized_log, cluster_idx)
 
-    def get_log_likelihood(self, tokenized_log_entries):
-        token_count_list = self._get_token_count_list(tokenized_log_entries)
+    def get_log_likelihood(self, tokenized_logs):
+        token_count_list = self._get_token_count_list(tokenized_logs)
         if self.is_classification:
             return self._get_classification_log_likelihood(token_count_list)
         else:
@@ -75,18 +75,18 @@ class MultinomialMixtureOnline(LogParserOnline):
     def get_log_likelihood_history(self):
         return self.log_likelihood_history
 
-    def find_best_initialization(self, log_entries, n_init, n_runs=10):
+    def find_best_initialization(self, logs, n_init, n_runs=10):
         best_ll = None
         best_pi = None
         best_theta = None
-        init_log_entries = self._get_init_log_entries(log_entries, n_init)
+        init_logs = self._get_init_logs(logs, n_init)
 
         for _ in range(n_runs):
             self._init_parameters(self.num_clusters, len(self.v_indices))
-            for tokenized_log in init_log_entries:
+            for tokenized_log in init_logs:
                 self._update_sufficient_statistics(tokenized_log)
             self._update_parameters()
-            ll = self.get_log_likelihood(init_log_entries)
+            ll = self.get_log_likelihood(init_logs)
             if best_ll is None or ll > best_ll:
                 best_ll = ll
                 best_pi = self.pi
@@ -96,7 +96,7 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.pi = best_pi
         self.theta = best_theta
 
-        for tokenized_log in init_log_entries:
+        for tokenized_log in init_logs:
             self._update_sufficient_statistics(tokenized_log)
 
     def get_parameters(self):
@@ -105,9 +105,9 @@ class MultinomialMixtureOnline(LogParserOnline):
     def set_parameters(self, parameters):
         self.pi, self.theta = parameters
 
-    def get_clusters(self, tokenized_log_entries):
+    def get_clusters(self, tokenized_logs):
         cluster_templates = {}
-        for log_idx, tokenized_log in enumerate(tokenized_log_entries):
+        for log_idx, tokenized_log in enumerate(tokenized_logs):
             token_counts = self._get_token_counts(tokenized_log)
             cluster_idx = self._get_best_cluster(token_counts)
             if cluster_idx not in cluster_templates:
@@ -115,17 +115,17 @@ class MultinomialMixtureOnline(LogParserOnline):
             cluster_templates[cluster_idx].append(log_idx)
         return cluster_templates
 
-    def _get_init_log_entries(self, log_entries, n_init):
-        init_indices = sample(range(len(log_entries)), k=n_init)
-        return [log_entries[idx] for idx in init_indices]
+    def _get_init_logs(self, logs, n_init):
+        init_indices = sample(range(len(logs)), k=n_init)
+        return [logs[idx] for idx in init_indices]
 
     def _init_sufficient_stats(self):
         self.t_zl = self.t_l + self.alpha - 1
         self.t_xzyl = self.t_yl + self.beta - 1
 
-    def _update_likelihood_hist(self, tokenized_log_entries, track_history):
+    def _update_likelihood_hist(self, tokenized_logs, track_history):
         if track_history:
-            current_ll = self.get_log_likelihood(tokenized_log_entries)
+            current_ll = self.get_log_likelihood(tokenized_logs)
             self.log_likelihood_history.append(current_ll)
 
     def _should_stop_offline_em(self, current_ll, past_ll):
@@ -187,9 +187,9 @@ class MultinomialMixtureOnline(LogParserOnline):
                 token_counts[self.v_indices[token]] += 1
         return token_counts
 
-    def _get_token_count_list(self, tokenized_log_entries):
+    def _get_token_count_list(self, tokenized_logs):
         return [self._get_token_counts(tokenized_log) for tokenized_log in
-                tokenized_log_entries]
+                tokenized_logs]
 
     def _update_parameters(self):
         self.pi = self.t_zl / self.t_zl.sum()

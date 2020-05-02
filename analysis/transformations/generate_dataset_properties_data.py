@@ -58,10 +58,10 @@ data = {
 for data_config in data_configs:
     name = data_config['name']
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_no_num_logs()
+    tokenized_logs = data_manager.get_tokenized_no_num_logs()
     true_assignments = data_manager.get_true_assignments()
-    v_indices = get_vocabulary_indices(tokenized_log_entries)
-    C = get_token_counts(tokenized_log_entries, v_indices)
+    v_indices = get_vocabulary_indices(tokenized_logs)
+    C = get_token_counts(tokenized_logs, v_indices)
     count_cluster_split = split_counts_per_cluster(C, true_assignments)
 
     true_labels = get_labels_from_true_assignments(true_assignments)

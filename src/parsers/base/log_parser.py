@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 
 class LogParser(ABC):
-    def __init__(self, tokenized_log_entries):
-        self.tokenized_log_entries = tokenized_log_entries
+    def __init__(self, tokenized_logs):
+        self.tokenized_logs = tokenized_logs
         self.cluster_templates = {}
 
     @abstractmethod

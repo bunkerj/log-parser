@@ -8,13 +8,13 @@ from global_constants import MAX_NEG_VALUE
 
 
 class MultinomialMixture(LogParser):
-    def __init__(self, tokenized_log_entries, num_clusters,
+    def __init__(self, tokenized_logs, num_clusters,
                  verbose=False, epsilon=0.001):
-        super().__init__(tokenized_log_entries)
+        super().__init__(tokenized_logs)
         self.epsilon = epsilon
         self.num_clusters = num_clusters
-        self.v_indices = get_vocabulary_indices(tokenized_log_entries)
-        self.C = get_token_counts(tokenized_log_entries, self.v_indices)
+        self.v_indices = get_vocabulary_indices(tokenized_logs)
+        self.C = get_token_counts(tokenized_logs, self.v_indices)
         self.Pi = np.zeros((num_clusters, 1))
         self.Theta = np.zeros((num_clusters, len(self.v_indices)))
         self.R = self._get_initial_responsibilities()
@@ -44,13 +44,13 @@ class MultinomialMixture(LogParser):
             n = min(len(self.cluster_templates[cluster_idx]), n_samples)
             log_indices = sample(self.cluster_templates[cluster_idx], n)
             for log_idx in log_indices:
-                log_entry = ' '.join(self.tokenized_log_entries[log_idx])
-                print(log_entry)
+                log = ' '.join(self.tokenized_logs[log_idx])
+                print(log)
         print()
 
     def _get_initial_responsibilities(self):
         G = self.num_clusters
-        D = len(self.tokenized_log_entries)
+        D = len(self.tokenized_logs)
         R = np.zeros((G, D))
         for log_idx in range(D):
             R[np.random.randint(0, self.num_clusters), log_idx] = 1
@@ -58,7 +58,7 @@ class MultinomialMixture(LogParser):
 
     def _update_parameters(self):
         self.Pi = self.R.sum(axis=1, keepdims=True)
-        self.Pi /= len(self.tokenized_log_entries)
+        self.Pi /= len(self.tokenized_logs)
         self.Theta = self.R @ self.C
         self.Theta /= self.Theta.sum(axis=1, keepdims=True)
 

@@ -15,12 +15,12 @@ def run_drain_accuracy_breakdown_over_similarity(data_config, sim_thresholds):
     type2_error_ratios = []
 
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_logs()
+    tokenized_logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     evaluator = Evaluator(true_assignments)
 
     for sim_threshold in sim_thresholds:
-        parser = Drain(tokenized_log_entries, 8, 75, sim_threshold)
+        parser = Drain(tokenized_logs, 8, 75, sim_threshold)
         parser.parse()
         cluster_templates = parser.cluster_templates
 

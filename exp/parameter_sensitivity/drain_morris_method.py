@@ -20,7 +20,7 @@ from SALib.sample.morris import sample
 def run_drain_morris_method(data_config, num_levels, conf_level, n_trajectories,
                             parameter_ranges_dict):
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_logs()
+    tokenized_logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     evaluator = Evaluator(true_assignments)
 
@@ -42,7 +42,7 @@ def run_drain_morris_method(data_config, num_levels, conf_level, n_trajectories,
     for idx, parameter_tuple in enumerate(morris_data['parameters']):
         print('Run {}/{}'.format(idx + 1, len(morris_data['parameters'])))
 
-        parser = Drain(tokenized_log_entries, *parameter_tuple)
+        parser = Drain(tokenized_logs, *parameter_tuple)
 
         start_time = time()
         parser.parse()

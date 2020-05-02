@@ -11,7 +11,7 @@ class ParameterSearch(ABC):
         self.verbose = verbose
         self.Parser_class = Parser_class
 
-    def search(self, tokenized_log_entries, true_assignments):
+    def search(self, tokenized_logs, true_assignments):
         self._reset_dynamic_fields()
         current_iteration = 1
         evaluator = Evaluator(true_assignments)
@@ -19,7 +19,7 @@ class ParameterSearch(ABC):
         total_iterations = len(parameter_tuples)
         for parameter_tuple in parameter_tuples:
             parameter_dict = self._get_parameter_dict(parameter_tuple)
-            parser = self.Parser_class(tokenized_log_entries, **parameter_dict)
+            parser = self.Parser_class(tokenized_logs, **parameter_dict)
             parser.parse()
 
             current_accuracy = evaluator.evaluate(parser.cluster_templates)

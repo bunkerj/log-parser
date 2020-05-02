@@ -15,29 +15,29 @@ class LogGroup:
         self.tokenized_template = None
         self.log_indices = []
 
-    def add(self, tokenized_log_entry, log_idx):
+    def add(self, tokenized_log, log_idx):
         """
-        Adds new log entry to the group and updates the template if needed.
+        Adds new log to the group and updates the template if needed.
         """
         self.log_indices.append(log_idx)
-        self._update_tokenized_template(tokenized_log_entry)
+        self._update_tokenized_template(tokenized_log)
 
-    def _update_tokenized_template(self, tokenized_log_entry):
+    def _update_tokenized_template(self, tokenized_log):
         """
         Updates the template by adding wildcards where required.
         """
         if self.tokenized_template is None:
-            self.tokenized_template = copy(tokenized_log_entry)
+            self.tokenized_template = copy(tokenized_log)
         else:
             for idx in range(len(self.tokenized_template)):
-                if tokenized_log_entry[idx] != self.tokenized_template[idx]:
+                if tokenized_log[idx] != self.tokenized_template[idx]:
                     self.tokenized_template[idx] = PLACEHOLDER
 
 
 class Drain(LogParser):
-    def __init__(self, tokenized_log_entries, max_depth, max_child,
+    def __init__(self, tokenized_logs, max_depth, max_child,
                  sim_threshold):
-        super().__init__(tokenized_log_entries)
+        super().__init__(tokenized_logs)
         self.max_depth = round(max_depth)
         self.max_child = round(max_child)
         self.sim_threshold = sim_threshold
@@ -48,9 +48,9 @@ class Drain(LogParser):
 
     def parse(self):
         """
-        Inserts each log entry into the parse tree.
+        Inserts each log into the parse tree.
         """
-        for idx in range(len(self.tokenized_log_entries)):
+        for idx in range(len(self.tokenized_logs)):
             self.single_parse()
         self.discover_cluster_templates()
 
@@ -83,25 +83,25 @@ class Drain(LogParser):
 
     def _traverse_tree(self, node):
         """
-        Recursively traverses the log tree to insert the new log entry.
+        Recursively traverses the log tree to insert the new log.
         """
-        log_entry = self.tokenized_log_entries[self.idx]
+        log = self.tokenized_logs[self.idx]
         if node.depth == (self.max_depth - 1) or node.depth == (
-                len(log_entry) + 1):
+                len(log) + 1):
             self._update_most_similar_groups(node.children)
         elif node.depth == 0:
-            child_key = len(log_entry)
+            child_key = len(log)
             if child_key not in node.children:
                 node.children[child_key] = Node(node.depth + 1)
             self._traverse_tree(node.children[child_key])
         else:
-            token = log_entry[node.depth - 1]
+            token = log[node.depth - 1]
             is_wild_card = any([
                 has_digit(token),
                 PLACEHOLDER in node.children and len(
                     node.children) == self.max_child,
                 PLACEHOLDER not in node.children and len(node.children) == (
-                            self.max_child - 1),
+                        self.max_child - 1),
             ])
             child_key = PLACEHOLDER if is_wild_card else token
             if child_key not in node.children:
@@ -110,12 +110,12 @@ class Drain(LogParser):
 
     def _update_most_similar_groups(self, log_groups):
         """
-        Inserts the log entry into the most similar log group.
+        Inserts the log into the most similar log group.
         """
-        log_entry = self.tokenized_log_entries[self.idx]
+        log = self.tokenized_logs[self.idx]
         if len(log_groups) == 0:
             log_group = LogGroup()
-            log_group.add(log_entry, self.idx)
+            log_group.add(log, self.idx)
             log_groups[0] = log_group
             self.log_groups.append(log_group)
         else:
@@ -123,24 +123,24 @@ class Drain(LogParser):
             highest_sim_idx = -1
             for idx in log_groups:
                 sim = self._get_similarity(log_groups[idx].tokenized_template,
-                                           log_entry)
+                                           log)
                 if sim > highest_sim:
                     highest_sim = sim
                     highest_sim_idx = idx
             if highest_sim >= self.sim_threshold:
-                log_groups[highest_sim_idx].add(log_entry, self.idx)
+                log_groups[highest_sim_idx].add(log, self.idx)
             else:
                 log_group = LogGroup()
-                log_group.add(log_entry, self.idx)
+                log_group.add(log, self.idx)
                 log_groups[len(log_groups)] = log_group
                 self.log_groups.append(log_group)
 
-    def _get_similarity(self, template, log_entry):
+    def _get_similarity(self, template, log):
         """
         Returns a similarity measure between two token lists.
         """
         delta_sum = 0
         for idx in range(len(template)):
-            if template[idx] != PLACEHOLDER and template[idx] == log_entry[idx]:
+            if template[idx] != PLACEHOLDER and template[idx] == log[idx]:
                 delta_sum += 1
         return delta_sum / len(template)

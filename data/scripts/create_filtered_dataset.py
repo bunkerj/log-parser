@@ -23,10 +23,10 @@ output_line_count = 0
 
 # Only write lines that have a valid template assignment
 with open(OUTPUT_PATH, 'w+', encoding='utf-8') as output_file:
-    for idx, tokenized_log_entry in enumerate(raw_log_full_lines):
-        log_entry = ' '.join(tokenized_log_entry)
+    for idx, tokenized_log in enumerate(raw_log_full_lines):
+        log = ' '.join(tokenized_log)
         if template_assignments[idx] != '-1':
-            output_file.write('{}\n'.format(log_entry))
+            output_file.write('{}\n'.format(log))
             output_line_count += 1
 
 print('Input File: {} lines'.format(input_line_count))

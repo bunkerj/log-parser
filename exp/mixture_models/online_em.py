@@ -16,7 +16,7 @@ from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 def run_online_em(data_config, n_sample, training_sizes):
     # Get relevant data
     data_manager = DataManager(data_config)
-    log_entries = data_manager.get_tokenized_no_num_logs()
+    logs = data_manager.get_tokenized_no_num_logs()
     true_assignments = data_manager.get_true_assignments()
     n_true_clusters = get_num_true_clusters(true_assignments)
 
@@ -43,30 +43,30 @@ def run_online_em(data_config, n_sample, training_sizes):
             print('Sample size: {}...'.format(training_size))
 
             # Randomly sample training logs
-            training_indices = sample(range(len(log_entries)), k=training_size)
-            training_log_entries = [log_entries[idx] for idx in
-                                    training_indices]
+            training_indices = sample(range(len(logs)), k=training_size)
+            training_logs = [logs[idx] for idx in
+                             training_indices]
 
             # Fit parameters on all training logs
-            em_parser = MultinomialMixtureOnline(log_entries,
+            em_parser = MultinomialMixtureOnline(logs,
                                                  n_true_clusters,
                                                  is_classification=False,
                                                  alpha=1.05,
                                                  beta=1.05)
 
-            cem_parser = MultinomialMixtureOnline(log_entries,
+            cem_parser = MultinomialMixtureOnline(logs,
                                                   n_true_clusters,
                                                   is_classification=True,
                                                   alpha=1.05,
                                                   beta=1.05)
 
-            online_em_parser = MultinomialMixtureOnline(log_entries,
+            online_em_parser = MultinomialMixtureOnline(logs,
                                                         n_true_clusters,
                                                         is_classification=False,
                                                         alpha=1.05,
                                                         beta=1.05)
 
-            online_cem_parser = MultinomialMixtureOnline(log_entries,
+            online_cem_parser = MultinomialMixtureOnline(logs,
                                                          n_true_clusters,
                                                          is_classification=True,
                                                          alpha=1.05,
@@ -78,26 +78,26 @@ def run_online_em(data_config, n_sample, training_sizes):
 
             # Run and get timings
             em_timing_tmp = time()
-            em_parser.perform_offline_em(training_log_entries)
+            em_parser.perform_offline_em(training_logs)
             em_timing += (time() - em_timing_tmp) / n_sample
 
             cem_timing_tmp = time()
-            cem_parser.perform_offline_em(training_log_entries)
+            cem_parser.perform_offline_em(training_logs)
             cem_timing += (time() - cem_timing_tmp) / n_sample
 
             online_em_timing_tmp = time()
-            online_em_parser.perform_online_batch_em(training_log_entries)
+            online_em_parser.perform_online_batch_em(training_logs)
             online_em_timing += (time() - online_em_timing_tmp) / n_sample
 
             online_cem_timing_tmp = time()
-            online_cem_parser.perform_online_batch_em(training_log_entries)
+            online_cem_parser.perform_online_batch_em(training_logs)
             online_cem_timing += (time() - online_cem_timing_tmp) / n_sample
 
             # Perform accuracy evaluations
-            em_clusters = em_parser.get_clusters(log_entries)
-            cem_clusters = cem_parser.get_clusters(log_entries)
-            online_em_clusters = online_em_parser.get_clusters(log_entries)
-            online_cem_clusters = online_cem_parser.get_clusters(log_entries)
+            em_clusters = em_parser.get_clusters(logs)
+            cem_clusters = cem_parser.get_clusters(logs)
+            online_em_clusters = online_em_parser.get_clusters(logs)
+            online_cem_clusters = online_cem_parser.get_clusters(logs)
 
             em_score += ev.get_impurity(em_clusters, []) / n_sample
             cem_score += ev.get_impurity(cem_clusters, []) / n_sample

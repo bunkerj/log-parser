@@ -6,9 +6,9 @@ from sklearn.cluster import AgglomerativeClustering
 
 
 class EnhancedDrain(Drain):
-    def __init__(self, tokenized_log_entries, max_depth, max_child,
+    def __init__(self, tokenized_logs, max_depth, max_child,
                  sim_threshold, edit_ratio_threshold):
-        super().__init__(tokenized_log_entries, max_depth, max_child,
+        super().__init__(tokenized_logs, max_depth, max_child,
                          sim_threshold)
         self.edit_ratio_threshold = edit_ratio_threshold
         self.agglo_clustering_model = None

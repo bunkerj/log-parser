@@ -17,27 +17,27 @@ class TemplateAssigner:
 
     def _get_template_assignments(self):
         data_manager = DataManager(self.data_config)
-        tokenized_log_entries = data_manager.get_tokenized_logs()
+        tokenized_logs = data_manager.get_tokenized_logs()
         templates = data_manager.get_templates()
         sorted_templates = sorted(templates,
                                   reverse=True,
                                   key=lambda t: self._get_constant_count(
                                       t.tokens))
         assignments = []
-        for log_idx, tokenized_log_entry in enumerate(tokenized_log_entries):
+        for log_idx, tokenized_log in enumerate(tokenized_logs):
             if (log_idx + 1) % 100000 == 0:
                 print('Log {}/{}...'.format(log_idx + 1,
-                                            len(tokenized_log_entries)))
-            match_idx = self._get_matching_template_idx(tokenized_log_entry,
+                                            len(tokenized_logs)))
+            match_idx = self._get_matching_template_idx(tokenized_log,
                                                         sorted_templates)
             assignments.append(match_idx)
         return assignments
 
-    def _get_matching_template_idx(self, tokenized_log_entry, templates):
+    def _get_matching_template_idx(self, tokenized_log, templates):
         # TODO: Verify correctness and efficiency
-        log_entry = ' '.join(tokenized_log_entry)
+        log = ' '.join(tokenized_log)
         for template in templates:
-            if re.match(template.regex, log_entry):
+            if re.match(template.regex, log):
                 return template.idx
         return -1
 

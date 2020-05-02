@@ -19,13 +19,13 @@ from global_constants import LABELED_IMPURITIES_SAMPLES, \
 def perform_single_experiment(num_label, passed_data_config):
     print(passed_data_config['name'])
     data_manager = DataManager(passed_data_config)
-    log_entries = data_manager.get_tokenized_no_num_logs()
+    logs = data_manager.get_tokenized_no_num_logs()
     true_assignments = data_manager.get_true_assignments()
     num_true_clusters = get_num_true_clusters(true_assignments)
     evaluator = Evaluator(true_assignments)
 
-    lab_parser = MultinomialMixture(log_entries, num_true_clusters)
-    unlab_parser = MultinomialMixture(log_entries, num_true_clusters)
+    lab_parser = MultinomialMixture(logs, num_true_clusters)
+    unlab_parser = MultinomialMixture(logs, num_true_clusters)
     unlab_parser.initialize_responsibilities(lab_parser)
     log_labels = get_log_labels(true_assignments, num_label)
     lab_parser.label_logs(log_labels)
@@ -59,9 +59,7 @@ def run_feedback_evaluation_mp(data_configs, n_samples, label_count_values):
 
         lab_samples = split_on_samples(lab_impurities, n_labels)
         unlab_samples = split_on_samples(unlab_impurities, n_labels)
-
-        tokenized_log_entries = DataManager(data_config) \
-            .get_tokenized_no_num_logs()
+        tokenized_logs = DataManager(data_config).get_tokenized_no_num_logs()
 
         dataset_results = {
             AVG_LABELED_IMPURITIES: get_avg(lab_samples),
@@ -69,7 +67,7 @@ def run_feedback_evaluation_mp(data_configs, n_samples, label_count_values):
             LABELED_IMPURITIES_SAMPLES: lab_samples,
             UNLABELED_IMPURITIES_SAMPLES: unlab_samples,
             LABEL_COUNTS: label_count_values,
-            N_LOGS: len(tokenized_log_entries)
+            N_LOGS: len(tokenized_logs)
         }
 
         results[dataset_name] = dataset_results

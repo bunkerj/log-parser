@@ -69,13 +69,13 @@ class DataManager:
             print('\t{}'.format(raw_logs[idx]))
             print('\t{}\n'.format(tokenized_logs[idx]))
 
-    def _get_tokenized_no_num_log(self, tokenized_log_entry):
-        tokenized_no_num_log_entry = []
-        for token in tokenized_log_entry:
+    def _get_tokenized_no_num_log(self, tokenized_log):
+        tokenized_no_num_log = []
+        for token in tokenized_log:
             new_token = ''.join([c for c in token if not c.isdigit()])
             if new_token != '':
-                tokenized_no_num_log_entry.append(new_token)
-        return tokenized_no_num_log_entry
+                tokenized_no_num_log.append(new_token)
+        return tokenized_no_num_log
 
     def _get_raw_logs(self):
         headers, regex = self._generate_logformat_regex()
@@ -97,9 +97,9 @@ class DataManager:
                 # raw_log_msg = re.sub(currentRex, PLACEHOLDER, raw_log_msg)
                 raw_log_msg = re.sub(currentRex, '',
                                      raw_log_msg)  # For IPLoM consistency
-            # log_entry = raw_log_msg.strip().split()  # For Drain consistency
-            log_entry = get_split_list(raw_log_msg)
-            tokenized_logs.append(log_entry)
+            # log = raw_log_msg.strip().split()  # For Drain consistency
+            log = get_split_list(raw_log_msg)
+            tokenized_logs.append(log)
         return tokenized_logs
 
     def _generate_logformat_regex(self):

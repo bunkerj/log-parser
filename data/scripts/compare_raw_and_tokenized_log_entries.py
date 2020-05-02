@@ -1,5 +1,5 @@
 """
-Compare the raw and tokenized log entries for some specified indices.
+Compare the raw and tokenized logs for some specified indices.
 """
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager

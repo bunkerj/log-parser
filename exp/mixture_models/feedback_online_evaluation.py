@@ -18,13 +18,13 @@ from global_constants import N_LOGS, LABELED_IMPURITIES_SAMPLES, \
 def run_feedback_online_evaluation(data_config, n_samples, is_class, is_online,
                                    label_counts):
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_no_num_logs()
+    tokenized_logs = data_manager.get_tokenized_no_num_logs()
     true_assignments = data_manager.get_true_assignments()
     num_true_clusters = get_num_true_clusters(true_assignments)
     ev = Evaluator(true_assignments)
 
     results = {
-        N_LOGS: len(tokenized_log_entries),
+        N_LOGS: len(tokenized_logs),
         AVG_LABELED_IMPURITIES: [],
         AVG_UNLABELED_IMPURITIES: [],
         AVG_LABELED_TIMING: 0,
@@ -47,12 +47,12 @@ def run_feedback_online_evaluation(data_config, n_samples, is_class, is_online,
 
         for label_count in label_counts:
             print(label_count)
-            lab_parser = MultinomialMixtureOnline(tokenized_log_entries,
+            lab_parser = MultinomialMixtureOnline(tokenized_logs,
                                                   num_true_clusters,
                                                   is_classification=is_class,
                                                   alpha=1.05,
                                                   beta=1.05)
-            unlab_parser = MultinomialMixtureOnline(tokenized_log_entries,
+            unlab_parser = MultinomialMixtureOnline(tokenized_logs,
                                                     num_true_clusters,
                                                     is_classification=is_class,
                                                     alpha=1.05,
@@ -60,27 +60,27 @@ def run_feedback_online_evaluation(data_config, n_samples, is_class, is_online,
             unlab_parser.set_parameters(lab_parser.get_parameters())
 
             log_labels = get_log_labels(true_assignments, label_count)
-            lab_parser.label_logs(log_labels, tokenized_log_entries)
+            lab_parser.label_logs(log_labels, tokenized_logs)
             labeled_indices = lab_parser.labeled_indices
 
             lab_time = time()
             if is_online:
-                lab_parser.perform_online_batch_em(tokenized_log_entries)
+                lab_parser.perform_online_batch_em(tokenized_logs)
             else:
-                lab_parser.perform_offline_em(tokenized_log_entries)
+                lab_parser.perform_offline_em(tokenized_logs)
             results[AVG_LABELED_TIMING] += (time() - lab_time) / n_samples
 
-            lab_cluster_t = lab_parser.get_clusters(tokenized_log_entries)
+            lab_cluster_t = lab_parser.get_clusters(tokenized_logs)
             lab_impurity = ev.get_impurity(lab_cluster_t, labeled_indices)
 
             unlab_time = time()
             if is_online:
-                unlab_parser.perform_online_batch_em(tokenized_log_entries)
+                unlab_parser.perform_online_batch_em(tokenized_logs)
             else:
-                unlab_parser.perform_offline_em(tokenized_log_entries)
+                unlab_parser.perform_offline_em(tokenized_logs)
             results[AVG_UNLABELED_TIMING] += (time() - unlab_time) / n_samples
 
-            unlab_cluster_t = unlab_parser.get_clusters(tokenized_log_entries)
+            unlab_cluster_t = unlab_parser.get_clusters(tokenized_logs)
             unlab_impurity = ev.get_impurity(unlab_cluster_t, labeled_indices)
 
             lab_impurities_samples[sample_idx].append(lab_impurity)

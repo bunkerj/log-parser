@@ -8,13 +8,13 @@ ZERO_THRESHOLD = 0.0000001
 
 
 class MultinomialMixtureDrain(Drain):
-    def __init__(self, tokenized_log_entries, max_depth, max_child,
+    def __init__(self, tokenized_logs, max_depth, max_child,
                  sim_threshold, num_clusters):
-        super().__init__(tokenized_log_entries, max_depth, max_child,
+        super().__init__(tokenized_logs, max_depth, max_child,
                          sim_threshold)
         self.num_clusters = num_clusters
-        self.v_indices = self._get_vocabulary_indices(tokenized_log_entries)
-        self.C = self._get_counts(tokenized_log_entries)
+        self.v_indices = self._get_vocabulary_indices(tokenized_logs)
+        self.C = self._get_counts(tokenized_logs)
         self.Pi = np.zeros((num_clusters, 1))
         self.Theta = np.zeros((num_clusters, len(self.v_indices)))
         self.frozen_indices = []
@@ -41,12 +41,12 @@ class MultinomialMixtureDrain(Drain):
                     samples_indices = sample(self.cluster_templates[g],
                                              safe_sample_size)
                     for idx in samples_indices:
-                        print(' '.join(self.tokenized_log_entries[idx]))
+                        print(' '.join(self.tokenized_logs[idx]))
                 else:
                     print('empty')
                 print()
             print('\n-------------------------------------------')
-            print(' '.join(self.tokenized_log_entries[d]))
+            print(' '.join(self.tokenized_logs[d]))
             print('-------------------------------------------\n')
             selected_cluster = int(input())
             self._apply_user_feedback(selected_cluster, d)
@@ -66,7 +66,7 @@ class MultinomialMixtureDrain(Drain):
     def _get_identical_token_indices(self, d):
         identical_token_indices = []
         base_count_row = self.C[d, :]
-        for d_comp in range(len(self.tokenized_log_entries)):
+        for d_comp in range(len(self.tokenized_logs)):
             count_row = self.C[d_comp, :]
             if np.all(base_count_row == count_row):
                 identical_token_indices.append(d_comp)
@@ -76,12 +76,12 @@ class MultinomialMixtureDrain(Drain):
         filtered_resp = np.extract(resp > 0.1, resp)
         return sum(-r * np.log(r) for r in filtered_resp)
 
-    def _get_counts(self, tokenized_log_entries):
-        D = len(tokenized_log_entries)
+    def _get_counts(self, tokenized_logs):
+        D = len(tokenized_logs)
         V = len(self.v_indices)
         C = np.zeros((D, V))
-        for log_idx, tokenized_log_entry in enumerate(tokenized_log_entries):
-            for token in tokenized_log_entry:
+        for log_idx, tokenized_log in enumerate(tokenized_logs):
+            for token in tokenized_log:
                 if token in self.v_indices:
                     token_idx = self.v_indices[token]
                     C[log_idx, token_idx] += 1
@@ -89,12 +89,12 @@ class MultinomialMixtureDrain(Drain):
 
     def _get_initial_responsibilities(self):
         G = self.num_clusters
-        D = len(self.tokenized_log_entries)
+        D = len(self.tokenized_logs)
         R = np.zeros((G, D))
         cluster_idx = 0
         for cluster in self.cluster_templates:
-            log_entry_indices = self.cluster_templates[cluster]
-            for log_idx in log_entry_indices:
+            log_indices = self.cluster_templates[cluster]
+            for log_idx in log_indices:
                 # R[np.random.randint(0, self.num_clusters), log_idx] = 1
                 R[cluster_idx, log_idx] = 1
             if cluster_idx < (G - 1):
@@ -107,9 +107,9 @@ class MultinomialMixtureDrain(Drain):
         self.Theta = self.R @ self.C + 1
         self.Theta /= self.Theta.sum(axis=1, keepdims=True)
 
-    def _get_vocabulary_indices(self, tokenized_log_entries):
+    def _get_vocabulary_indices(self, tokenized_logs):
         v_indices = {}
-        for tokens in tokenized_log_entries:
+        for tokens in tokenized_logs:
             for token in tokens:
                 if token.isalpha():
                     v_indices[token] = 0

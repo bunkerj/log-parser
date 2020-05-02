@@ -7,5 +7,5 @@ class LogParserOnline(ABC):
         pass
 
     @abstractmethod
-    def get_clusters(self, tokenized_log_entries):
+    def get_clusters(self, tokenized_logs):
         pass

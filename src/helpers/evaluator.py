@@ -60,8 +60,8 @@ class Evaluator:
 
     def get_type1_error_ratio(self):
         """
-        Returns the ratio of log entries which belong to generated clusters
-        that are composed of log entries from more than one true cluster.
+        Returns the ratio of logs which belong to generated clusters
+        that are composed of logs from more than one true cluster.
         """
         error_line_count = 0
         for template_eval in self.template_evaluations:
@@ -71,9 +71,9 @@ class Evaluator:
 
     def get_type2_error_ratio(self):
         """
-        Returns the ratio of log entries which belong to generated clusters
+        Returns the ratio of logs which belong to generated clusters
         that are all from the same true cluster and are missing at least one
-        entry (i.e. incomplete clusters).
+        log (i.e. incomplete clusters).
         """
         error_line_count = 0
         for template_eval in self.template_evaluations:
@@ -127,10 +127,10 @@ class Evaluator:
                     event_counts[cluster][event] += 1
         return event_counts
 
-    def _get_template_counts(self, parsed_entry_indices, truth_templates):
+    def _get_template_counts(self, parsed_log_indices, truth_templates):
         truth_template_count = len(
             self.template_truth[truth_templates[0]])
-        parsed_template_count = len(parsed_entry_indices)
+        parsed_template_count = len(parsed_log_indices)
         return parsed_template_count, truth_template_count
 
     def print_all_discrepancies(self, template_parsed):
@@ -152,9 +152,9 @@ class Evaluator:
         return sum([temp_eval.actual_count
                     for temp_eval in correct_templates])
 
-    def _get_truth_templates(self, parsed_entry_indices):
+    def _get_truth_templates(self, parsed_log_indices):
         truth_templates = set()
-        for idx in parsed_entry_indices:
+        for idx in parsed_log_indices:
             template = self.true_assignments[idx][-1]
             if template not in truth_templates:
                 truth_templates.add(template)
@@ -162,10 +162,10 @@ class Evaluator:
 
     def _get_template_truth(self, raw_truth):
         cluster_templates_truth = {}
-        for raw_log_entry_truth in raw_truth[0:]:
-            entry_id = raw_log_entry_truth[0]
-            template = raw_log_entry_truth[-1]
+        for raw_log_truth in raw_truth[0:]:
+            log_id = raw_log_truth[0]
+            template = raw_log_truth[-1]
             if template not in cluster_templates_truth:
                 cluster_templates_truth[template] = []
-            cluster_templates_truth[template].append(entry_id)
+            cluster_templates_truth[template].append(log_id)
         return cluster_templates_truth

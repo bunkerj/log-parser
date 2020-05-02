@@ -16,7 +16,7 @@ def run_drain_parameter_sensitivity(data_config,
                                     parameter_ranges_dict):
     accuracies = {}
     data_manager = DataManager(data_config)
-    tokenized_log_entries = data_manager.get_tokenized_logs()
+    tokenized_logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     evaluator = Evaluator(true_assignments)
 
@@ -26,7 +26,7 @@ def run_drain_parameter_sensitivity(data_config,
             base_config_copy = copy(base_config)
             base_config_copy[parameter_field] = parameter_value
 
-            parser = Drain(tokenized_log_entries, **base_config_copy)
+            parser = Drain(tokenized_logs, **base_config_copy)
             parser.parse()
 
             if parameter_field not in accuracies:

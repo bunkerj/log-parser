@@ -14,7 +14,7 @@ assignment_path = DATA_CONFIG['assignments_path']
 
 template_assignments = read_template_assignments_from_file(assignment_path,
                                                            JUMP_SIZE)
-tokenized_log_entries = data_manager.get_tokenized_logs()[::JUMP_SIZE]
+tokenized_logs = data_manager.get_tokenized_logs()[::JUMP_SIZE]
 
 n = len(template_assignments)
 
@@ -22,9 +22,9 @@ n = len(template_assignments)
 mismatches = set()
 mismatch_count = 0
 for idx in range(n):
-    log_entry = ' '.join(tokenized_log_entries[idx])
+    log = ' '.join(tokenized_logs[idx])
     if template_assignments[idx] == '-1':
-        mismatches.add(log_entry)
+        mismatches.add(log)
         mismatch_count += 1
 
 # Print template mismatches

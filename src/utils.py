@@ -93,9 +93,9 @@ def plot_dendrogram(model, **kwargs):
     dendrogram(linkage_matrix, **kwargs)
 
 
-def get_vocabulary_indices(tokenized_log_entries):
+def get_vocabulary_indices(tokenized_logs):
     v_indices = {}
-    for tokens in tokenized_log_entries:
+    for tokens in tokenized_logs:
         for token in tokens:
             if not any(c.isdigit() for c in token):
                 v_indices[token] = 0
@@ -104,12 +104,12 @@ def get_vocabulary_indices(tokenized_log_entries):
     return v_indices
 
 
-def get_token_counts(tokenized_log_entries, v_indices):
-    D = len(tokenized_log_entries)
+def get_token_counts(tokenized_logs, v_indices):
+    D = len(tokenized_logs)
     V = len(v_indices)
     C = np.zeros((D, V))
-    for log_idx, tokenized_log_entry in enumerate(tokenized_log_entries):
-        for token in tokenized_log_entry:
+    for log_idx, tokenized_log in enumerate(tokenized_logs):
+        for token in tokenized_log:
             if token in v_indices:
                 token_idx = v_indices[token]
                 C[log_idx, token_idx] += 1
