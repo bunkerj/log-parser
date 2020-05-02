@@ -96,14 +96,14 @@ class DataManager:
             tokenized_logs.append(log)
         return tokenized_logs
 
-    def _preprocess_raw_log(self, raw_log_msg):
+    def _preprocess_raw_log(self, raw_log):
         for currentRex in self.data_config['regex']:
             # # For Drain consistency
             # raw_log_msg = re.sub(currentRex, PLACEHOLDER, raw_log_msg)
-            raw_log_msg = re.sub(currentRex, '',
-                                 raw_log_msg)  # For IPLoM consistency
+            raw_log = re.sub(currentRex, '',
+                             raw_log)  # For IPLoM consistency
         # log = raw_log_msg.strip().split()  # For Drain consistency
-        return get_split_list(raw_log_msg)
+        return get_split_list(raw_log)
 
     def _generate_logformat_regex(self):
         headers = []
