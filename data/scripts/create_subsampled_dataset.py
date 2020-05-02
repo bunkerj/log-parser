@@ -3,7 +3,7 @@ Create a new dataset and template assignment files that contains N_SAMPLES
 number of samples from the original dataset and template assignment files.
 """
 from numpy.random import choice
-from data.scripts.utils import subsample_file, get_file_length
+from data.scripts.utils import subsample_file, get_num_lines
 
 N_SAMPLES = 50000
 
@@ -15,8 +15,8 @@ OUTPUT_DATASET_PATH = 'data/full/unstructured/BGL_filtered_reduced.log'
 OUTPUT_TEMPLATE_ASSIGNMENT_PATH = \
     'data/full/assignments/BGL_filtered_reduced_assignments.csv'
 
-n = get_file_length(INPUT_DATASET_PATH)
-m = get_file_length(INPUT_TEMPLATE_ASSIGNMENT_PATH) - 1
+n = get_num_lines(INPUT_DATASET_PATH)
+m = get_num_lines(INPUT_TEMPLATE_ASSIGNMENT_PATH) - 1
 
 if n != m:
     raise Exception('File length mismatch: {} != {}'.format(n, m))

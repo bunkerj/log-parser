@@ -1,4 +1,6 @@
+import os
 import csv
+from glob import glob
 
 
 def read_template_assignments_from_file(file_path, jump_size=1):
@@ -22,5 +24,10 @@ def subsample_file(input_path, output_path, indices, include_header=False):
                     output_file.write(line)
 
 
-def get_file_length(file_path):
-    return sum(1 for i in open(file_path, 'r', encoding='utf-8'))
+def get_num_lines(file_path):
+    return sum(1 for _ in open(file_path, 'r', encoding='utf-8'))
+
+
+def get_nested_file_paths(input_dir, extension):
+    return [y for x in os.walk(input_dir) for y in
+            glob(os.path.join(x[0], extension))]
