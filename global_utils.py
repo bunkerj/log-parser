@@ -6,7 +6,7 @@ from scipy.special import gammaln
 from global_constants import RESULTS_DIR
 
 
-def dump_results(name, results, results_dir):
+def dump_results(name, results, results_dir=None):
     results_dir = RESULTS_DIR if results_dir is None else results_dir
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
