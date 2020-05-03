@@ -13,14 +13,19 @@ class ExperimentsPipeline:
         self.result_names = self._get_results_filenames(jobs, len(jobs))
 
     def run_experiments(self):
+        jobs = self.mp_jobs + self.non_mp_jobs
+        for job_dict in jobs:
+            result = self._get_job_result(job_dict)
+            self.results.append(result)
+
+    def run_experiments_mp(self):
         """
         Perform *_mp experiments separately since daemonic processes are not
         allowed to have children.
         """
         for job_dict in self.mp_jobs:
-            f = job_dict[FUNCTION]
-            kwargs = self._get_kwargs(job_dict)
-            self.results.append(f(**kwargs))
+            result = self._get_job_result(job_dict)
+            self.results.append(result)
 
         with mp.Pool(mp.cpu_count()) as pool:
             self.results.extend(pool.starmap(self._execute,
@@ -31,6 +36,11 @@ class ExperimentsPipeline:
             dump_results(self.result_names[idx],
                          self.results[idx],
                          results_dir)
+
+    def _get_job_result(self, job_dict):
+        f = job_dict[FUNCTION]
+        kwargs = self._get_kwargs(job_dict)
+        return f(**kwargs)
 
     def _get_results_filenames(self, jobs, n_jobs):
         """

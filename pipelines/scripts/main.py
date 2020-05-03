@@ -27,5 +27,5 @@ if __name__ == '__main__':
     ]
 
     pipe = ExperimentsPipeline(jobs)
-    pipe.run_experiments()
+    pipe.run_experiments_mp()
     pipe.write_results(results_dir)
