@@ -24,14 +24,23 @@ def run_single_pass_timing(data_config, init_data_config):
 
     start_time = time()
     with open(data_config['unstructured_path'], encoding='utf-8') as f:
-        for idx, raw_log in enumerate(f.readlines()):
+        for idx, raw_log in enumerate(f.readlines(), start=1):
+            if idx % 5000 == 0:
+                print('{}...'.format(idx))
             log = data_manager.process_streaming_raw_log(raw_log)
             parser.perform_online_em(log)
-    return time() - start_time
+    timing = time() - start_time
+
+    print('Done')
+
+    return {
+        'name': data_config['name'],
+        'timing': timing,
+    }
 
 
 if __name__ == '__main__':
-    data_config = DataConfigs.Apache_Full
+    data_config = DataConfigs.Apache_FULL
     init_data_config = DataConfigs.Apache
 
     results = run_single_pass_timing(data_config, init_data_config)
