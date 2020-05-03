@@ -59,6 +59,12 @@ class MultinomialMixtureOnline(LogParserOnline):
                 break
 
     def label_logs(self, log_labels, tokenized_logs):
+        """
+        log_labels: dictionary where each key is a true cluster and the values
+                    are log indices.
+        tokenized_logs: list of tokenized logs where the log_labels keys are a
+                        subset.
+        """
         for cluster_idx, log_indices in enumerate(log_labels.values()):
             for log_idx in log_indices:
                 self.labeled_indices.append(log_idx)
