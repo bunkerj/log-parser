@@ -22,8 +22,8 @@ def run_single_pass_timing(data_config, init_data_config, limit):
                                       alpha=1.05,
                                       beta=1.05)
 
-    start_time = time()
     with open(data_config['unstructured_path'], encoding='utf-8') as f:
+        start_time = time()
         for idx, raw_log in enumerate(f.readlines(), start=1):
             if idx % 5000 == 0:
                 print('{}...'.format(idx))
@@ -31,7 +31,7 @@ def run_single_pass_timing(data_config, init_data_config, limit):
             parser.perform_online_em(log)
             if idx == limit:
                 break
-    timing = time() - start_time
+        timing = time() - start_time
 
     print('Done')
 
