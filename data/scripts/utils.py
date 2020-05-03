@@ -1,6 +1,7 @@
 import os
 import csv
 from glob import glob
+from src.utils import read_csv
 
 
 def read_template_assignments_from_file(file_path, jump_size=1):
@@ -31,3 +32,13 @@ def get_num_lines(file_path):
 def get_nested_file_paths(input_dir, extension):
     return [y for x in os.walk(input_dir) for y in
             glob(os.path.join(x[0], extension))]
+
+
+def extract_templates(structured_file):
+    templates = {}
+    lines = read_csv(structured_file)
+    for idx in range(1, len(lines)):
+        event_id = int(lines[idx][-2][1:])
+        template = lines[idx][-1]
+        templates[event_id] = template
+    return {k: templates[k] for k in sorted(templates)}
