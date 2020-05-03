@@ -60,6 +60,10 @@ class DataManager:
         assignments_path = self.data_config['assignments_path']
         return read_csv(assignments_path)[1:]
 
+    def process_streaming_raw_log(self, raw_log):
+        tokenized_log = self._preprocess_raw_log(raw_log)
+        return self._get_tokenized_no_num_log(tokenized_log)
+
     def print_select_raw_and_tokenized_logs(self, log_indices):
         raw_logs = self._get_raw_logs()
         tokenized_logs = self._preprocess_raw_logs(raw_logs)
