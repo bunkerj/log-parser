@@ -38,6 +38,7 @@ def run_single_pass_timing(data_config, init_data_config, limit):
     return {
         'name': data_config['name'],
         'n_clusters': n_true_clusters,
+        'n_vocab': len(parser.v_indices),
         'timing': timing,
     }
 
