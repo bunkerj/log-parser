@@ -10,7 +10,7 @@ from exp.mixture_models.utils import get_num_true_clusters
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 
-def run_single_pass_timing(data_config, init_data_config):
+def run_single_pass_timing(data_config, init_data_config, limit):
     data_manager = DataManager(init_data_config)
     initial_logs = data_manager.get_tokenized_no_num_logs()
     true_assignments = data_manager.get_true_assignments()
@@ -29,12 +29,15 @@ def run_single_pass_timing(data_config, init_data_config):
                 print('{}...'.format(idx))
             log = data_manager.process_streaming_raw_log(raw_log)
             parser.perform_online_em(log)
+            if idx == limit:
+                break
     timing = time() - start_time
 
     print('Done')
 
     return {
         'name': data_config['name'],
+        'n_clusters': n_true_clusters,
         'timing': timing,
     }
 
@@ -43,5 +46,5 @@ if __name__ == '__main__':
     data_config = DataConfigs.Apache_FULL
     init_data_config = DataConfigs.Apache
 
-    results = run_single_pass_timing(data_config, init_data_config)
+    results = run_single_pass_timing(data_config, init_data_config, 50000)
     dump_results('single_pass_timing.p', results)
