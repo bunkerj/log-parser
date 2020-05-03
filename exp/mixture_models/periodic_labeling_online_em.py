@@ -60,7 +60,6 @@ def run_periodic_labeling_online_em(data_config, n_init, n_restarts, n_samples,
             lab_on_cem_parser.perform_online_em(tokenized_log)
 
             if log_idx_1 == 1 or log_idx_1 % label_interval == 0:
-                label_indices = sample(range(len(logs)), n_labels)
                 log_labels = get_log_labels(true_assignments, n_labels)
                 lab_on_em_parser.label_logs(log_labels, logs)
                 lab_on_cem_parser.label_logs(log_labels, logs)
