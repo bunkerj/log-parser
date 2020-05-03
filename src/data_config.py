@@ -115,9 +115,17 @@ class DataConfigs:
     }
     BGL_FULL = {
         'name': 'BGL',
-        'unstructured_path': 'data/full/unstructured/BGL_filtered_reduced.log',
         'assignments_path': 'data/full/assignments/BGL_filtered_reduced_assignments.csv',
-        'template_path': 'data/full/templates/BGL_templates.csv',
+        'unstructured_path': 'data/full/unstructured/BGL_filtered_reduced.log',
         'log_format': '<Label> <Timestamp> <Date> <Node> <Time> <NodeRepeat> <Type> <Component> <Level> <Content>',
         'regex': [r'core\.\d+'],
+        'template_path': 'data/full/templates/BGL_templates.csv',
+    }
+    Apache_FULL = {
+        'name': 'Apache',
+        'assignments_path': '',
+        'unstructured_path': 'data/full/unstructured/apache.log',
+        'log_format': '\[<Time>\] \[<Level>\] <Content>',
+        'regex': [r'(\d+\.){3}\d+'],
+        'template_path': '',
     }
