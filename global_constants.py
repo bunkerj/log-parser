@@ -5,6 +5,10 @@ SPLIT_REGEX = r'[\s]'  # For Drain consistency
 
 MAX_NEG_VALUE = -99999999999
 
+# For experiments pipeline
+NAME = '__name__'
+FUNCTION = '__function__'
+
 
 class MAP:
     ONE_TO_ONE = 'ONE_TO_ONE'

@@ -1,5 +1,7 @@
 import multiprocessing as mp
+from copy import deepcopy
 from global_utils import dump_results
+from global_constants import NAME, FUNCTION
 
 
 class ExperimentsPipeline:
@@ -8,46 +10,58 @@ class ExperimentsPipeline:
         self.n_jobs = len(jobs)
         self.mp_jobs = self._filter_jobs(jobs, True)
         self.non_mp_jobs = self._filter_jobs(jobs, False)
-        self.result_names = self._get_results_filenames(jobs)
+        self.result_names = self._get_results_filenames(jobs, len(jobs))
 
     def run_experiments(self):
         """
         Perform *_mp experiments separately since daemonic processes are not
         allowed to have children.
         """
-        for f in self.mp_jobs:
-            args = self.mp_jobs[f]
-            self.results.append(f(**args))
+        for job_dict in self.mp_jobs:
+            f = job_dict[FUNCTION]
+            kwargs = self._get_kwargs(job_dict)
+            self.results.append(f(**kwargs))
 
         with mp.Pool(mp.cpu_count()) as pool:
             self.results.extend(pool.starmap(self._execute,
-                                             self.non_mp_jobs.items()))
+                                             self._get_non_mp_jobs_iter()))
 
     def write_results(self, results_dir):
-        assert len(self.results) == self.n_jobs
         for idx in range(self.n_jobs):
             dump_results(self.result_names[idx],
                          self.results[idx],
                          results_dir)
 
-    def _get_results_filenames(self, jobs):
+    def _get_results_filenames(self, jobs, n_jobs):
         """
         Return array of filenames which will contain the results for each
         experiment. The filename is constructed as:
         [name of experiment function].p
         """
-        return ['{}.p'.format(f.__name__) for f in jobs]
+        result_names = ['{}.p'.format(job_dict[NAME]) for job_dict in jobs]
+        assert len(set(result_names)) == n_jobs
+        return result_names
 
     def _filter_jobs(self, jobs, mp_flag):
         """
         Filter jobs based on whether or not we want only mp jobs (mp_flag is
         True) or only non-mp jobs (mp_flag is set to False).
         """
-        keys = filter(lambda f: self._filter(f.__name__, mp_flag), jobs)
-        return {k: jobs[k] for k in keys}
+        return list(filter(lambda job: self._filter(job, mp_flag), jobs))
 
-    def _filter(self, name, mp_flag):
-        return mp_flag if name[-3:] == '_mp' else not mp_flag
+    def _filter(self, job, mp_flag):
+        return mp_flag if job[NAME][-3:] == '_mp' else not mp_flag
 
-    def _execute(self, f, kwargs):
+    def _execute(self, job_dict):
+        f = job_dict[FUNCTION]
+        kwargs = self._get_kwargs(job_dict)
         return f(**kwargs)
+
+    def _get_kwargs(self, job_dict):
+        exp_dict_copy = deepcopy(job_dict)
+        exp_dict_copy.pop(NAME, None)
+        exp_dict_copy.pop(FUNCTION, None)
+        return exp_dict_copy
+
+    def _get_non_mp_jobs_iter(self):
+        return [(job_dict,) for job_dict in self.non_mp_jobs]
