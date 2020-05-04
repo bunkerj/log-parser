@@ -1,5 +1,4 @@
 import re
-import pandas as pd
 from src.utils import read_csv
 from global_constants import SPLIT_REGEX, PLACEHOLDER
 
@@ -26,10 +25,25 @@ class Template:
 class DataManager:
     def __init__(self, data_config):
         self.data_config = data_config
+        self.headers, self.regex = self._generate_logformat_regex(data_config)
 
     def get_tokenized_logs(self):
         raw_logs = self._get_raw_logs()
         return self._preprocess_raw_logs(raw_logs)
+
+    def process_raw_log(self, raw_log_full_line, is_no_num=True):
+        """
+        Used for a streaming environment, processes line from log file into a
+        tokenized log. The is_no_num flag determines whether numbers are
+        filtered out from the tokens.
+        """
+        log_full_line = self._get_log_full_line(raw_log_full_line)
+        if log_full_line is not None:
+            raw_log_contents = self._extract_contents([log_full_line])
+            tokenized_log = self._preprocess_raw_log(raw_log_contents[0])
+            return self._get_tokenized_no_num_log(
+                tokenized_log) if is_no_num else tokenized_log
+        return None
 
     def get_tokenized_no_num_logs(self):
         logs = []
@@ -52,17 +66,12 @@ class DataManager:
         Returns the raw full lines including but not limited to the message
         component.
         """
-        headers, regex = self._generate_logformat_regex()
         log_file = self.data_config['unstructured_path']
-        return self._get_raw_log_full_lines(log_file, regex, headers)
+        return self._get_raw_log_full_lines(log_file)
 
     def get_true_assignments(self):
         assignments_path = self.data_config['assignments_path']
         return read_csv(assignments_path)[1:]
-
-    def process_streaming_raw_log(self, raw_log):
-        tokenized_log = self._preprocess_raw_log(raw_log)
-        return self._get_tokenized_no_num_log(tokenized_log)
 
     def print_select_raw_and_tokenized_logs(self, log_indices):
         raw_logs = self._get_raw_logs()
@@ -82,9 +91,9 @@ class DataManager:
         return tokenized_no_num_log
 
     def _get_raw_logs(self):
-        headers, regex = self._generate_logformat_regex()
         log_file = self.data_config['unstructured_path']
-        return self._log_to_df(log_file, regex, headers)['Content'].to_list()
+        raw_log_full_lines = self._get_raw_log_full_lines(log_file)
+        return self._extract_contents(raw_log_full_lines)
 
     def _get_template_regex(self, template):
         regex = re.escape(template)
@@ -100,18 +109,14 @@ class DataManager:
             tokenized_logs.append(log)
         return tokenized_logs
 
-    def _preprocess_raw_log(self, raw_log):
+    def _preprocess_raw_log(self, raw_log_content):
         for currentRex in self.data_config['regex']:
-            # # For Drain consistency
-            # raw_log_msg = re.sub(currentRex, PLACEHOLDER, raw_log_msg)
-            raw_log = re.sub(currentRex, '',
-                             raw_log)  # For IPLoM consistency
-        # log = raw_log_msg.strip().split()  # For Drain consistency
-        return get_split_list(raw_log)
+            raw_log_content = re.sub(currentRex, '', raw_log_content)
+        return get_split_list(raw_log_content)
 
-    def _generate_logformat_regex(self):
+    def _generate_logformat_regex(self, data_config):
         headers = []
-        splitters = re.split(r'(<[^<>]+>)', self.data_config['log_format'])
+        splitters = re.split(r'(<[^<>]+>)', data_config['log_format'])
         regex = ''
         for k in range(len(splitters)):
             if k % 2 == 0:
@@ -124,20 +129,22 @@ class DataManager:
         regex = re.compile('^{}$'.format(regex))
         return headers, regex
 
-    def _log_to_df(self, log_file, regex, headers):
-        log_messages = self._get_raw_log_full_lines(log_file, regex, headers)
-        log_df = pd.DataFrame(log_messages, columns=headers)
-        log_df.insert(0, 'LineId', None)
-        log_df['LineId'] = [i + 1 for i in range(len(log_messages))]
-        return log_df
+    def _extract_contents(self, raw_logs):
+        content_idx = self.headers.index('Content')
+        return [raw_log[content_idx] for raw_log in raw_logs]
 
-    def _get_raw_log_full_lines(self, log_file, regex, headers):
-        log_messages = []
+    def _get_raw_log_full_lines(self, log_file):
+        processed_log_lines = []
         with open(log_file, 'r', encoding='utf-8') as f:
             for line in f.readlines():
-                match = regex.search(line.strip())
-                if match is None:
+                processed_log_line = self._get_log_full_line(line)
+                if processed_log_line is None:
                     continue
-                message = [match.group(header) for header in headers]
-                log_messages.append(message)
-        return log_messages
+                processed_log_lines.append(processed_log_line)
+        return processed_log_lines
+
+    def _get_log_full_line(self, log_line):
+        match = self.regex.search(log_line.strip())
+        if match is None:
+            return None
+        return [match.group(header) for header in self.headers]

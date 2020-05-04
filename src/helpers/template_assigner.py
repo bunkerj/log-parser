@@ -1,39 +1,38 @@
 import re
 from global_constants import PLACEHOLDER
 from src.helpers.data_manager import DataManager
-from src.utils import write_csv
 
 
 class TemplateAssigner:
     def __init__(self, data_config):
         self.data_config = data_config
+        self.data_manager = DataManager(data_config)
 
     def write_assignments(self):
-        template_assignments = self._get_template_assignments()
-        line_indices = list(range(1, len(template_assignments) + 1))
-        csv_contents = {'LineId': line_indices,
-                        'EventTemplate': template_assignments}
-        write_csv(self.data_config['assignments_path'], csv_contents)
+        templates = self._get_templates()
+        assignment_path = self.data_config['assignments_path']
+        unstruct_path = self.data_config['unstructured_path']
+        with open(unstruct_path, encoding='utf-8') as f_read:
+            with open(assignment_path, 'w+', encoding='utf-8') as f_write:
+                f_write.write('{}\n'.format('LineId,EventTemplate'))
+                for idx, raw_log in enumerate(f_read.readlines(), start=1):
+                    self._print_status(idx)
+                    log = self.data_manager.process_raw_log(raw_log, False)
+                    if log is not None:
+                        match_idx = self._get_template_idx(log, templates)
+                        f_write.write('{},{}\n'.format(idx, match_idx))
 
-    def _get_template_assignments(self):
-        data_manager = DataManager(self.data_config)
-        tokenized_logs = data_manager.get_tokenized_logs()
-        templates = data_manager.get_templates()
-        sorted_templates = sorted(templates,
-                                  reverse=True,
-                                  key=lambda t: self._get_constant_count(
-                                      t.tokens))
-        assignments = []
-        for log_idx, tokenized_log in enumerate(tokenized_logs):
-            if (log_idx + 1) % 100000 == 0:
-                print('Log {}/{}...'.format(log_idx + 1,
-                                            len(tokenized_logs)))
-            match_idx = self._get_matching_template_idx(tokenized_log,
-                                                        sorted_templates)
-            assignments.append(match_idx)
-        return assignments
+    def _print_status(self, idx):
+        if idx % 100000 == 0:
+            print('{}...'.format(idx))
 
-    def _get_matching_template_idx(self, tokenized_log, templates):
+    def _get_templates(self):
+        templates = self.data_manager.get_templates()
+        return sorted(templates,
+                      reverse=True,
+                      key=lambda t: self._get_const_count(t.tokens))
+
+    def _get_template_idx(self, tokenized_log, templates):
         # TODO: Verify correctness and efficiency
         log = ' '.join(tokenized_log)
         for template in templates:
@@ -41,5 +40,5 @@ class TemplateAssigner:
                 return template.idx
         return -1
 
-    def _get_constant_count(self, tokenized_template):
+    def _get_const_count(self, tokenized_template):
         return sum(map(lambda token: token != PLACEHOLDER, tokenized_template))
