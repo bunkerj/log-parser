@@ -20,7 +20,7 @@ def subsample_file(input_path, output_path, indices, include_header=False):
         indices.add(0)
     with open(output_path, 'w+', encoding='utf-8') as output_file:
         with open(input_path, 'r+', encoding='utf-8') as input_file:
-            for idx, line in enumerate(input_file.readlines()):
+            for idx, line in enumerate(input_file):
                 if idx in indices:
                     output_file.write(line)
 

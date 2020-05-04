@@ -136,7 +136,7 @@ class DataManager:
     def _get_raw_log_full_lines(self, log_file):
         processed_log_lines = []
         with open(log_file, 'r', encoding='utf-8') as f:
-            for line in f.readlines():
+            for line in f:
                 processed_log_line = self._get_log_full_line(line)
                 if processed_log_line is None:
                     continue

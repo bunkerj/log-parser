@@ -15,7 +15,7 @@ class TemplateAssigner:
         with open(unstruct_path, encoding='utf-8') as f_read:
             with open(assignment_path, 'w+', encoding='utf-8') as f_write:
                 f_write.write('{}\n'.format('LineId,EventTemplate'))
-                for idx, raw_log in enumerate(f_read.readlines(), start=1):
+                for idx, raw_log in enumerate(f_read, start=1):
                     self._print_status(idx)
                     log = self.data_manager.process_raw_log(raw_log, False)
                     if log is not None:

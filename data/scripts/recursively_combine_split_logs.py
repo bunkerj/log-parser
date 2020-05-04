@@ -17,7 +17,7 @@ with open(OUTPUT_FILE, 'w+', encoding='utf-8') as output_file:
     for idx, input_file_path in enumerate(input_file_paths, start=1):
         print('File {}/{}...'.format(idx, n_input_files))
         with open(input_file_path, 'r+', encoding='utf-8') as input_file:
-            for line in input_file.readlines():
+            for line in input_file:
                 output_file.write(line)
 
 print("Done!")

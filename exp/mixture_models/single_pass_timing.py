@@ -24,7 +24,7 @@ def run_single_pass_timing(data_config, init_data_config, limit):
 
     with open(data_config['unstructured_path'], encoding='utf-8') as f:
         start_time = time()
-        for idx, raw_log in enumerate(f.readlines(), start=1):
+        for idx, raw_log in enumerate(f, start=1):
             if idx % 5000 == 0:
                 print('{}...'.format(idx))
             log = data_manager.process_raw_log(raw_log)
