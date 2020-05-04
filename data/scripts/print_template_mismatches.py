@@ -1,36 +1,38 @@
 """
-Prints all of the templates of a given dataset that are unmatched (i.e has a
+Prints all of the templates of a given dataset that are unmatched (i.e. has a
 template index of -1).
 """
-from data.scripts.utils import read_template_assignments_from_file
 from src.data_config import DataConfigs
-from src.helpers.data_manager import DataManager
 
-JUMP_SIZE = 1
-DATA_CONFIG = DataConfigs.BGL_FULL
+data_configs = [
+    DataConfigs.Android_FULL,
+    DataConfigs.Apache_FULL,
+    DataConfigs.BGL_FULL,
+    DataConfigs.Hadoop_FULL,
+    DataConfigs.HDFS_FULL,
+    DataConfigs.HealthApp_FULL,
+    DataConfigs.HPC_FULL,
+    DataConfigs.Linux_FULL,
+    DataConfigs.Mac_FULL,
+    DataConfigs.OpenSSH_FULL,
+    DataConfigs.OpenStack_FULL,
+    DataConfigs.Proxifier_FULL,
+    DataConfigs.Spark_FULL,
+    DataConfigs.Zookeeper_FULL,
+]
 
-data_manager = DataManager(DATA_CONFIG)
-assignment_path = DATA_CONFIG['assignments_path']
+print('{:<15}{:<15}{:<15}'.format('Name', '# Logs', '% Match'))
+for data_config in data_configs:
+    n = 0
+    mismatch_count = 0
+    with open(data_config['assignments_path'], encoding='utf-8') as f:
+        next(f)
+        for line in f:
+            _, event_idx = line.split(',')
+            event_idx = event_idx.strip()
+            if event_idx == '-1':
+                mismatch_count += 1
+            n += 1
 
-template_assignments = read_template_assignments_from_file(assignment_path,
-                                                           JUMP_SIZE)
-tokenized_logs = data_manager.get_tokenized_logs()[::JUMP_SIZE]
-
-n = len(template_assignments)
-
-# Get template mismatches
-mismatches = set()
-mismatch_count = 0
-for idx in range(n):
-    log = ' '.join(tokenized_logs[idx])
-    if template_assignments[idx] == '-1':
-        mismatches.add(log)
-        mismatch_count += 1
-
-# Print template mismatches
-for mismatch in mismatches:
-    print(mismatch)
-
-print('\n-------------------------------------\n')
-print('Number of mismatches: {}'.format(mismatch_count))
-print('Percentage matched: {}'.format(100 * (n - mismatch_count) / n))
+    percent_match = 100 * (n - mismatch_count) / n
+    print('{:<15}{:<15}{:<15.4}'.format(data_config['name'], n, percent_match))
