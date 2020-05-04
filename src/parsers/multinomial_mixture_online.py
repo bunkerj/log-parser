@@ -82,6 +82,15 @@ class MultinomialMixtureOnline(LogParserOnline):
         return self.log_likelihood_history
 
     def find_best_initialization(self, logs, n_init, n_runs=10):
+        """
+        1) Randomly sample n_init logs
+        Repeat the following steps "n_runs" times:
+            2) Initialize parameters
+            3) Run 1 EM
+            4) Compute log-likelihood
+        Keep parameter configuration and sufficient stats that result in the
+        highest log-likelihood.
+        """
         best_ll = None
         best_pi = None
         best_theta = None
@@ -122,6 +131,9 @@ class MultinomialMixtureOnline(LogParserOnline):
         return cluster_templates
 
     def _get_init_logs(self, logs, n_init):
+        """
+        Sample n_init logs without replacement.
+        """
         init_indices = sample(range(len(logs)), k=n_init)
         return [logs[idx] for idx in init_indices]
 
