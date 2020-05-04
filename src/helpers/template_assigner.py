@@ -17,9 +17,9 @@ class TemplateAssigner:
                 f_write.write('{}\n'.format('LineId,EventTemplate'))
                 for idx, raw_log in enumerate(f_read, start=1):
                     self._print_status(idx)
-                    log = self.data_manager.process_raw_log(raw_log, False)
-                    if log is not None:
-                        match_idx = self._get_template_idx(log, templates)
+                    content = self.data_manager.get_raw_log_content(raw_log)
+                    if content is not None:
+                        match_idx = self._get_template_idx(content, templates)
                         f_write.write('{},{}\n'.format(idx, match_idx))
 
     def _print_status(self, idx):
@@ -32,11 +32,10 @@ class TemplateAssigner:
                       reverse=True,
                       key=lambda t: self._get_const_count(t.tokens))
 
-    def _get_template_idx(self, tokenized_log, templates):
+    def _get_template_idx(self, content, templates):
         # TODO: Verify correctness and efficiency
-        log = ' '.join(tokenized_log)
         for template in templates:
-            if re.match(template.regex, log):
+            if re.match(template.regex, content):
                 return template.idx
         return -1
 

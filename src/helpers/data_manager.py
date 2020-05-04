@@ -33,16 +33,24 @@ class DataManager:
 
     def process_raw_log(self, raw_log_full_line, is_no_num=True):
         """
-        Used for a streaming environment, processes line from log file into a
+        Used for a streaming environment. Processes line from log file into a
         tokenized log. The is_no_num flag determines whether numbers are
         filtered out from the tokens.
         """
+        raw_log_content = self.get_raw_log_content(raw_log_full_line)
+        if raw_log_content is not None:
+            tokenized_log = self._preprocess_raw_log(raw_log_content)
+            if is_no_num:
+                return self._get_tokenized_no_num_log(tokenized_log)
+            else:
+                return tokenized_log
+        return None
+
+    def get_raw_log_content(self, raw_log_full_line):
         log_full_line = self._get_log_full_line(raw_log_full_line)
         if log_full_line is not None:
             raw_log_contents = self._extract_contents([log_full_line])
-            tokenized_log = self._preprocess_raw_log(raw_log_contents[0])
-            return self._get_tokenized_no_num_log(
-                tokenized_log) if is_no_num else tokenized_log
+            return raw_log_contents[0]
         return None
 
     def get_tokenized_no_num_logs(self):
@@ -56,7 +64,7 @@ class DataManager:
         templates = []
         for line in raw_templates[1:]:
             idx, template = line
-            template = ' '.join(get_split_list(template))
+            # template = ' '.join(get_split_list(template))
             regex = self._get_template_regex(template)
             templates.append(Template(idx, template, regex))
         return templates
@@ -147,4 +155,5 @@ class DataManager:
         match = self.regex.search(log_line.strip())
         if match is None:
             return None
+        # TODO: can probably use a dict here
         return [match.group(header) for header in self.headers]
