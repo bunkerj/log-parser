@@ -22,5 +22,7 @@ data_configs = [
 ]
 
 for data_config in data_configs:
+    print(data_config['name'])
     template_assigner = TemplateAssigner(data_config)
     template_assigner.write_assignments()
+    print('Done!')
