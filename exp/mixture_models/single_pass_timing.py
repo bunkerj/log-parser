@@ -27,7 +27,7 @@ def run_single_pass_timing(data_config, init_data_config, limit):
         for idx, raw_log in enumerate(f, start=1):
             if idx % 5000 == 0:
                 print('{}...'.format(idx))
-            log = data_manager.process_raw_log(raw_log)
+            log = data_manager.get_tokenized_log(raw_log)
             if log is not None:
                 parser.perform_online_em(log)
             if idx == limit:
