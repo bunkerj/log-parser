@@ -1,7 +1,5 @@
 from global_utils import load_results
 
-PADDING = 20
-
 results = load_results('single_pass_timing.p')
 
 print('{:<15}{}'.format('Name:', results['name']))
