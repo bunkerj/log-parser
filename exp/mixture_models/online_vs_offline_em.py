@@ -18,7 +18,7 @@ def run_online_vs_offline_em(data_configs, n_init):
         print('Running for {}...'.format(name))
 
         data_manager = DataManager(data_config)
-        logs = data_manager.get_tokenized_no_num_logs()
+        logs = data_manager.get_tokenized_logs()
         true_assignments = data_manager.get_true_assignments()
         n_true_clusters = get_num_true_clusters(true_assignments)
 

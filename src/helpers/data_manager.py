@@ -37,13 +37,6 @@ class DataManager:
             tokenized_logs.append(tokenized_log)
         return tokenized_logs
 
-    def get_tokenized_no_num_logs(self):
-        # TODO: Replace this with get_tokenized_logs()
-        logs = []
-        for tokenized_logs in self.get_tokenized_logs():
-            logs.append(self._get_tokenized_no_num_log(tokenized_logs))
-        return logs
-
     def get_tokenized_log(self, raw_log_full_line, is_no_num=True):
         """
         Used for a streaming environment. Processes line from log file into a

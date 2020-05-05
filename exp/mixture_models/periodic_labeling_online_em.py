@@ -19,7 +19,7 @@ def run_periodic_labeling_online_em(data_config, n_init, n_restarts, n_samples,
                                     n_labels, n_test, label_interval,
                                     eval_interval, n_logs):
     data_manager = DataManager(data_config)
-    logs = data_manager.get_tokenized_no_num_logs()
+    logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     logs, true_assignments = shuffle_same_order(logs[:n_logs],
                                                 true_assignments[

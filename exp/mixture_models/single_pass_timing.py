@@ -12,7 +12,7 @@ from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 def run_single_pass_timing(data_config, init_data_config, limit):
     data_manager = DataManager(init_data_config)
-    initial_logs = data_manager.get_tokenized_no_num_logs()
+    initial_logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     n_true_clusters = get_num_true_clusters(true_assignments)
 

@@ -16,7 +16,7 @@ from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 def run_online_em(data_config, n_sample, training_sizes):
     # Get relevant data
     data_manager = DataManager(data_config)
-    logs = data_manager.get_tokenized_no_num_logs()
+    logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     n_true_clusters = get_num_true_clusters(true_assignments)
 

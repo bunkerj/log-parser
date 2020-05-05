@@ -33,7 +33,7 @@ def run_online_benchmark(n_labels):
     results = {}
     for data_config in data_configs:
         data_manager = DataManager(data_config)
-        logs = data_manager.get_tokenized_no_num_logs()
+        logs = data_manager.get_tokenized_logs()
         true_assignments = data_manager.get_true_assignments()
         ev = Evaluator(true_assignments)
 

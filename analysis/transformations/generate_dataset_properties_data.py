@@ -58,7 +58,7 @@ data = {
 for data_config in data_configs:
     name = data_config['name']
     data_manager = DataManager(data_config)
-    tokenized_logs = data_manager.get_tokenized_no_num_logs()
+    tokenized_logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     v_indices = get_vocabulary_indices(tokenized_logs)
     C = get_token_counts(tokenized_logs, v_indices)
