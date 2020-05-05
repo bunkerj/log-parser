@@ -53,10 +53,16 @@ class DataManager:
         return None
 
     def get_preprocessed_log(self, raw_log_full_line):
-        raw_content = self._get_raw_content(raw_log_full_line)
+        raw_content = self.get_raw_content(raw_log_full_line)
         if raw_content is not None:
             return self._get_preprocessed_log(raw_content)
         return None
+
+    def get_raw_content(self, raw_log_full_line):
+        match = self.regex.search(raw_log_full_line.strip())
+        if match is None:
+            return None
+        return match.group('Content')
 
     def get_templates(self):
         raw_templates = read_csv(self.data_config['template_path'])
@@ -112,13 +118,7 @@ class DataManager:
         log_file = self.data_config['unstructured_path']
         with open(log_file, 'r', encoding='utf-8') as f:
             for raw_log_full_line in f:
-                raw_content = self._get_raw_content(raw_log_full_line)
+                raw_content = self.get_raw_content(raw_log_full_line)
                 if raw_content is not None:
                     log_contents.append(raw_content)
         return log_contents
-
-    def _get_raw_content(self, raw_log_full_line):
-        match = self.regex.search(raw_log_full_line.strip())
-        if match is None:
-            return None
-        return match.group('Content')

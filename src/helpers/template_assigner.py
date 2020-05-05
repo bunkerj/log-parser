@@ -15,9 +15,9 @@ class TemplateAssigner:
         with open(unstruct_path, encoding='utf-8') as f_read:
             with open(assignment_path, 'w+', encoding='utf-8') as f_write:
                 f_write.write('{}\n'.format('LineId,EventTemplate'))
-                for idx, raw_log in enumerate(f_read, start=1):
+                for idx, line in enumerate(f_read, start=1):
                     self._print_status(idx)
-                    content = self.data_manager.get_preprocessed_log(raw_log)
+                    content = self.data_manager.get_raw_content(line)
                     if content is not None:
                         match_idx = self._get_template_idx(content, templates)
                         f_write.write('{},{}\n'.format(idx, match_idx))
