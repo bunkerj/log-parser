@@ -25,7 +25,7 @@ def shuffle_same_order(*arrays):
     return list(zip(*c))
 
 
-def multi(x, params):
+def log_multi(x, params):
     x_flat = x.flatten()
     params_flat = np.maximum(params, 0).flatten()
     coeff = gammaln(x_flat.sum() + 1) - np.sum(gammaln(x_flat + 1))
@@ -36,8 +36,9 @@ def multi(x, params):
     if not np.all(np.isin(valid_indices_x, valid_indices_params)):
         return 0.0
 
-    log_result = coeff + (x_flat[valid_indices_x] * np.log(
+    return coeff + (x_flat[valid_indices_x] * np.log(
         params_flat[valid_indices_x])).sum()
-    result = np.exp(log_result)
 
-    return result
+
+def multi(x, params):
+    return np.exp(log_multi(x, params))

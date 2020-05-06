@@ -2,7 +2,7 @@ import numpy as np
 from random import sample
 from copy import deepcopy
 from global_constants import MAX_NEG_VALUE
-from global_utils import multi
+from global_utils import log_multi, multi
 from src.parsers.base.log_parser_online import LogParserOnline
 from src.utils import get_vocabulary_indices
 
@@ -214,7 +214,9 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.theta = self.t_xzyl / self.t_xzyl.sum(axis=1)[:, np.newaxis]
 
     def _get_responsibilities(self, token_counts):
-        r = np.zeros((self.num_clusters, 1))
+        log_multi_values = np.zeros((self.num_clusters, 1))
         for g in range(self.num_clusters):
-            r[g] = self.pi[g] * multi(token_counts, self.theta[g, :])
+            log_multi_values[g] = log_multi(token_counts, self.theta[g, :])
+        log_multi_values -= np.max(log_multi_values)
+        r = self.pi.reshape((-1, 1)) * np.exp(log_multi_values)
         return r / r.sum()
