@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 
 def plot_dataset_comparison_graph(title, benchmark_accuracies,
-                                  final_best_accuracies):
+                                  final_best_accuracies, annotate=True):
     relevant_benchmark_accuracies = {}
     for name in benchmark_accuracies:
         if name in final_best_accuracies:
@@ -28,8 +28,9 @@ def plot_dataset_comparison_graph(title, benchmark_accuracies,
     ax.set_xticklabels(labels)
     ax.legend()
 
-    autolabel(ax, rects1)
-    autolabel(ax, rects2)
+    if annotate:
+        autolabel(ax, rects1)
+        autolabel(ax, rects2)
 
     fig.tight_layout()
 

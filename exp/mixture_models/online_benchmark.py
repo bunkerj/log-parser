@@ -68,7 +68,7 @@ def run_online_benchmark(n_labels):
 
 
 if __name__ == '__main__':
-    n_labels = 2000
+    n_labels = 200
 
     results = run_online_benchmark(n_labels)
     dump_results('online_benchmark_test.p', results)
