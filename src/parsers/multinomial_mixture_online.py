@@ -217,6 +217,6 @@ class MultinomialMixtureOnline(LogParserOnline):
         log_multi_values = np.zeros((self.num_clusters, 1))
         for g in range(self.num_clusters):
             log_multi_values[g] = log_multi(token_counts, self.theta[g, :])
-        log_multi_values -= np.min(log_multi_values)
+        log_multi_values -= np.max(log_multi_values)
         r = self.pi.reshape((-1, 1)) * np.exp(log_multi_values)
         return r / r.sum()
