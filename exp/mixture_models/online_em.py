@@ -120,7 +120,7 @@ def run_online_em(data_config, n_sample, training_sizes):
         results_tim['online_em'].append(online_em_timing)
         results_tim['online_cem'].append(online_cem_timing)
 
-    print('done!')
+    print('Done!')
     return results
 
 

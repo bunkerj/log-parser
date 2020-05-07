@@ -15,7 +15,7 @@ def run_online_vs_offline_em(data_configs, n_init):
         name = data_config['name']
         results[name] = {'offline': None, 'online': None}
 
-        print('Running for {}...'.format(name))
+        print('{}...'.format(name))
 
         data_manager = DataManager(data_config)
         logs = data_manager.get_tokenized_logs()
@@ -40,6 +40,8 @@ def run_online_vs_offline_em(data_configs, n_init):
                                                  track_history=True)
         online_ll_history = online_em_parser.get_log_likelihood_history()
         results[name]['online'] = online_ll_history
+
+        print('Done!')
 
     return results
 

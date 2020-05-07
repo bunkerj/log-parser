@@ -34,7 +34,7 @@ def run_single_pass_timing(data_config, init_data_config, limit):
                 break
         timing = time() - start_time
 
-    print('Done')
+    print('Done!')
 
     return {
         'name': data_config['name'],
