@@ -34,7 +34,7 @@ def log_multi(x, params):
     valid_indices_params = np.nonzero(params_flat)
 
     if not np.all(np.isin(valid_indices_x, valid_indices_params)):
-        return 0.0
+        return -np.inf
 
     return coeff + (x_flat[valid_indices_x] * np.log(
         params_flat[valid_indices_x])).sum()
