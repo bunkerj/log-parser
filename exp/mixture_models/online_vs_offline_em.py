@@ -41,7 +41,7 @@ def run_online_vs_offline_em(data_configs, n_init):
         online_ll_history = online_em_parser.get_log_likelihood_history()
         results[name]['online'] = online_ll_history
 
-        print('Done!')
+    print('Done!')
 
     return results
 
