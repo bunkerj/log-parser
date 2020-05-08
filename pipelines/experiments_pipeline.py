@@ -1,35 +1,62 @@
+import contextlib
 import multiprocessing as mp
+from time import time
 from copy import deepcopy
-from global_utils import dump_results
+from global_utils import dump_results, create_file_path
 from global_constants import NAME, FUNCTION
 
 
 class ExperimentsPipeline:
-    def __init__(self, jobs):
+    def __init__(self, jobs, results_dir=None):
         self.results = []
         self.n_jobs = len(jobs)
+        self.results_dir = results_dir
         self.mp_jobs = self._filter_jobs(jobs, True)
         self.non_mp_jobs = self._filter_jobs(jobs, False)
         self.result_names = self._get_results_filenames(jobs, len(jobs))
 
     def run_experiments(self):
-        jobs = self.mp_jobs + self.non_mp_jobs
-        for job_dict in jobs:
-            result = self._get_job_result(job_dict)
-            self.results.append(result)
+        with contextlib.redirect_stdout(self._get_print_output_file()):
+            total_time_start = time()
+
+            jobs = self.mp_jobs + self.non_mp_jobs
+            for idx, job_dict in enumerate(jobs):
+                print(job_dict[NAME])
+                exp_time_start = time()
+
+                result = self._get_job_result(job_dict)
+
+                self._print_exp_time(job_dict[NAME], exp_time_start)
+                self.results.append(result)
+
+            total_time = time() - total_time_start
+            print('Total time taken: {}'.format(total_time))
 
     def run_experiments_mp(self):
         """
         Perform *_mp experiments separately since daemonic processes are not
-        allowed to have children.
+        allowed to have children. Pipe all print outputs to output.txt.
         """
-        for job_dict in self.mp_jobs:
-            result = self._get_job_result(job_dict)
-            self.results.append(result)
+        with contextlib.redirect_stdout(self._get_print_output_file()):
+            total_time_start = time()
+            for job_dict in self.mp_jobs:
+                result = self._get_job_result(job_dict)
+                self.results.append(result)
 
-        with mp.Pool(mp.cpu_count()) as pool:
-            self.results.extend(pool.starmap(self._execute,
-                                             self._get_non_mp_jobs_iter()))
+            with mp.Pool(mp.cpu_count()) as pool:
+                self.results.extend(pool.starmap(self._execute,
+                                                 self._get_non_mp_jobs_iter()))
+            total_time = time() - total_time_start
+            print('Total time taken: {}'.format(total_time))
+
+    def _get_print_output_file(self):
+        path = create_file_path('output.txt', self.results_dir)
+        return open(path, 'w')
+
+    def _print_exp_time(self, name, exp_time_start):
+        msg = 'Time for exp {}: {}\n'
+        end_time = time() - exp_time_start
+        print(msg.format(name, end_time))
 
     def write_results(self, results_dir):
         for idx in range(self.n_jobs):

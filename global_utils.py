@@ -7,16 +7,21 @@ from global_constants import RESULTS_DIR
 
 
 def dump_results(name, results, results_dir=None):
-    results_dir = RESULTS_DIR if results_dir is None else results_dir
-    if not os.path.exists(results_dir):
-        os.makedirs(results_dir)
-    path = os.path.join(results_dir, name)
+    path = create_file_path(name, results_dir)
     pickle.dump(results, open(path, 'wb'))
 
 
 def load_results(name, results_dir=RESULTS_DIR):
     path = os.path.join(results_dir, name)
     return pickle.load(open(path, 'rb'))
+
+
+def create_file_path(name, results_dir):
+    results_dir = RESULTS_DIR if results_dir is None else results_dir
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+    path = os.path.join(results_dir, name)
+    return path
 
 
 def shuffle_same_order(*arrays):
