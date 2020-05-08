@@ -1,14 +1,15 @@
 """
 Evaluate how different initializations have an impact on impurity when using
-the multinomial mixture model. [Using multiprocessing]
+the online multinomial mixture model. [Using multiprocessing]
 """
-import multiprocessing as mp
 from time import time
+from copy import deepcopy
+import multiprocessing as mp
 from global_utils import dump_results
-from src.parsers.multinomial_mixture import MultinomialMixture
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
+from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 from exp.mixture_models.utils import get_log_labels, get_num_true_clusters, \
     split_on_result_sources, split_on_samples, get_avg
 from global_constants import LABELED_IMPURITIES_SAMPLES, \
@@ -24,19 +25,26 @@ def perform_single_experiment(num_label, passed_data_config):
     num_true_clusters = get_num_true_clusters(true_assignments)
     evaluator = Evaluator(true_assignments)
 
-    lab_parser = MultinomialMixture(logs, num_true_clusters)
-    unlab_parser = MultinomialMixture(logs, num_true_clusters)
-    unlab_parser.initialize_responsibilities(lab_parser)
+    lab_parser = MultinomialMixtureOnline(logs,
+                                          num_true_clusters,
+                                          is_classification=True,
+                                          alpha=1.05,
+                                          beta=1.05)
+    unlab_parser = deepcopy(lab_parser)
+
     log_labels = get_log_labels(true_assignments, num_label)
-    lab_parser.label_logs(log_labels)
+    lab_parser.label_logs(log_labels, logs)
     labeled_indices = lab_parser.labeled_indices
 
-    lab_parser.parse()
-    lab_impurity = evaluator.get_impurity(lab_parser.cluster_templates,
-                                          labeled_indices)
-    unlab_parser.parse()
-    unlab_impurity = evaluator.get_impurity(unlab_parser.cluster_templates,
-                                            labeled_indices)
+    lab_parser.perform_online_batch_em(log_labels)
+    unlab_parser.perform_online_batch_em(log_labels)
+
+    lab_clusters = lab_parser.get_clusters(logs)
+    unlab_clusters = unlab_parser.get_clusters(logs)
+
+    lab_impurity = evaluator.get_impurity(lab_clusters, labeled_indices)
+    unlab_impurity = evaluator.get_impurity(unlab_clusters, labeled_indices)
+
     return lab_impurity, unlab_impurity
 
 
