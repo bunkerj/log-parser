@@ -17,6 +17,7 @@ class ExperimentsPipeline:
 
     def run_experiments(self):
         with contextlib.redirect_stdout(self._get_print_output_file()):
+            print('CPU count: {}\n'.format(mp.cpu_count()))
             total_time_start = time()
 
             jobs = self.mp_jobs + self.non_mp_jobs
