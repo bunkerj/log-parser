@@ -38,9 +38,8 @@ if __name__ == '__main__':
             FUNCTION: run_online_em,
             'data_config': DataConfigs.Apache,
             'n_sample': 100,
-            'training_sizes': [50, 100, 200, 300, 400, 500, 600, 700, 800, 900,
-                               1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700,
-                               1800, 1900, 2000],
+            'training_sizes': [200, 400, 600, 800, 1000,
+                               1200, 1400, 1600, 1800, 2000],
         },
         {
             NAME: 'run_online_benchmark_40_lab',
