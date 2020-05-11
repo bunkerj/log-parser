@@ -27,7 +27,7 @@ def perform_single_experiment(num_label, passed_data_config):
 
     lab_parser = MultinomialMixtureOnline(logs,
                                           num_true_clusters,
-                                          is_classification=True,
+                                          is_classification=False,
                                           alpha=1.05,
                                           beta=1.05)
     unlab_parser = deepcopy(lab_parser)
