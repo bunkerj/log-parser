@@ -47,3 +47,7 @@ def log_multi(x, params):
 
 def multi(x, params):
     return np.exp(log_multi(x, params))
+
+
+def get_top_k_args(arr, k):
+    return arr.flatten().argsort()[-k:][::-1]
