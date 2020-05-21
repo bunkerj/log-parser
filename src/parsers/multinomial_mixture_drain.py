@@ -1,10 +1,10 @@
 import numpy as np
 from random import sample
 from src.parsers.drain import Drain
+from global_constants import ZERO_THRESHOLD
 
 SAMPLE_SIZE = 5
 N_QUERIES_PER_ROUND = 5
-ZERO_THRESHOLD = 0.0000001
 
 
 class MultinomialMixtureDrain(Drain):
