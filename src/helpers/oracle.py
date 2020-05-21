@@ -6,8 +6,8 @@ from global_constants import MUST_LINK, CANNOT_LINK
 class Oracle:
     def __init__(self, true_assignments):
         self.true_assignments = true_assignments
-        self.true_clusters = None
-        self.true_references = None
+        self.true_clusters = defaultdict(list)
+        self.true_references = []
 
     def get_constraints(self, parsed_clusters, n_samples_per_cluster,
                         tokenized_logs):
@@ -78,29 +78,25 @@ class Oracle:
         Returns a dictionary where the keys are true cluster events and the
         values are list of log indices.
         """
-        if self.true_clusters is not None:
+        if len(self.true_clusters) != 0:
             return self.true_clusters
 
-        true_clusters = defaultdict(list)
         for log_idx in range(len(self.true_assignments)):
             event = self.true_assignments[log_idx][-2]
-            true_clusters[event].append(log_idx)
+            self.true_clusters[event].append(log_idx)
 
-        self.true_clusters = true_clusters
-        return true_clusters
+        return self.true_clusters
 
     def _get_true_references(self):
         """
         Returns a list where each index corresponds to a log index and the value
         corresponds to a true event.
         """
-        if self.true_references is not None:
+        if len(self.true_references) != 0:
             return self.true_references
 
-        true_references = [assignment[-2] for assignment in
-                           self.true_assignments]
-        self.true_references = true_references
-        return true_references
+        self.true_references = [a[-2] for a in self.true_assignments]
+        return self.true_references
 
     def _get_parsed_references(self, parsed_clusters):
         """
