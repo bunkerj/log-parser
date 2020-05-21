@@ -1,15 +1,16 @@
 import numpy as np
 from random import sample
 from copy import deepcopy
-from global_constants import MAX_NEG_VALUE
-from global_utils import log_multi, multi
-from src.parsers.base.log_parser_online import LogParserOnline
+from scipy.optimize import root_scalar
 from src.utils import get_vocabulary_indices
+from global_utils import log_multi, multi, get_top_k_args
+from src.parsers.base.log_parser_online import LogParserOnline
+from global_constants import MAX_NEG_VALUE, CANNOT_LINK, ZERO_THRESHOLD
 
 
 class MultinomialMixtureOnline(LogParserOnline):
-    def __init__(self, tokenized_logs, num_clusters,
-                 is_classification=True, alpha=1, beta=1, epsilon=0.01):
+    def __init__(self, tokenized_logs, num_clusters, is_classification=True,
+                 alpha=1, beta=1, epsilon=0.01, improvement_rate=1.25):
         self.epsilon = epsilon
         self.alpha = alpha
         self.beta = beta
@@ -18,6 +19,7 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.v_indices = get_vocabulary_indices(tokenized_logs)
         self.log_likelihood_history = []
         self.labeled_indices = []
+        self.improvement_rate = improvement_rate
 
         self.t_zl = None
         self.t_xzyl = None
@@ -130,6 +132,45 @@ class MultinomialMixtureOnline(LogParserOnline):
             cluster_templates[cluster_idx].append(log_idx)
         return cluster_templates
 
+    def enforce_constraints(self, constraints):
+        """
+        Enforce cannot-link constraints passed as a list of tuples where each
+        tuple represents two logs that should not be clustered together.
+        """
+        cannot_links = constraints[CANNOT_LINK]
+        for constraint in cannot_links:
+            log1, log2 = constraint
+            c1 = self._get_token_counts(log1)
+            c2 = self._get_token_counts(log2)
+
+            r1 = self._get_responsibilities(c1)
+            r2 = self._get_responsibilities(c2)
+
+            g1_first, g2_first = get_top_k_args(r1, 2)
+            g1_second, g2_second = get_top_k_args(r2, 2)
+
+            if g1_first != g1_second:
+                continue
+
+            p1_first, p2_first = r1[g1_first], r1[g2_first]
+            p1_second, p2_second = r2[g1_second], r2[g2_second]
+
+            g_empty = self._get_empty_cluster()
+            if g_empty != -1 and p1_first < p1_second:
+                self._change_dominant_resp(c1, g1_first, g_empty)
+            elif g_empty != -1 and p1_first >= p1_second:
+                self._change_dominant_resp(c2, g1_second, g_empty)
+            elif p1_first < p2_second:
+                self._change_dominant_resp(c1, g1_first, g2_first)
+            else:
+                self._change_dominant_resp(c2, g1_second, g2_second)
+
+    def _get_empty_cluster(self):
+        for g, v in enumerate(self.t_zl):
+            if abs(v - self.alpha + 1) < ZERO_THRESHOLD:
+                return g
+        return -1
+
     def _get_init_logs(self, logs, n_init):
         """
         Sample n_init logs without replacement.
@@ -193,6 +234,35 @@ class MultinomialMixtureOnline(LogParserOnline):
 
         self.t_zl += r
         self.t_xzyl += r @ token_counts.T
+
+    def _change_dominant_resp(self, c, g1, g):
+        """
+        Update the sufficient statistics so that cluster g dominates the current
+        best cluster g1 by a factor based on the improvement_rate.
+
+        After our update we want:
+        improvement_rate = r[g] / r[g1]
+        """
+        t_xzyl_g1 = self.t_xzyl[g1, :].reshape((-1, 1))
+        t_xzyl_g = self.t_xzyl[g, :].reshape((-1, 1))
+
+        f = lambda a: float(np.log(self.t_zl[g] + np.exp(a)) + np.sum(
+            c * np.log(t_xzyl_g + c * np.exp(a))) - np.sum(
+            c * np.log(np.sum(t_xzyl_g + c * np.exp(a)))) - np.log(
+            self.t_zl[g1]) - np.sum(c * np.log(t_xzyl_g1)) + np.sum(
+            c * np.log(np.sum(t_xzyl_g1))) - np.log(self.improvement_rate))
+
+        fprime = lambda a: float(
+            np.exp(a) / (self.t_zl[g] + np.exp(a)) + np.sum(
+                (c ** 2) * np.exp(a) / (t_xzyl_g + c * np.exp(a))) - np.sum(
+                c * np.sum(c) * np.exp(a)) / np.sum(t_xzyl_g + c * np.exp(a)))
+
+        op = root_scalar(f=f, fprime=fprime, x0=0, method='newton')
+        alpha = np.exp(op.root)
+
+        self.t_zl[g] += alpha
+        self.t_xzyl[g, :] += (alpha * c.flatten())
+        self._update_parameters()
 
     def _get_best_cluster(self, token_counts):
         r = self._get_responsibilities(token_counts)
