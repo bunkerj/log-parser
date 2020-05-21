@@ -103,6 +103,12 @@ class Evaluator:
             total_impurity += (cluster_size / N) * norm_entropy
         return total_impurity
 
+    def print_all_discrepancies(self, template_parsed):
+        result = self.evaluate(template_parsed)
+        for template_eval in self._get_specific_templates_evals(False):
+            template_eval.print_discrepancies(template_parsed)
+        print('Final accuracy: {}'.format(result))
+
     def _get_norm_impurity(self, entropy, true_cluster_count):
         return entropy / math.log(true_cluster_count) \
             if true_cluster_count > 1 else entropy
@@ -132,12 +138,6 @@ class Evaluator:
             self.template_truth[truth_templates[0]])
         parsed_template_count = len(parsed_log_indices)
         return parsed_template_count, truth_template_count
-
-    def print_all_discrepancies(self, template_parsed):
-        result = self.evaluate(template_parsed)
-        for template_eval in self._get_specific_templates_evals(False):
-            template_eval.print_discrepancies(template_parsed)
-        print('Final accuracy: {}'.format(result))
 
     def _get_ratio_of_correct_lines(self):
         correct_template_evals = self._get_specific_templates_evals(True)
