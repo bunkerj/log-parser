@@ -21,10 +21,10 @@ class MultinomialMixtureOnline(LogParserOnline):
         self.labeled_indices = []
         self.improvement_rate = improvement_rate
 
-        self.t_zl = None
-        self.t_xzyl = None
-        self.t_l = np.zeros((self.num_clusters, 1))
-        self.t_yl = np.zeros((self.num_clusters, len(self.v_indices)))
+        self.t_c = None
+        self.t_v = None
+        self.t_c_obs = np.zeros((self.num_clusters, 1))
+        self.t_v_obs = np.zeros((self.num_clusters, len(self.v_indices)))
         self._init_sufficient_stats()
 
         self.pi = None
@@ -166,7 +166,7 @@ class MultinomialMixtureOnline(LogParserOnline):
                 self._change_dominant_resp(c2, g1_second, g2_second)
 
     def _get_empty_cluster(self):
-        for g, v in enumerate(self.t_zl):
+        for g, v in enumerate(self.t_c):
             if abs(v - self.alpha + 1) < ZERO_THRESHOLD:
                 return g
         return -1
@@ -179,8 +179,8 @@ class MultinomialMixtureOnline(LogParserOnline):
         return [logs[idx] for idx in init_indices]
 
     def _init_sufficient_stats(self):
-        self.t_zl = self.t_l + self.alpha - 1
-        self.t_xzyl = self.t_yl + self.beta - 1
+        self.t_c = self.t_c_obs + self.alpha - 1
+        self.t_v = self.t_v_obs + self.beta - 1
 
     def _update_likelihood_hist(self, tokenized_logs, track_history):
         if track_history:
@@ -229,11 +229,11 @@ class MultinomialMixtureOnline(LogParserOnline):
         else:
             r = np.zeros((self.num_clusters, 1))
             r[cluster_idx] = 1
-            self.t_l += r
-            self.t_yl += r @ token_counts.T
+            self.t_c_obs += r
+            self.t_v_obs += r @ token_counts.T
 
-        self.t_zl += r
-        self.t_xzyl += r @ token_counts.T
+        self.t_c += r
+        self.t_v += r @ token_counts.T
 
     def _change_dominant_resp(self, c, g1, g):
         """
@@ -243,25 +243,25 @@ class MultinomialMixtureOnline(LogParserOnline):
         After our update we want:
         improvement_rate = r[g] / r[g1]
         """
-        t_xzyl_g1 = self.t_xzyl[g1, :].reshape((-1, 1))
-        t_xzyl_g = self.t_xzyl[g, :].reshape((-1, 1))
+        t_xzyl_g1 = self.t_v[g1, :].reshape((-1, 1))
+        t_xzyl_g = self.t_v[g, :].reshape((-1, 1))
 
-        f = lambda a: float(np.log(self.t_zl[g] + np.exp(a)) + np.sum(
+        f = lambda a: float(np.log(self.t_c[g] + np.exp(a)) + np.sum(
             c * np.log(t_xzyl_g + c * np.exp(a))) - np.sum(
             c * np.log(np.sum(t_xzyl_g + c * np.exp(a)))) - np.log(
-            self.t_zl[g1]) - np.sum(c * np.log(t_xzyl_g1)) + np.sum(
+            self.t_c[g1]) - np.sum(c * np.log(t_xzyl_g1)) + np.sum(
             c * np.log(np.sum(t_xzyl_g1))) - np.log(self.improvement_rate))
 
         fprime = lambda a: float(
-            np.exp(a) / (self.t_zl[g] + np.exp(a)) + np.sum(
+            np.exp(a) / (self.t_c[g] + np.exp(a)) + np.sum(
                 (c ** 2) * np.exp(a) / (t_xzyl_g + c * np.exp(a))) - np.sum(
                 c * np.sum(c) * np.exp(a)) / np.sum(t_xzyl_g + c * np.exp(a)))
 
         op = root_scalar(f=f, fprime=fprime, x0=0, method='newton')
         alpha = np.exp(op.root)
 
-        self.t_zl[g] += alpha
-        self.t_xzyl[g, :] += (alpha * c.flatten())
+        self.t_c[g] += alpha
+        self.t_v[g, :] += (alpha * c.flatten())
         self._update_parameters()
 
     def _get_best_cluster(self, token_counts):
@@ -280,8 +280,8 @@ class MultinomialMixtureOnline(LogParserOnline):
                 tokenized_logs]
 
     def _update_parameters(self):
-        self.pi = self.t_zl / self.t_zl.sum()
-        self.theta = self.t_xzyl / self.t_xzyl.sum(axis=1)[:, np.newaxis]
+        self.pi = self.t_c / self.t_c.sum()
+        self.theta = self.t_v / self.t_v.sum(axis=1)[:, np.newaxis]
 
     def _get_responsibilities(self, token_counts):
         log_multi_values = np.zeros((self.num_clusters, 1))
