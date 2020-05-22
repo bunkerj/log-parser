@@ -8,14 +8,14 @@ from src.parsers.iplom import Iplom
 from src.data_config import DataConfigs
 
 
-def run_iplom_comparison(dataset_configs, fixed_configs):
+def run_iplom_comparison(data_configs, fixed_configs):
     return get_final_dataset_accuracies(Iplom,
-                                        dataset_configs,
+                                        data_configs,
                                         fixed_configs=fixed_configs)
 
 
 if __name__ == '__main__':
-    dataset_configs = [
+    data_configs = [
         DataConfigs.Android,
         DataConfigs.Apache,
         DataConfigs.BGL,
@@ -53,6 +53,6 @@ if __name__ == '__main__':
         'Zookeeper': (0, 0, 0.7, 0.9, 0.4),
     }
 
-    results = run_iplom_comparison(dataset_configs,
+    results = run_iplom_comparison(data_configs,
                                    fixed_configs)
     dump_results('iplom_comparison.p', results)

@@ -11,14 +11,14 @@ from src.parsers.drain import Drain
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 
-def run_feedback_using_constraints(dataset_configs, drain_parameters):
+def run_feedback_using_constraints(data_configs, drain_parameters):
     results = {
         'drain': {},
         'mmo': {},
         'constraints': {},
     }
 
-    for data_config in dataset_configs:
+    for data_config in data_configs:
         name = data_config['name']
         print('{}...'.format(name))
 
@@ -65,7 +65,7 @@ def run_feedback_using_constraints(dataset_configs, drain_parameters):
 
 
 if __name__ == '__main__':
-    dataset_configs = [
+    data_configs = [
         DataConfigs.Android,
         DataConfigs.Apache,
         DataConfigs.BGL,
@@ -103,6 +103,6 @@ if __name__ == '__main__':
         'Zookeeper': (4, 100, 0.60),
     }
 
-    results = run_feedback_using_constraints(dataset_configs,
+    results = run_feedback_using_constraints(data_configs,
                                              drain_parameters)
     dump_results('feedback_using_constraints.p', results)

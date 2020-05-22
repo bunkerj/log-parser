@@ -10,16 +10,16 @@ from src.parsers.iplom import Iplom
 from src.data_config import DataConfigs
 
 
-def run_iplom_comparison_grid(dataset_configs, parameter_ranges_dict):
+def run_iplom_comparison_grid(data_configs, parameter_ranges_dict):
     parameter_searcher = ParameterGridSearcher(Iplom, parameter_ranges_dict)
     final_best_accuracies = get_final_dataset_accuracies(Iplom,
-                                                         dataset_configs,
+                                                         data_configs,
                                                          parameter_searcher)
     return final_best_accuracies
 
 
 if __name__ == '__main__':
-    dataset_configs = [
+    data_configs = [
         DataConfigs.Android,
         DataConfigs.Apache,
         DataConfigs.BGL,
@@ -46,6 +46,6 @@ if __name__ == '__main__':
         'goodness_threshold': (0.3, 1, 0.1)
     }
 
-    results = run_iplom_comparison_grid(dataset_configs,
+    results = run_iplom_comparison_grid(data_configs,
                                         parameter_ranges_dict)
     dump_results('iplom_comparison_grid.p', results)

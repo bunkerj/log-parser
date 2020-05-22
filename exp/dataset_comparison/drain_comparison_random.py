@@ -10,14 +10,14 @@ from src.parameter_searchers.parameter_random_searcher import \
 from src.parsers.enhanced_drain import EnhancedDrain
 
 
-def run_drain_comparison_random(dataset_configs, n_calls,
+def run_drain_comparison_random(data_configs, n_calls,
                                 parameter_ranges_dict):
     parameter_searcher = ParameterRandomSearcher(EnhancedDrain,
                                                  parameter_ranges_dict,
                                                  n_calls=n_calls)
     final_best_accuracies = \
         get_final_dataset_accuracies(EnhancedDrain,
-                                     dataset_configs,
+                                     data_configs,
                                      parameter_searcher)
     return final_best_accuracies
 
@@ -25,7 +25,7 @@ def run_drain_comparison_random(dataset_configs, n_calls,
 if __name__ == '__main__':
     n_calls = 5
 
-    dataset_configs = [
+    data_configs = [
         DataConfigs.Android,
         DataConfigs.Apache,
         DataConfigs.BGL,
@@ -51,7 +51,7 @@ if __name__ == '__main__':
         'edit_ratio_threshold': (0, 0.5),
     }
 
-    results = run_drain_comparison_random(dataset_configs,
+    results = run_drain_comparison_random(data_configs,
                                           n_calls,
                                           parameter_ranges_dict)
     dump_results('drain_comparison_random.p', results)
