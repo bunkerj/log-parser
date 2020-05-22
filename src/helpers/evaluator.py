@@ -1,4 +1,5 @@
 import math
+from sklearn.metrics import normalized_mutual_info_score
 
 
 class TemplateEvaluation:
@@ -58,6 +59,11 @@ class Evaluator:
             self.template_evaluations.append(template_eval)
         return self._get_ratio_of_correct_lines()
 
+    def get_nmi(self, parsed_clusters):
+        true_references = [a[-2] for a in self.true_assignments]
+        parsed_references = self._get_parsed_references(parsed_clusters)
+        return normalized_mutual_info_score(true_references, parsed_references)
+
     def get_type1_error_ratio(self):
         """
         Returns the ratio of logs which belong to generated clusters
@@ -108,6 +114,17 @@ class Evaluator:
         for template_eval in self._get_specific_templates_evals(False):
             template_eval.print_discrepancies(template_parsed)
         print('Final accuracy: {}'.format(result))
+
+    def _get_parsed_references(self, parsed_clusters):
+        """
+        Returns a list where each index corresponds to a log index and the value
+        corresponds to the index of a parsed event.
+        """
+        parsed_reference = [0] * len(self.true_assignments)
+        for event_idx, event in enumerate(parsed_clusters):
+            for log_idx in parsed_clusters[event]:
+                parsed_reference[log_idx] = event_idx
+        return parsed_reference
 
     def _get_norm_impurity(self, entropy, true_cluster_count):
         return entropy / math.log(true_cluster_count) \
