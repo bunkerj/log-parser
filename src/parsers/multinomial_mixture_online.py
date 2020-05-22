@@ -5,7 +5,8 @@ from scipy.optimize import root_scalar
 from src.utils import get_vocabulary_indices
 from global_utils import log_multi, multi, get_top_k_args
 from src.parsers.base.log_parser_online import LogParserOnline
-from global_constants import MAX_NEG_VALUE, CANNOT_LINK, ZERO_THRESHOLD
+from global_constants import MAX_NEG_VALUE, CANNOT_LINK, ZERO_THRESHOLD, \
+    MUST_LINK
 
 
 class MultinomialMixtureOnline(LogParserOnline):
@@ -137,9 +138,48 @@ class MultinomialMixtureOnline(LogParserOnline):
         Enforce cannot-link constraints passed as a list of tuples where each
         tuple represents two logs that should not be clustered together.
         """
-        cannot_links = constraints[CANNOT_LINK]
-        for constraint in cannot_links:
-            log1, log2 = constraint
+        self._enforce_must_link_constraints(constraints[MUST_LINK])
+        self._enforce_cannot_link_constraints(constraints[CANNOT_LINK])
+
+    def _get_empty_cluster(self):
+        for g, v in enumerate(self.t_c):
+            if abs(v - self.alpha + 1) < ZERO_THRESHOLD:
+                return g
+        return -1
+
+    def _get_init_logs(self, logs, n_init):
+        """
+        Sample n_init logs without replacement.
+        """
+        init_indices = sample(range(len(logs)), k=n_init)
+        return [logs[idx] for idx in init_indices]
+
+    def _enforce_must_link_constraints(self, must_links):
+        for link in must_links:
+            log1, log2 = link
+            c1 = self._get_token_counts(log1)
+            c2 = self._get_token_counts(log2)
+
+            r1 = self._get_responsibilities(c1)
+            r2 = self._get_responsibilities(c2)
+
+            g1_first, g2_first = get_top_k_args(r1, 2)
+            g1_second, g2_second = get_top_k_args(r2, 2)
+
+            if g1_first == g1_second:
+                continue
+
+            p1_first, p2_first = r1[g1_first], r1[g2_first]
+            p1_second, p2_second = r2[g1_second], r2[g2_second]
+
+            if p1_first < p2_second:
+                self._change_dominant_resp(c1, g1_first, g2_first)
+            else:
+                self._change_dominant_resp(c2, g1_second, g1_first)
+
+    def _enforce_cannot_link_constraints(self, cannot_links):
+        for link in cannot_links:
+            log1, log2 = link
             c1 = self._get_token_counts(log1)
             c2 = self._get_token_counts(log2)
 
@@ -164,19 +204,6 @@ class MultinomialMixtureOnline(LogParserOnline):
                 self._change_dominant_resp(c1, g1_first, g2_first)
             else:
                 self._change_dominant_resp(c2, g1_second, g2_second)
-
-    def _get_empty_cluster(self):
-        for g, v in enumerate(self.t_c):
-            if abs(v - self.alpha + 1) < ZERO_THRESHOLD:
-                return g
-        return -1
-
-    def _get_init_logs(self, logs, n_init):
-        """
-        Sample n_init logs without replacement.
-        """
-        init_indices = sample(range(len(logs)), k=n_init)
-        return [logs[idx] for idx in init_indices]
 
     def _init_sufficient_stats(self):
         self.t_c = self.t_c_obs + self.alpha - 1
