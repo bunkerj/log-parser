@@ -284,12 +284,19 @@ class MultinomialMixtureOnline(LogParserOnline):
                 (c ** 2) * np.exp(a) / (t_xzyl_g + c * np.exp(a))) - np.sum(
                 c * np.sum(c) * np.exp(a)) / np.sum(t_xzyl_g + c * np.exp(a)))
 
-        op = root_scalar(f=f, fprime=fprime, x0=0, method='newton')
-        alpha = np.exp(op.root)
+        root = self._find_root(f, fprime)
+        if root is not None:
+            alpha = np.exp(root)
+            self.t_c[g] += alpha
+            self.t_v[g, :] += (alpha * c.flatten())
+            self._update_parameters()
 
-        self.t_c[g] += alpha
-        self.t_v[g, :] += (alpha * c.flatten())
-        self._update_parameters()
+    def _find_root(self, f, fprime):
+        for x0 in [2, 3, 5, 7, 11]:
+            op = root_scalar(f=f, fprime=fprime, x0=x0, method='newton')
+            if op.converged:
+                return op.root
+        return None
 
     def _get_best_cluster(self, token_counts):
         r = self._get_responsibilities(token_counts)

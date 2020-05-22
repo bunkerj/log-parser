@@ -21,8 +21,6 @@ class Oracle:
                                     n_samples_per_cluster,
                                     tokenized_logs)
 
-        a = 10
-
         return {
             CANNOT_LINK: cannot_link,
             MUST_LINK: must_link,
