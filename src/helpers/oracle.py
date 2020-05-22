@@ -20,6 +20,9 @@ class Oracle:
         must_link = self._get_links(split_true_clusters,
                                     n_samples_per_cluster,
                                     tokenized_logs)
+
+        a = 10
+
         return {
             CANNOT_LINK: cannot_link,
             MUST_LINK: must_link,
@@ -33,7 +36,7 @@ class Oracle:
         clusters) be clustered together.
         """
         constraints = []
-        err_clusters = [c for c in split_clusters.values() if len(c) > 2]
+        err_clusters = [c for c in split_clusters.values() if len(c) > 1]
         for cluster in err_clusters:
             majority_event = self._get_majority_true_cluster(cluster)
             minority_events = [c for c in cluster if c != majority_event]
