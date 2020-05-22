@@ -2,45 +2,107 @@
 Evaluate how well the online multinomial mixture model works when an oracle is
 used to provide constraints.
 """
-from exp.mixture_models.utils import get_num_true_clusters
+from global_utils import dump_results
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
 from src.helpers.oracle import Oracle
+from src.parsers.drain import Drain
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
-N_RUNS = 5
-DATA_CONFIG = DataConfigs.HPC
 
+def run_feedback_using_constraints(dataset_configs, drain_parameters):
+    results = {
+        'drain': {},
+        'mmo': {},
+        'constraints': {},
+    }
 
-def run_feedback_using_constraints(data_config, n_runs):
-    data_manager = DataManager(data_config)
-    logs = data_manager.get_tokenized_logs()
-    true_assignments = data_manager.get_true_assignments()
-    n_true_clusters = get_num_true_clusters(true_assignments)
-    evaluator = Evaluator(true_assignments)
-    oracle = Oracle(true_assignments)
-    parser = MultinomialMixtureOnline(logs,
-                                      n_true_clusters,
-                                      improvement_rate=1.25,
-                                      is_classification=True,
-                                      epsilon=0.01,
-                                      alpha=1.05,
-                                      beta=1.05)
+    for data_config in dataset_configs:
+        name = data_config['name']
+        print('{}...'.format(name))
 
-    for idx in range(n_runs):
-        parser.perform_online_batch_em(logs)
-        clusters = parser.get_clusters(logs)
-        score = evaluator.get_impurity(clusters, [])
-        print(score)
+        data_manager = DataManager(data_config)
+        logs = data_manager.get_tokenized_logs()
+        true_assignments = data_manager.get_true_assignments()
+        evaluator = Evaluator(true_assignments)
 
-        if (idx + 1) < n_runs:
-            constraints = oracle.get_constraints(clusters, 1, logs)
-            parser.enforce_constraints(constraints)
+        drain = Drain(logs, *drain_parameters[name])
+        drain.parse()
+        drain_clusters = drain.cluster_templates
+        drain_score = evaluator.evaluate(drain_clusters)
+
+        mmo = MultinomialMixtureOnline(logs,
+                                       len(drain_clusters),
+                                       improvement_rate=1.50,
+                                       is_classification=True,
+                                       epsilon=0.01,
+                                       alpha=1.05,
+                                       beta=1.05)
+        mmo.label_logs(drain_clusters, logs)
+
+        logs_1 = logs[:len(logs) // 2]
+        logs_2 = logs[len(logs) // 2:]
+
+        mmo.perform_online_batch_em(logs_1)
+
+        mmo_clusters = mmo.get_clusters(logs_1)
+        oracle = Oracle(true_assignments[:len(logs) // 2])
+        constraints = oracle.get_constraints(mmo_clusters, 2, logs_1)
+        mmo.enforce_constraints(constraints)
+
+        mmo.perform_online_batch_em(logs_2)
+
+        mmo_clusters = mmo.get_clusters(logs)
+        mmo_score = evaluator.evaluate(mmo_clusters)
+
+        results['drain'][name] = drain_score
+        results['mmo'][name] = mmo_score
+        results['constraints'][name] = constraints
+
+    print('Done!')
+    return results
 
 
 if __name__ == '__main__':
-    n_runs = 5
-    data_config = DataConfigs.HPC
+    dataset_configs = [
+        DataConfigs.Android,
+        DataConfigs.Apache,
+        DataConfigs.BGL,
+        DataConfigs.Hadoop,
+        DataConfigs.HDFS,
+        DataConfigs.HealthApp,
+        DataConfigs.HPC,
+        DataConfigs.Linux,
+        DataConfigs.Mac,
+        DataConfigs.OpenSSH,
+        DataConfigs.OpenStack,
+        DataConfigs.Proxifier,
+        DataConfigs.Spark,
+        DataConfigs.Thunderbird,
+        DataConfigs.Windows,
+        DataConfigs.Zookeeper,
+    ]
 
-    run_feedback_using_constraints(data_config, n_runs)
+    drain_parameters = {
+        'Android': (5, 100, 0.21),
+        'Apache': (11, 100, 0.76),
+        'BGL': (5, 100, 0.54),
+        'Hadoop': (3, 100, 0.66),
+        'HDFS': (3, 100, 0.48),
+        'HealthApp': (3, 100, 0.30),
+        'HPC': (3, 100, 0.22),
+        'Linux': (4, 100, 0.40),
+        'Mac': (4, 100, 0.80),
+        'OpenSSH': (4, 100, 0.71),
+        'OpenStack': (3, 100, 0.80),
+        'Proxifier': (50, 100, 0.62),
+        'Spark': (6, 100, 0.75),
+        'Thunderbird': (4, 100, 0.70),
+        'Windows': (7, 100, 0.42),
+        'Zookeeper': (4, 100, 0.60),
+    }
+
+    results = run_feedback_using_constraints(dataset_configs,
+                                             drain_parameters)
+    dump_results('feedback_using_constraints.p', results)
