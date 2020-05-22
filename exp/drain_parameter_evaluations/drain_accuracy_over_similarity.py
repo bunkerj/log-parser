@@ -24,7 +24,7 @@ def run_drain_accuracy_breakdown_over_similarity(data_config, sim_thresholds):
         parser.parse()
         cluster_templates = parser.cluster_templates
 
-        accuracy = evaluator.evaluate(cluster_templates)
+        accuracy = evaluator.get_accuracy(cluster_templates)
         type1_error_ratio = evaluator.get_type1_error_ratio()
         type2_error_ratio = evaluator.get_type2_error_ratio()
 

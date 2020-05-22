@@ -18,7 +18,7 @@ def run_drain_accuracy_over_tree_depth(data_config, tree_depths):
     for tree_depth in tree_depths:
         parser = Drain(tokenized_logs, 3, tree_depth, 0.5)
         parser.parse()
-        accuracies.append(evaluator.evaluate(parser.cluster_templates))
+        accuracies.append(evaluator.get_accuracy(parser.cluster_templates))
 
     return {
         'tree_depths': tree_depths,

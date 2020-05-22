@@ -30,7 +30,7 @@ def run_feedback_using_constraints(data_configs, drain_parameters):
         drain = Drain(logs, *drain_parameters[name])
         drain.parse()
         drain_clusters = drain.cluster_templates
-        drain_score = evaluator.evaluate(drain_clusters)
+        drain_score = evaluator.get_accuracy(drain_clusters)
 
         mmo = MultinomialMixtureOnline(logs,
                                        len(drain_clusters),
@@ -54,7 +54,7 @@ def run_feedback_using_constraints(data_configs, drain_parameters):
         mmo.perform_online_batch_em(logs_2)
 
         mmo_clusters = mmo.get_clusters(logs)
-        mmo_score = evaluator.evaluate(mmo_clusters)
+        mmo_score = evaluator.get_accuracy(mmo_clusters)
 
         results['drain'][name] = drain_score
         results['mmo'][name] = mmo_score

@@ -32,7 +32,7 @@ def run_drain_parameter_sensitivity(data_config,
             if parameter_field not in accuracies:
                 accuracies[parameter_field] = []
             accuracies[parameter_field].append(
-                evaluator.evaluate(parser.cluster_templates))
+                evaluator.get_accuracy(parser.cluster_templates))
 
     return [
         accuracies['max_depth'],

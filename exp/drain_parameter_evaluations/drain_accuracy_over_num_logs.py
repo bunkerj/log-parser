@@ -30,7 +30,7 @@ def run_drain_accuracy_over_num_logs(data_config, jump_size, n_runs):
                     tokenized_logs):
                 parser.discover_cluster_templates()
                 evaluator = Evaluator(true_assignments[:end_idx])
-                accuracy = evaluator.evaluate(parser.cluster_templates)
+                accuracy = evaluator.get_accuracy(parser.cluster_templates)
                 if run == 0:
                     accuracies.append(accuracy / n_runs)
                     end_indices.append(end_idx)

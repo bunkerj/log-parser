@@ -24,7 +24,7 @@ def run_drain_bayesian_optimization(data_config, n_runs, n_calls, acq_func,
     def loss_function(parameters):
         parser = Drain(tokenized_logs, *parameters)
         parser.parse()
-        return -evaluator.evaluate(parser.cluster_templates)
+        return -evaluator.get_accuracy(parser.cluster_templates)
 
     for run in range(n_runs):
         res = gp_minimize(loss_function,

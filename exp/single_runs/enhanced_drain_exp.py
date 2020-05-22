@@ -22,7 +22,7 @@ def run_drain_exp(data_config, enhanced_drain_params):
 
     start_time = time()
     evaluator = Evaluator(true_assignments)
-    accuracy = evaluator.evaluate(parser.cluster_templates)
+    accuracy = evaluator.get_accuracy(parser.cluster_templates)
     minutes_to_eval = (time() - start_time) / 60
 
     return {

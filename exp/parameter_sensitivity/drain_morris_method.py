@@ -48,7 +48,7 @@ def run_drain_morris_method(data_config, num_levels, conf_level, n_trajectories,
         parser.parse()
         minutes_to_parse = (time() - start_time) / 60
 
-        accuracy = evaluator.evaluate(parser.cluster_templates)
+        accuracy = evaluator.get_accuracy(parser.cluster_templates)
 
         morris_data['timing'].append(minutes_to_parse)
         morris_data['accuracy'].append(accuracy)

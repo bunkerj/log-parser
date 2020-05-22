@@ -41,7 +41,7 @@ class Evaluator:
         self.total_lines = len(true_assignments)
         self.template_evaluations = []
 
-    def evaluate(self, template_parsed):
+    def get_accuracy(self, template_parsed):
         """
         Updates the template_evaluations field and return the ratio of correct
         lines.
@@ -104,7 +104,7 @@ class Evaluator:
         return total_impurity
 
     def print_all_discrepancies(self, template_parsed):
-        result = self.evaluate(template_parsed)
+        result = self.get_accuracy(template_parsed)
         for template_eval in self._get_specific_templates_evals(False):
             template_eval.print_discrepancies(template_parsed)
         print('Final accuracy: {}'.format(result))

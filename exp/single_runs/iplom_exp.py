@@ -19,7 +19,7 @@ def run_iplom_exp(iplom_params):
 
     true_assignments = data_manager.get_true_assignments()
     evaluator = Evaluator(true_assignments)
-    accuracy = evaluator.evaluate(parser.cluster_templates)
+    accuracy = evaluator.get_accuracy(parser.cluster_templates)
 
     return {
         'accuracy': accuracy,

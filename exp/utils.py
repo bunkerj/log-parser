@@ -25,7 +25,7 @@ def get_final_dataset_accuracies(Parser_class,
         parser.parse()
 
         evaluator = Evaluator(true_assignments)
-        accuracy = evaluator.evaluate(parser.cluster_templates)
+        accuracy = evaluator.get_accuracy(parser.cluster_templates)
 
         print('{}: Final {} Accuracy: {}'.format(parameters,
                                                  data_config['name'],

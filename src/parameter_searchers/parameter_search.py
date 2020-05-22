@@ -22,7 +22,7 @@ class ParameterSearch(ABC):
             parser = self.Parser_class(tokenized_logs, **parameter_dict)
             parser.parse()
 
-            current_accuracy = evaluator.evaluate(parser.cluster_templates)
+            current_accuracy = evaluator.get_accuracy(parser.cluster_templates)
 
             if current_accuracy > self.best_accuracy:
                 self.best_parameters_dict = parameter_dict
