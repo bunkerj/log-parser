@@ -163,19 +163,19 @@ class MultinomialMixtureOnline(LogParserOnline):
             r1 = self._get_responsibilities(c1)
             r2 = self._get_responsibilities(c2)
 
-            g1_first, g2_first = get_top_k_args(r1, 2)
-            g1_second, g2_second = get_top_k_args(r2, 2)
+            g1_first, g1_second = get_top_k_args(r1, 2)
+            g2_first, g2_second = get_top_k_args(r2, 2)
 
-            if g1_first == g1_second:
+            if g1_first == g2_first:
                 continue
 
-            p1_first, p2_first = r1[g1_first], r1[g2_first]
-            p1_second, p2_second = r2[g1_second], r2[g2_second]
+            p1_first, p1_second = r1[g1_first], r1[g1_second]
+            p2_first, p2_second = r2[g2_first], r2[g2_second]
 
             if p1_first < p2_second:
-                self._change_dominant_resp(c1, g1_first, g2_first)
+                self._change_dominant_resp(c1, g1_first, g1_second)
             else:
-                self._change_dominant_resp(c2, g1_second, g1_first)
+                self._change_dominant_resp(c2, g2_first, g1_first)
 
     def _enforce_cannot_link_constraints(self, cannot_links):
         for link in cannot_links:
@@ -186,24 +186,24 @@ class MultinomialMixtureOnline(LogParserOnline):
             r1 = self._get_responsibilities(c1)
             r2 = self._get_responsibilities(c2)
 
-            g1_first, g2_first = get_top_k_args(r1, 2)
-            g1_second, g2_second = get_top_k_args(r2, 2)
+            g1_first, g1_second = get_top_k_args(r1, 2)
+            g2_first, g2_second = get_top_k_args(r2, 2)
 
-            if g1_first != g1_second:
+            if g1_first != g2_first:
                 continue
 
-            p1_first, p2_first = r1[g1_first], r1[g2_first]
-            p1_second, p2_second = r2[g1_second], r2[g2_second]
+            p1_first, p1_second = r1[g1_first], r1[g1_second]
+            p2_second, p2_second = r2[g2_first], r2[g2_second]
 
             g_empty = self._get_empty_cluster()
-            if g_empty != -1 and p1_first < p1_second:
+            if g_empty != -1 and p1_first < p2_second:
                 self._change_dominant_resp(c1, g1_first, g_empty)
-            elif g_empty != -1 and p1_first >= p1_second:
-                self._change_dominant_resp(c2, g1_second, g_empty)
+            elif g_empty != -1 and p1_first >= p2_second:
+                self._change_dominant_resp(c2, g2_first, g_empty)
             elif p1_first < p2_second:
-                self._change_dominant_resp(c1, g1_first, g2_first)
+                self._change_dominant_resp(c1, g1_first, g1_second)
             else:
-                self._change_dominant_resp(c2, g1_second, g2_second)
+                self._change_dominant_resp(c2, g2_first, g2_second)
 
     def _init_sufficient_stats(self):
         self.t_c = self.t_c_obs + self.alpha - 1
