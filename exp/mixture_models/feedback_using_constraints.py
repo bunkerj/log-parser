@@ -33,24 +33,21 @@ def run_feedback_using_constraints(data_configs, drain_parameters):
         drain_score = evaluator.get_accuracy(drain_clusters)
 
         mmo = MultinomialMixtureOnline(logs,
-                                       len(drain_clusters),
+                                       len(drain_clusters) + 20,
                                        improvement_rate=1.50,
                                        is_classification=True,
                                        epsilon=0.01,
                                        alpha=1.05,
                                        beta=1.05)
         mmo.label_logs(drain_clusters, logs)
+        apply_constraints(mmo, logs, true_assignments)
 
         logs_1 = logs[:len(logs) // 2]
-        logs_2 = logs[len(logs) // 2:]
-
+        true_assignments_1 = true_assignments[:len(logs) // 2]
         mmo.perform_online_batch_em(logs_1)
+        apply_constraints(mmo, logs_1, true_assignments_1)
 
-        mmo_clusters = mmo.get_clusters(logs_1)
-        oracle = Oracle(true_assignments[:len(logs) // 2])
-        constraints = oracle.get_constraints(mmo_clusters, 2, logs_1)
-        mmo.enforce_constraints(constraints)
-
+        logs_2 = logs[len(logs) // 2:]
         mmo.perform_online_batch_em(logs_2)
 
         mmo_clusters = mmo.get_clusters(logs)
@@ -58,10 +55,18 @@ def run_feedback_using_constraints(data_configs, drain_parameters):
 
         results['drain'][name] = drain_score
         results['mmo'][name] = mmo_score
-        results['constraints'][name] = constraints
+        results['constraints'][name] = None
 
     print('Done!')
     return results
+
+
+def apply_constraints(mmo, logs, true_assignments):
+    mmo_clusters = mmo.get_clusters(logs)
+    oracle = Oracle(true_assignments)
+    constraints = oracle.get_constraints(mmo_clusters, 1, logs)
+    mmo.enforce_constraints(constraints)
+    return constraints
 
 
 if __name__ == '__main__':
