@@ -156,22 +156,23 @@ class MultinomialMixtureOnline(LogParserOnline):
 
     def _enforce_must_link_constraints(self, must_links):
         for link in must_links:
-            log1, log2 = link
-            c1 = self._get_token_counts(log1)
-            c2 = self._get_token_counts(log2)
+            self._enforce_must_link_constraint(link)
 
-            r1 = self._get_responsibilities(c1)
-            r2 = self._get_responsibilities(c2)
+    def _enforce_must_link_constraint(self, link):
+        log1, log2 = link
 
-            g1_first, = get_top_k_args(r1, 1)
-            g2_first, = get_top_k_args(r2, 1)
+        c1 = self._get_token_counts(log1)
+        c2 = self._get_token_counts(log2)
 
-            if g1_first == g2_first:
-                continue
+        r1 = self._get_responsibilities(c1)
+        r2 = self._get_responsibilities(c2)
 
+        g1_first, = get_top_k_args(r1, 1)
+        g2_first, = get_top_k_args(r2, 1)
+
+        if g1_first != g2_first:
             p1_first = r1[g1_first]
             p2_first = r2[g2_first]
-
             if p1_first < p2_first:
                 self._change_dominant_resp(c1, g1_first, g2_first)
             else:
@@ -179,19 +180,21 @@ class MultinomialMixtureOnline(LogParserOnline):
 
     def _enforce_cannot_link_constraints(self, cannot_links):
         for link in cannot_links:
-            log1, log2 = link
-            c1 = self._get_token_counts(log1)
-            c2 = self._get_token_counts(log2)
+            self._enforce_cannot_link_constraint(link)
 
-            r1 = self._get_responsibilities(c1)
-            r2 = self._get_responsibilities(c2)
+    def _enforce_cannot_link_constraint(self, link):
+        log1, log2 = link
 
-            g1_first, g1_second = get_top_k_args(r1, 2)
-            g2_first, g2_second = get_top_k_args(r2, 2)
+        c1 = self._get_token_counts(log1)
+        c2 = self._get_token_counts(log2)
 
-            if g1_first != g2_first:
-                continue
+        r1 = self._get_responsibilities(c1)
+        r2 = self._get_responsibilities(c2)
 
+        g1_first, g1_second = get_top_k_args(r1, 2)
+        g2_first, g2_second = get_top_k_args(r2, 2)
+
+        if g1_first == g2_first:
             p1_first = r1[g1_first]
             p2_first = r2[g2_first]
 
