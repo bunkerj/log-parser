@@ -68,6 +68,8 @@ class Evaluator:
         """
         Returns the ratio of logs which belong to generated clusters
         that are composed of logs from more than one true cluster.
+
+        Must call get_accuracy() prior to using this function.
         """
         error_line_count = 0
         for template_eval in self.template_evaluations:
@@ -80,6 +82,8 @@ class Evaluator:
         Returns the ratio of logs which belong to generated clusters
         that are all from the same true cluster and are missing at least one
         log (i.e. incomplete clusters).
+
+        Must call get_accuracy() prior to using this function.
         """
         error_line_count = 0
         for template_eval in self.template_evaluations:
