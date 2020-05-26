@@ -21,10 +21,7 @@ class Oracle:
                                     n_samples_per_cluster,
                                     tokenized_logs)
 
-        return {
-            CANNOT_LINK: cannot_link,
-            MUST_LINK: must_link,
-        }
+        return {CANNOT_LINK: cannot_link, MUST_LINK: must_link}
 
     def _get_links(self, split_clusters, n_samples_per_cluster, tokenized_logs):
         """
