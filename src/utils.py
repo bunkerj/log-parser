@@ -1,7 +1,11 @@
 import csv
+
+import numpy
 import numpy as np
 from random import uniform
 from scipy.cluster.hierarchy import dendrogram
+
+from global_utils import log_multi
 
 
 def read_file(file_path):
@@ -104,7 +108,7 @@ def get_vocabulary_indices(tokenized_logs):
     return v_indices
 
 
-def get_token_counts(tokenized_logs, v_indices):
+def get_token_counts_batch(tokenized_logs, v_indices):
     D = len(tokenized_logs)
     V = len(v_indices)
     C = np.zeros((D, V))
@@ -114,3 +118,21 @@ def get_token_counts(tokenized_logs, v_indices):
                 token_idx = v_indices[token]
                 C[log_idx, token_idx] += 1
     return C
+
+
+def get_token_counts(tokenized_log, v_indices):
+    token_counts = np.zeros((len(v_indices), 1))
+    for token in tokenized_log:
+        if token in v_indices:
+            token_counts[v_indices[token]] += 1
+    return token_counts
+
+
+def get_responsibilities(token_counts, pi, theta):
+    num_clusters = len(pi)
+    log_multi_values = np.zeros((num_clusters, 1))
+    for g in range(num_clusters):
+        log_multi_values[g] = log_multi(token_counts, theta[g, :])
+    log_multi_values -= np.max(log_multi_values)
+    r = pi.reshape((-1, 1)) * np.exp(log_multi_values)
+    return r / r.sum()

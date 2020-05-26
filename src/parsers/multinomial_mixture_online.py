@@ -2,8 +2,9 @@ import numpy as np
 from random import sample
 from copy import deepcopy
 from scipy.optimize import root_scalar
-from src.utils import get_vocabulary_indices
-from global_utils import log_multi, multi, get_top_k_args
+from src.utils import get_vocabulary_indices, get_token_counts, \
+    get_responsibilities
+from global_utils import multi, get_top_k_args
 from src.parsers.base.log_parser_online import LogParserOnline
 from global_constants import MAX_NEG_VALUE, CANNOT_LINK, ZERO_THRESHOLD, \
     MUST_LINK
@@ -126,7 +127,7 @@ class MultinomialMixtureOnline(LogParserOnline):
     def get_clusters(self, tokenized_logs):
         cluster_templates = {}
         for log_idx, tokenized_log in enumerate(tokenized_logs):
-            token_counts = self._get_token_counts(tokenized_log)
+            token_counts = get_token_counts(tokenized_log, self.v_indices)
             cluster_idx = self._get_best_cluster(token_counts)
             if cluster_idx not in cluster_templates:
                 cluster_templates[cluster_idx] = []
@@ -161,11 +162,11 @@ class MultinomialMixtureOnline(LogParserOnline):
     def _enforce_must_link_constraint(self, link):
         log1, log2 = link
 
-        c1 = self._get_token_counts(log1)
-        c2 = self._get_token_counts(log2)
+        c1 = get_token_counts(log1, self.v_indices)
+        c2 = get_token_counts(log2, self.v_indices)
 
-        r1 = self._get_responsibilities(c1)
-        r2 = self._get_responsibilities(c2)
+        r1 = get_responsibilities(c1, self.pi, self.theta)
+        r2 = get_responsibilities(c2, self.pi, self.theta)
 
         g1_first, = get_top_k_args(r1, 1)
         g2_first, = get_top_k_args(r2, 1)
@@ -185,11 +186,11 @@ class MultinomialMixtureOnline(LogParserOnline):
     def _enforce_cannot_link_constraint(self, link):
         log1, log2 = link
 
-        c1 = self._get_token_counts(log1)
-        c2 = self._get_token_counts(log2)
+        c1 = get_token_counts(log1, self.v_indices)
+        c2 = get_token_counts(log2, self.v_indices)
 
-        r1 = self._get_responsibilities(c1)
-        r2 = self._get_responsibilities(c2)
+        r1 = get_responsibilities(c1, self.pi, self.theta)
+        r2 = get_responsibilities(c2, self.pi, self.theta)
 
         g1_first, g1_second = get_top_k_args(r1, 2)
         g2_first, g2_second = get_top_k_args(r2, 2)
@@ -248,10 +249,10 @@ class MultinomialMixtureOnline(LogParserOnline):
         return float(likelihood)
 
     def _update_sufficient_statistics(self, tokenized_log, cluster_idx=-1):
-        token_counts = self._get_token_counts(tokenized_log)
+        token_counts = get_token_counts(tokenized_log, self.v_indices)
 
         if cluster_idx == -1:
-            r = self._get_responsibilities(token_counts)
+            r = get_responsibilities(token_counts, self.pi, self.theta)
             if self.is_classification:
                 g = int(r.argmax())
                 r = np.zeros(r.shape)
@@ -302,28 +303,14 @@ class MultinomialMixtureOnline(LogParserOnline):
         return None
 
     def _get_best_cluster(self, token_counts):
-        r = self._get_responsibilities(token_counts)
+        r = get_responsibilities(token_counts, self.pi, self.theta)
         return int(r.argmax())
 
-    def _get_token_counts(self, tokenized_log):
-        token_counts = np.zeros((len(self.v_indices), 1))
-        for token in tokenized_log:
-            if token in self.v_indices:
-                token_counts[self.v_indices[token]] += 1
-        return token_counts
-
     def _get_token_count_list(self, tokenized_logs):
-        return [self._get_token_counts(tokenized_log) for tokenized_log in
+        return [get_token_counts(tokenized_log, self.v_indices) for
+                tokenized_log in
                 tokenized_logs]
 
     def _update_parameters(self):
         self.pi = self.t_c / self.t_c.sum()
         self.theta = self.t_v / self.t_v.sum(axis=1)[:, np.newaxis]
-
-    def _get_responsibilities(self, token_counts):
-        log_multi_values = np.zeros((self.num_clusters, 1))
-        for g in range(self.num_clusters):
-            log_multi_values[g] = log_multi(token_counts, self.theta[g, :])
-        log_multi_values -= np.max(log_multi_values)
-        r = self.pi.reshape((-1, 1)) * np.exp(log_multi_values)
-        return r / r.sum()

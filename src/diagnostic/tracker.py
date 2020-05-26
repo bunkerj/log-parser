@@ -4,6 +4,7 @@ Tracks details for the specified log_indices and cluster_indices.
 Public functions that end in _ require the activation flag to be set to run.
 """
 import numpy as np
+from src.utils import get_token_counts, get_responsibilities
 
 
 class Tracker:
@@ -58,11 +59,19 @@ class Tracker:
             return
         self.log1, self.log2 = link
 
-    def register_old_responsibilities_(self, r1, r2):
+    def register_old_responsibilities_(self, link):
         if not self.is_active:
             return
+        r1, r2 = self._get_resp_from_link(link, self.pi_old, self.theta_old)
         self.r1_old = r1
         self.r2_old = r2
+
+    def register_new_responsibilities_(self, link):
+        if not self.is_active:
+            return
+        r1, r2 = self._get_resp_from_link(link, self.pi_new, self.theta_new)
+        self.r1_new = r1
+        self.r2_new = r2
 
     def register_old_parameters_(self, pi, theta):
         if not self.is_active:
@@ -70,27 +79,23 @@ class Tracker:
         self.pi_old = pi
         self.theta_old = theta
 
-    def register_new_responsibilities_(self, r1, r2):
-        if not self.is_active:
-            return
-        self.r1_new = r1
-        self.r2_new = r2
-
     def register_new_parameters_(self, pi, theta):
         if not self.is_active:
             return
         self.pi_new = pi
         self.theta_new = theta
 
-    def register_old_target_responsibilities_(self, get_resp, get_counts):
+    def register_old_target_responsibilities_(self):
         if not self.is_active:
             return
-        self.old_target_resps = self._get_target_resps(get_resp, get_counts)
+        self.old_target_resps = self._get_target_resps(self.pi_old,
+                                                       self.theta_old)
 
-    def register_new_target_responsibilities_(self, get_resp, get_counts):
+    def register_new_target_responsibilities_(self):
         if not self.is_active:
             return
-        self.new_target_resps = self._get_target_resps(get_resp, get_counts)
+        self.new_target_resps = self._get_target_resps(self.pi_new,
+                                                       self.theta_new)
 
     def _get_dominant_clusters(self):
         dominant_clusters = []
@@ -104,6 +109,14 @@ class Tracker:
             if token not in self.tokens:
                 return False
         return True
+
+    def _get_resp_from_link(self, link, pi, theta):
+        log1, log2 = link
+        c1 = get_token_counts(log1, self.v_indices)
+        c2 = get_token_counts(log2, self.v_indices)
+        r1 = get_responsibilities(c1, pi, theta)
+        r2 = get_responsibilities(c2, pi, theta)
+        return r1, r2
 
     def _get_log_idx_lookup(self, logs, log_indices):
         log_idx_lookup = {}
@@ -176,12 +189,12 @@ class Tracker:
             msg = msg_format_entries.format(token, *theta_comp_strs)
             print(msg)
 
-    def _get_target_resps(self, get_resp, get_counts):
+    def _get_target_resps(self, pi, theta):
         target_resps = {}
         for log_idx in self.log_indices:
             log = self.logs[log_idx]
-            c = get_counts(log)
-            target_resps[log_idx] = get_resp(c)
+            c = get_token_counts(log, self.v_indices)
+            target_resps[log_idx] = get_responsibilities(c, pi, theta)
         return target_resps
 
     def _print_update_step(self):

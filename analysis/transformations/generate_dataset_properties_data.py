@@ -6,7 +6,7 @@ import pandas as pd
 from global_constants import RESULTS_DIR
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
-from src.utils import get_vocabulary_indices, get_token_counts
+from src.utils import get_vocabulary_indices, get_token_counts_batch
 from exp.mixture_models.utils import get_num_true_clusters
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, \
     davies_bouldin_score
@@ -61,7 +61,7 @@ for data_config in data_configs:
     tokenized_logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
     v_indices = get_vocabulary_indices(tokenized_logs)
-    C = get_token_counts(tokenized_logs, v_indices)
+    C = get_token_counts_batch(tokenized_logs, v_indices)
     count_cluster_split = split_counts_per_cluster(C, true_assignments)
 
     true_labels = get_labels_from_true_assignments(true_assignments)

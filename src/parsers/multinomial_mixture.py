@@ -2,7 +2,7 @@ import numpy as np
 from copy import deepcopy
 from random import sample
 from src.parsers.base.log_parser import LogParser
-from src.utils import get_vocabulary_indices, get_token_counts
+from src.utils import get_vocabulary_indices, get_token_counts_batch
 from global_utils import multi
 from global_constants import MAX_NEG_VALUE
 
@@ -14,7 +14,7 @@ class MultinomialMixture(LogParser):
         self.epsilon = epsilon
         self.num_clusters = num_clusters
         self.v_indices = get_vocabulary_indices(tokenized_logs)
-        self.C = get_token_counts(tokenized_logs, self.v_indices)
+        self.C = get_token_counts_batch(tokenized_logs, self.v_indices)
         self.Pi = np.zeros((num_clusters, 1))
         self.Theta = np.zeros((num_clusters, len(self.v_indices)))
         self.R = self._get_initial_responsibilities()
