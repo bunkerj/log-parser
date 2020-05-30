@@ -33,16 +33,16 @@ class Oracle:
         constraints = []
         err_clusters = [c for c in split_clusters.values() if len(c) > 1]
         for cluster in err_clusters:
-            majority_event = self._get_majority_true_cluster(cluster)
-            minority_events = [c for c in cluster if c != majority_event]
+            first_event = sample(cluster.keys(), 1)[0]
+            second_events = [c for c in cluster if c != first_event]
 
-            majority_indices = cluster[majority_event]
-            minority_event = sample(minority_events, 1)[0]
-            minority_indices = cluster[minority_event]
+            first_indices = cluster[first_event]
+            second_event = sample(second_events, 1)[0]
+            second_indices = cluster[second_event]
 
             for _ in range(n_samples_per_cluster):
-                sampled_maj_idx = sample(majority_indices, 1)[0]
-                sampled_min_idx = sample(minority_indices, 1)[0]
+                sampled_maj_idx = sample(first_indices, 1)[0]
+                sampled_min_idx = sample(second_indices, 1)[0]
                 constraints.append((tokenized_logs[sampled_maj_idx],
                                     tokenized_logs[sampled_min_idx]))
 
