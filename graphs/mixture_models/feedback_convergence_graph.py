@@ -11,8 +11,8 @@ n_subplots = len(results)
 for idx, name in enumerate(results, start=1):
     plt.subplot(*SUBPLOT_DIM, idx)
     plt.title(name)
-    plt.xticks([])
     plt.grid()
+    plt.tight_layout()
     for improvement_rate in results[name]:
         acc_vals = results[name][improvement_rate]['acc']
         t1_vals = results[name][improvement_rate]['t1']
