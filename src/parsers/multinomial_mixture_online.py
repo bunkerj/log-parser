@@ -134,13 +134,20 @@ class MultinomialMixtureOnline(LogParserOnline):
             cluster_templates[cluster_idx].append(log_idx)
         return cluster_templates
 
-    def enforce_constraints(self, constraints):
+    def enforce_constraints(self, constraints, constraint_type):
         """
         Enforce cannot-link constraints passed as a list of tuples where each
         tuple represents two logs that should not be clustered together.
         """
-        self._enforce_must_link_constraints(constraints[MUST_LINK])
-        self._enforce_cannot_link_constraints(constraints[CANNOT_LINK])
+        if constraint_type is None:
+            self._enforce_must_link_constraints(constraints[MUST_LINK])
+            self._enforce_cannot_link_constraints(constraints[CANNOT_LINK])
+        elif constraint_type == 'must-link':
+            self._enforce_must_link_constraints(constraints[MUST_LINK])
+        elif constraint_type == 'cannot-link':
+            self._enforce_cannot_link_constraints(constraints[CANNOT_LINK])
+        else:
+            raise Exception('Invalid constraint type')
 
     def _get_empty_cluster(self):
         for g, v in enumerate(self.t_c):

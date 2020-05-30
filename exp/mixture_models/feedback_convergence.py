@@ -8,7 +8,9 @@ from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 
 def run_feedback_convergence(data_configs, drain_parameters,
-                             improvement_rates, n_runs):
+                             improvement_rates, n_cycles,
+                             constraint_type, is_classification,
+                             n_clusters_buffer):
     results = {}
     for data_config in data_configs:
         name = data_config['name']
@@ -23,15 +25,16 @@ def run_feedback_convergence(data_configs, drain_parameters,
         drain = Drain(logs, *drain_parameters[name])
         drain.parse()
         drain_clusters = drain.cluster_templates
+        n_clusters = len(drain_clusters) + n_clusters_buffer
 
         for improvement_rate in improvement_rates:
             print('Rate: {}'.format(improvement_rate))
 
             results[name][improvement_rate] = {}
             mmo = MultinomialMixtureOnline(logs,
-                                           len(drain_clusters),
+                                           n_clusters,
                                            improvement_rate=improvement_rate,
-                                           is_classification=True,
+                                           is_classification=is_classification,
                                            epsilon=0.01,
                                            alpha=1.05,
                                            beta=1.05)
@@ -39,7 +42,8 @@ def run_feedback_convergence(data_configs, drain_parameters,
 
             oracle = Oracle(true_assignments)
             acc_vals, t1_vals, t2_vals = perform_runs(ev, logs, mmo,
-                                                      n_runs, oracle)
+                                                      n_cycles, oracle,
+                                                      constraint_type)
             results[name][improvement_rate]['acc'] = acc_vals
             results[name][improvement_rate]['t1'] = t1_vals
             results[name][improvement_rate]['t2'] = t2_vals
@@ -47,12 +51,13 @@ def run_feedback_convergence(data_configs, drain_parameters,
     return results
 
 
-def perform_runs(ev, logs, mmo, n_runs, oracle):
+def perform_runs(ev, logs, mmo, n_runs, oracle, constraint_type):
     acc_vals, t1_vals, t2_vals = [], [], []
     for _ in range(n_runs):
         clusters = mmo.get_clusters(logs)
         constraints = oracle.get_constraints(clusters, 1, logs)
-        mmo.enforce_constraints(constraints)
+        mmo.enforce_constraints(constraints, constraint_type)
+        mmo.perform_online_batch_em(logs)
 
         acc_val = ev.get_accuracy(clusters)
         t1_val = ev.get_type1_error_ratio()
@@ -66,9 +71,11 @@ def perform_runs(ev, logs, mmo, n_runs, oracle):
 
 
 if __name__ == '__main__':
-    n_runs = 20
-
+    n_cycles = 5
     improvement_rates = [1.05, 1.50, 2.00]
+    constraint_type = None
+    is_classification = True
+    n_clusters_buffer = 0
 
     data_configs = [
         DataConfigs.Android,
@@ -108,8 +115,8 @@ if __name__ == '__main__':
         'Zookeeper': (4, 100, 0.60),
     }
 
-    results = run_feedback_convergence(data_configs,
-                                       drain_parameters,
-                                       improvement_rates,
-                                       n_runs)
+    results = run_feedback_convergence(data_configs, drain_parameters,
+                                       improvement_rates, n_cycles,
+                                       constraint_type, is_classification,
+                                       n_clusters_buffer)
     dump_results('feedback_convergence.p', results)
