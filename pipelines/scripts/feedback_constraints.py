@@ -46,7 +46,7 @@ if __name__ == '__main__':
         'Zookeeper': (4, 100, 0.60),
     }
 
-    improvement_rates = [1.05, 1.50, 2.00]
+    improvement_rates = [1.05, 1.50, 2.00, 5.00]
 
     jobs = [
         {
@@ -107,5 +107,5 @@ if __name__ == '__main__':
     ]
 
     pipe = ExperimentsPipeline(jobs, results_dir)
-    pipe.run_experiments()
+    pipe.run_experiments_mp()
     pipe.write_results(results_dir)
