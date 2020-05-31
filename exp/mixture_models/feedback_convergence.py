@@ -1,3 +1,4 @@
+from copy import deepcopy
 from global_utils import dump_results
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
@@ -27,19 +28,20 @@ def run_feedback_convergence(data_configs, drain_parameters,
         drain_clusters = drain.cluster_templates
         n_clusters = len(drain_clusters) + n_clusters_buffer
 
+        mmo_base = MultinomialMixtureOnline(logs,
+                                            n_clusters,
+                                            is_classification=is_classification,
+                                            epsilon=0.01,
+                                            alpha=1.05,
+                                            beta=1.05)
+        mmo_base.label_logs(drain_clusters, logs)
+
         for improvement_rate in improvement_rates:
             print('Rate: {}'.format(improvement_rate))
-
             results[name][improvement_rate] = {}
-            mmo = MultinomialMixtureOnline(logs,
-                                           n_clusters,
-                                           improvement_rate=improvement_rate,
-                                           is_classification=is_classification,
-                                           epsilon=0.01,
-                                           alpha=1.05,
-                                           beta=1.05)
-            mmo.label_logs(drain_clusters, logs)
 
+            mmo = deepcopy(mmo_base)
+            mmo.improvement_rate = improvement_rate
             oracle = Oracle(true_assignments)
             acc_vals, t1_vals, t2_vals = perform_runs(ev, logs, mmo,
                                                       n_cycles, oracle,
@@ -53,11 +55,8 @@ def run_feedback_convergence(data_configs, drain_parameters,
 
 def perform_runs(ev, logs, mmo, n_runs, oracle, constraint_type):
     acc_vals, t1_vals, t2_vals = [], [], []
-    for _ in range(n_runs):
+    for run_idx in range(n_runs + 1):
         clusters = mmo.get_clusters(logs)
-        constraints = oracle.get_constraints(clusters, 1, logs)
-        mmo.enforce_constraints(constraints, constraint_type)
-        mmo.perform_online_batch_em(logs)
 
         acc_val = ev.get_accuracy(clusters)
         t1_val = ev.get_type1_error_ratio()
@@ -66,6 +65,11 @@ def perform_runs(ev, logs, mmo, n_runs, oracle, constraint_type):
         acc_vals.append(acc_val)
         t1_vals.append(t1_val)
         t2_vals.append(t2_val)
+
+        if run_idx < n_runs:
+            constraints = oracle.get_constraints(clusters, 1, logs)
+            mmo.enforce_constraints(constraints, constraint_type)
+            mmo.perform_online_batch_em(logs)
 
     return acc_vals, t1_vals, t2_vals
 
