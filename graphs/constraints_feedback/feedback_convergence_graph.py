@@ -12,6 +12,7 @@ for idx, name in enumerate(results, start=1):
     plt.subplot(*SUBPLOT_DIM, idx)
     plt.title(name)
     plt.grid()
+    plt.ylim((0, 1.05))
     plt.tight_layout()
     imp_rate_results = results[name]['cem']
     for improvement_rate in imp_rate_results:
