@@ -10,7 +10,8 @@ from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 def run_feedback_convergence(data_configs, drain_parameters,
                              improvement_rates, n_cycles,
-                             constraint_type, n_clusters_buffer):
+                             constraint_type, n_clusters_buffer,
+                             is_class_flags):
     results = {}
     for data_config in data_configs:
         name = data_config['name']
@@ -26,7 +27,7 @@ def run_feedback_convergence(data_configs, drain_parameters,
         drain.parse()
         drain_clusters = drain.cluster_templates
         n_clusters = len(drain_clusters) + n_clusters_buffer
-        for is_class in [True, False]:
+        for is_class in is_class_flags:
             is_class_key = 'cem' if is_class else 'em'
             results[name][is_class_key] = {}
 
@@ -80,7 +81,7 @@ if __name__ == '__main__':
     n_cycles = 5
     improvement_rates = [1.05, 1.50, 2.00]
     constraint_type = None
-    is_classification = True
+    is_class_flags = [True, False]
     n_clusters_buffer = 0
 
     data_configs = [
@@ -123,5 +124,6 @@ if __name__ == '__main__':
 
     results = run_feedback_convergence(data_configs, drain_parameters,
                                        improvement_rates, n_cycles,
-                                       constraint_type, n_clusters_buffer)
+                                       constraint_type, n_clusters_buffer,
+                                       is_class_flags)
     dump_results('feedback_convergence.p', results)

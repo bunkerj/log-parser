@@ -58,6 +58,7 @@ if __name__ == '__main__':
             'n_cycles': 5,
             'constraint_type': None,
             'n_clusters_buffer': 0,
+            'is_class_flags': [True, False],
         },
         {
             NAME: 'run_feedback_convergence_20_buffer',
@@ -68,6 +69,7 @@ if __name__ == '__main__':
             'n_cycles': 5,
             'constraint_type': None,
             'n_clusters_buffer': 20,
+            'is_class_flags': [True],
         },
         {
             NAME: 'run_feedback_convergence_only_must_link',
@@ -78,6 +80,7 @@ if __name__ == '__main__':
             'n_cycles': 5,
             'constraint_type': 'must-link',
             'n_clusters_buffer': 0,
+            'is_class_flags': [True],
         },
         {
             NAME: 'run_feedback_convergence_only_cannot_link',
@@ -88,6 +91,7 @@ if __name__ == '__main__':
             'n_cycles': 5,
             'constraint_type': 'cannot-link',
             'n_clusters_buffer': 0,
+            'is_class_flags': [True],
         },
     ]
 
