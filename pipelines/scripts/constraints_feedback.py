@@ -3,7 +3,7 @@ from src.data_config import DataConfigs
 from pipelines.utils import get_results_dir_from_args
 from pipelines.experiments_pipeline import ExperimentsPipeline
 
-from exp.mixture_models.feedback_convergence import run_feedback_convergence
+from exp.feedback.feedback_convergence import run_feedback_convergence
 
 if __name__ == '__main__':
     results_dir = get_results_dir_from_args()

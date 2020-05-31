@@ -15,8 +15,6 @@ for idx, name in enumerate(results, start=1):
     plt.tight_layout()
     for improvement_rate in results[name]:
         acc_vals = results[name][improvement_rate]['acc']
-        t1_vals = results[name][improvement_rate]['t1']
-        t2_vals = results[name][improvement_rate]['t2']
         n = len(acc_vals)
 
         acc_label = 'acc_{}'.format(improvement_rate)
