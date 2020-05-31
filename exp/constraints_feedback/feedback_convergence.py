@@ -10,8 +10,7 @@ from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 def run_feedback_convergence(data_configs, drain_parameters,
                              improvement_rates, n_cycles,
-                             constraint_type, is_classification,
-                             n_clusters_buffer):
+                             constraint_type, n_clusters_buffer):
     results = {}
     for data_config in data_configs:
         name = data_config['name']
@@ -27,28 +26,31 @@ def run_feedback_convergence(data_configs, drain_parameters,
         drain.parse()
         drain_clusters = drain.cluster_templates
         n_clusters = len(drain_clusters) + n_clusters_buffer
+        for is_class in [True, False]:
+            is_class_key = 'cem' if is_class else 'em'
+            results[name][is_class_key] = {}
 
-        mmo_base = MultinomialMixtureOnline(logs,
-                                            n_clusters,
-                                            is_classification=is_classification,
-                                            epsilon=0.01,
-                                            alpha=1.05,
-                                            beta=1.05)
-        mmo_base.label_logs(drain_clusters, logs)
+            mmo_base = MultinomialMixtureOnline(logs,
+                                                n_clusters,
+                                                is_classification=is_class,
+                                                epsilon=0.01,
+                                                alpha=1.05,
+                                                beta=1.05)
+            mmo_base.label_logs(drain_clusters, logs)
 
-        for improvement_rate in improvement_rates:
-            print('Rate: {}'.format(improvement_rate))
-            results[name][improvement_rate] = {}
+            for improvement_rate in improvement_rates:
+                print('Rate: {}'.format(improvement_rate))
+                results[name][is_class_key][improvement_rate] = {}
 
-            mmo = deepcopy(mmo_base)
-            mmo.improvement_rate = improvement_rate
-            oracle = Oracle(true_assignments)
-            acc_vals, t1_vals, t2_vals = perform_runs(ev, logs, mmo,
-                                                      n_cycles, oracle,
-                                                      constraint_type)
-            results[name][improvement_rate]['acc'] = acc_vals
-            results[name][improvement_rate]['t1'] = t1_vals
-            results[name][improvement_rate]['t2'] = t2_vals
+                mmo = deepcopy(mmo_base)
+                mmo.improvement_rate = improvement_rate
+                oracle = Oracle(true_assignments)
+                acc_vals, t1_vals, t2_vals = perform_runs(ev, logs, mmo,
+                                                          n_cycles, oracle,
+                                                          constraint_type)
+                results[name][is_class_key][improvement_rate]['acc'] = acc_vals
+                results[name][is_class_key][improvement_rate]['t1'] = t1_vals
+                results[name][is_class_key][improvement_rate]['t2'] = t2_vals
 
     return results
 
@@ -121,6 +123,5 @@ if __name__ == '__main__':
 
     results = run_feedback_convergence(data_configs, drain_parameters,
                                        improvement_rates, n_cycles,
-                                       constraint_type, is_classification,
-                                       n_clusters_buffer)
+                                       constraint_type, n_clusters_buffer)
     dump_results('feedback_convergence.p', results)

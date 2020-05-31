@@ -2,8 +2,8 @@ from global_constants import NAME, FUNCTION
 from src.data_config import DataConfigs
 from pipelines.utils import get_results_dir_from_args
 from pipelines.experiments_pipeline import ExperimentsPipeline
-
-from exp.feedback.feedback_convergence import run_feedback_convergence
+from exp.constraints_feedback.feedback_convergence import \
+    run_feedback_convergence
 
 if __name__ == '__main__':
     results_dir = get_results_dir_from_args()
@@ -46,62 +46,47 @@ if __name__ == '__main__':
         'Zookeeper': (4, 100, 0.60),
     }
 
-    improvement_rates = [1.05, 1.50, 2.00, 5.00]
+    improvement_rates = [1.05, 1.50, 2.00, 5.00, 10.00]
 
     jobs = [
         {
-            NAME: 'run_feedback_convergence_cem',
+            NAME: 'run_feedback_convergence',
             FUNCTION: run_feedback_convergence,
             'data_configs': data_configs,
             'drain_parameters': drain_parameters,
             'improvement_rates': improvement_rates,
             'n_cycles': 5,
             'constraint_type': None,
-            'is_classification': True,
             'n_clusters_buffer': 0,
         },
         {
-            NAME: 'run_feedback_convergence_em',
+            NAME: 'run_feedback_convergence_20_buffer',
             FUNCTION: run_feedback_convergence,
             'data_configs': data_configs,
             'drain_parameters': drain_parameters,
             'improvement_rates': improvement_rates,
             'n_cycles': 5,
             'constraint_type': None,
-            'is_classification': False,
-            'n_clusters_buffer': 0,
-        },
-        {
-            NAME: 'run_feedback_convergence_cem_20_buffer',
-            FUNCTION: run_feedback_convergence,
-            'data_configs': data_configs,
-            'drain_parameters': drain_parameters,
-            'improvement_rates': improvement_rates,
-            'n_cycles': 5,
-            'constraint_type': None,
-            'is_classification': True,
             'n_clusters_buffer': 20,
         },
         {
-            NAME: 'run_feedback_convergence_cem_only_must_link',
+            NAME: 'run_feedback_convergence_only_must_link',
             FUNCTION: run_feedback_convergence,
             'data_configs': data_configs,
             'drain_parameters': drain_parameters,
             'improvement_rates': improvement_rates,
             'n_cycles': 5,
             'constraint_type': 'must-link',
-            'is_classification': True,
             'n_clusters_buffer': 0,
         },
         {
-            NAME: 'run_feedback_convergence_cem_only_cannot_link',
+            NAME: 'run_feedback_convergence_only_cannot_link',
             FUNCTION: run_feedback_convergence,
             'data_configs': data_configs,
             'drain_parameters': drain_parameters,
             'improvement_rates': improvement_rates,
             'n_cycles': 5,
             'constraint_type': 'cannot-link',
-            'is_classification': True,
             'n_clusters_buffer': 0,
         },
     ]

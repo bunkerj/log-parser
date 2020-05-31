@@ -13,8 +13,9 @@ for idx, name in enumerate(results, start=1):
     plt.title(name)
     plt.grid()
     plt.tight_layout()
-    for improvement_rate in results[name]:
-        acc_vals = results[name][improvement_rate]['acc']
+    imp_rate_results = results[name]['cem']
+    for improvement_rate in imp_rate_results:
+        acc_vals = imp_rate_results[improvement_rate]['acc']
         n = len(acc_vals)
 
         acc_label = 'acc_{}'.format(improvement_rate)
