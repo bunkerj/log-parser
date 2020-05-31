@@ -9,21 +9,21 @@ class Oracle:
         self.true_clusters = defaultdict(list)
         self.true_references = []
 
-    def get_constraints(self, parsed_clusters, n_samples_per_cluster,
+    def get_constraints(self, parsed_clusters, n_samples,
                         tokenized_logs):
         split_parsed_clusters = self._get_split_clusters(parsed_clusters, True)
         split_true_clusters = self._get_split_clusters(parsed_clusters, False)
 
         cannot_link = self._get_links(split_parsed_clusters,
-                                      n_samples_per_cluster,
+                                      n_samples,
                                       tokenized_logs)
         must_link = self._get_links(split_true_clusters,
-                                    n_samples_per_cluster,
+                                    n_samples,
                                     tokenized_logs)
 
         return {CANNOT_LINK: cannot_link, MUST_LINK: must_link}
 
-    def _get_links(self, split_clusters, n_samples_per_cluster, tokenized_logs):
+    def _get_links(self, split_clusters, n_samples, tokenized_logs):
         """
         Return constraints as a list of tuples where each
         tuple represents two logs that either should (true clusters split into
@@ -32,7 +32,9 @@ class Oracle:
         """
         constraints = []
         err_clusters = [c for c in split_clusters.values() if len(c) > 1]
-        for cluster in err_clusters:
+        for _ in range(n_samples):
+            cluster = sample(err_clusters, 1)[0]
+
             first_event = sample(cluster.keys(), 1)[0]
             second_events = [c for c in cluster if c != first_event]
 
@@ -40,11 +42,10 @@ class Oracle:
             second_event = sample(second_events, 1)[0]
             second_indices = cluster[second_event]
 
-            for _ in range(n_samples_per_cluster):
-                sampled_maj_idx = sample(first_indices, 1)[0]
-                sampled_min_idx = sample(second_indices, 1)[0]
-                constraints.append((tokenized_logs[sampled_maj_idx],
-                                    tokenized_logs[sampled_min_idx]))
+            sampled_maj_idx = sample(first_indices, 1)[0]
+            sampled_min_idx = sample(second_indices, 1)[0]
+            constraints.append((tokenized_logs[sampled_maj_idx],
+                                tokenized_logs[sampled_min_idx]))
 
         return constraints
 

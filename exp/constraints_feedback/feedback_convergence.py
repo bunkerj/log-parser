@@ -70,7 +70,7 @@ def perform_runs(ev, logs, mmo, n_runs, oracle, constraint_type):
         t2_vals.append(t2_val)
 
         if run_idx < n_runs:
-            constraints = oracle.get_constraints(clusters, 1, logs)
+            constraints = oracle.get_constraints(clusters, 10, logs)
             mmo.enforce_constraints(constraints, constraint_type)
             mmo.perform_online_batch_em(logs)
 
