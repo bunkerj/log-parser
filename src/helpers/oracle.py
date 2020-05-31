@@ -32,6 +32,10 @@ class Oracle:
         """
         constraints = []
         err_clusters = [c for c in split_clusters.values() if len(c) > 1]
+
+        if len(err_clusters) == 0:
+            return []
+
         for _ in range(n_samples):
             cluster = sample(err_clusters, 1)[0]
 
