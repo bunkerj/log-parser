@@ -34,15 +34,7 @@ def log_multi(x, params):
     x_flat = x.flatten()
     params_flat = np.maximum(params, 0).flatten()
     coeff = gammaln(x_flat.sum() + 1) - np.sum(gammaln(x_flat + 1))
-
-    valid_indices_x = np.nonzero(x_flat)
-    valid_indices_params = np.nonzero(params_flat)
-
-    if not np.all(np.isin(valid_indices_x, valid_indices_params)):
-        return -np.inf
-
-    return coeff + (x_flat[valid_indices_x] * np.log(
-        params_flat[valid_indices_x])).sum()
+    return coeff + (x_flat * np.log(params_flat)).sum()
 
 
 def multi(x, params):
