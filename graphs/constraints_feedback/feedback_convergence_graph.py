@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from global_utils import load_results
+from global_utils import load_results, get_avg
 
 SUBPLOT_DIM = (4, 4)
 LEGEND_IDX = 16
@@ -16,11 +16,12 @@ for idx, name in enumerate(results, start=1):
     plt.tight_layout(0.1)
     imp_rate_results = results[name]['cem']
     for improvement_rate in imp_rate_results:
-        acc_vals = imp_rate_results[improvement_rate]['acc']
-        n = len(acc_vals)
+        acc_vals_samples = imp_rate_results[improvement_rate]['acc']
+        avg_acc_vals = get_avg(acc_vals_samples)
+        n = len(avg_acc_vals)
 
         acc_label = 'acc_{}'.format(improvement_rate)
-        plt.plot(list(range(n)), acc_vals, label=acc_label)
+        plt.plot(list(range(n)), avg_acc_vals, label=acc_label)
 
     if idx == LEGEND_IDX:
         plt.legend()

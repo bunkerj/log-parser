@@ -5,13 +5,13 @@ the online multinomial mixture model. [Using multiprocessing]
 from time import time
 from copy import deepcopy
 import multiprocessing as mp
-from global_utils import dump_results
+from global_utils import dump_results, get_avg
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 from exp.mixture_models.utils import get_log_labels, get_num_true_clusters, \
-    split_on_result_sources, split_on_samples, get_avg
+    split_on_result_sources, split_on_samples
 from global_constants import LABELED_IMPURITIES_SAMPLES, \
     UNLABELED_IMPURITIES_SAMPLES, LABEL_COUNTS, N_LOGS, \
     AVG_LABELED_IMPURITIES, AVG_UNLABELED_IMPURITIES

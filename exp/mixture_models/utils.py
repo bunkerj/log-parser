@@ -41,15 +41,3 @@ def split_on_result_sources(results):
     lab_impurities = [r[0] for r in results]
     unlab_impurities = [r[1] for r in results]
     return lab_impurities, unlab_impurities
-
-
-def get_avg(samples):
-    n_samples = len(samples)
-    sample_len = len(samples[0])
-    averages = []
-    for label_idx in range(sample_len):
-        avg_lab_impurity = 0
-        for sample_idx in range(n_samples):
-            avg_lab_impurity += samples[sample_idx][label_idx]
-        averages.append(avg_lab_impurity / n_samples)
-    return averages

@@ -3,13 +3,12 @@ Evaluate how different initializations have an impact on impurity when using
 the online multinomial mixture model.
 """
 from time import time
-from global_utils import dump_results
+from global_utils import dump_results, get_avg
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
-from exp.mixture_models.utils import get_log_labels, get_num_true_clusters, \
-    get_avg
+from exp.mixture_models.utils import get_log_labels, get_num_true_clusters
 from global_constants import N_LOGS, LABELED_IMPURITIES_SAMPLES, \
     UNLABELED_IMPURITIES_SAMPLES, LABEL_COUNTS, AVG_LABELED_IMPURITIES, \
     AVG_UNLABELED_IMPURITIES, AVG_LABELED_TIMING, AVG_UNLABELED_TIMING

@@ -9,21 +9,21 @@ class Oracle:
         self.true_clusters = defaultdict(list)
         self.true_references = []
 
-    def get_constraints(self, parsed_clusters, n_samples,
+    def get_constraints(self, parsed_clusters, n_constraint_samples,
                         tokenized_logs):
         split_parsed_clusters = self._get_split_clusters(parsed_clusters, True)
         split_true_clusters = self._get_split_clusters(parsed_clusters, False)
 
         cannot_link = self._get_links(split_parsed_clusters,
-                                      n_samples,
+                                      n_constraint_samples,
                                       tokenized_logs)
         must_link = self._get_links(split_true_clusters,
-                                    n_samples,
+                                    n_constraint_samples,
                                     tokenized_logs)
 
         return {CANNOT_LINK: cannot_link, MUST_LINK: must_link}
 
-    def _get_links(self, split_clusters, n_samples, tokenized_logs):
+    def _get_links(self, split_clusters, n_constraint_samples, tokenized_logs):
         """
         Return constraints as a list of tuples where each
         tuple represents two logs that either should (true clusters split into
@@ -36,7 +36,7 @@ class Oracle:
         if len(err_clusters) == 0:
             return []
 
-        for _ in range(n_samples):
+        for _ in range(n_constraint_samples):
             cluster = sample(err_clusters, 1)[0]
 
             first_event = sample(cluster.keys(), 1)[0]

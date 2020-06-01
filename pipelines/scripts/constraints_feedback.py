@@ -55,9 +55,7 @@ if __name__ == '__main__':
             'data_configs': data_configs,
             'drain_parameters': drain_parameters,
             'improvement_rates': improvement_rates,
-            'n_cycles': 5,
             'constraint_type': None,
-            'n_clusters_buffer': 0,
             'is_class_flags': [True, False],
         },
         {
@@ -66,7 +64,6 @@ if __name__ == '__main__':
             'data_configs': data_configs,
             'drain_parameters': drain_parameters,
             'improvement_rates': improvement_rates,
-            'n_cycles': 5,
             'constraint_type': None,
             'n_clusters_buffer': 20,
             'is_class_flags': [True],
@@ -77,9 +74,7 @@ if __name__ == '__main__':
             'data_configs': data_configs,
             'drain_parameters': drain_parameters,
             'improvement_rates': improvement_rates,
-            'n_cycles': 5,
             'constraint_type': 'must-link',
-            'n_clusters_buffer': 0,
             'is_class_flags': [True],
         },
         {
@@ -88,9 +83,7 @@ if __name__ == '__main__':
             'data_configs': data_configs,
             'drain_parameters': drain_parameters,
             'improvement_rates': improvement_rates,
-            'n_cycles': 5,
             'constraint_type': 'cannot-link',
-            'n_clusters_buffer': 0,
             'is_class_flags': [True],
         },
     ]
