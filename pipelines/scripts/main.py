@@ -3,7 +3,6 @@ from src.data_config import DataConfigs
 from pipelines.utils import get_results_dir_from_args
 from exp.mixture_models.online_em import run_online_em
 from pipelines.experiments_pipeline import ExperimentsPipeline
-from exp.mixture_models.online_benchmark import run_online_benchmark
 from exp.mixture_models.feedback_evaluation_mp import run_feedback_evaluation_mp
 
 if __name__ == '__main__':
@@ -30,29 +29,19 @@ if __name__ == '__main__':
                 DataConfigs.Windows,
                 DataConfigs.Zookeeper,
             ],
-            'n_samples': 50,
+            'n_samples': 1000,
             'label_count_values': [0, 20, 40, 60, 80, 100],
         },
         {
             NAME: 'run_online_em',
             FUNCTION: run_online_em,
-            'data_config': DataConfigs.Apache,
-            'n_sample': 100,
+            'data_config': DataConfigs.BGL,
+            'n_sample': 1000,
             'training_sizes': [200, 400, 600, 800, 1000,
                                1200, 1400, 1600, 1800, 2000],
         },
-        {
-            NAME: 'run_online_benchmark_40_lab',
-            FUNCTION: run_online_benchmark,
-            'n_labels': 40,
-        },
-        {
-            NAME: 'run_online_benchmark_80_lab',
-            FUNCTION: run_online_benchmark,
-            'n_labels': 80,
-        }
     ]
 
     pipe = ExperimentsPipeline(jobs, results_dir)
-    pipe.run_experiments()
+    pipe.run_experiments_mp()
     pipe.write_results(results_dir)
