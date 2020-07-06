@@ -32,14 +32,14 @@ if __name__ == '__main__':
             'n_samples': 1000,
             'label_count_values': [0, 20, 40, 60, 80, 100],
         },
-        {
-            NAME: 'run_online_em',
-            FUNCTION: run_online_em,
-            'data_config': DataConfigs.BGL,
-            'n_sample': 1000,
-            'training_sizes': [200, 400, 600, 800, 1000,
-                               1200, 1400, 1600, 1800, 2000],
-        },
+        # {
+        #     NAME: 'run_online_em',
+        #     FUNCTION: run_online_em,
+        #     'data_config': DataConfigs.BGL,
+        #     'n_sample': 1000,
+        #     'training_sizes': [200, 400, 600, 800, 1000,
+        #                        1200, 1400, 1600, 1800, 2000],
+        # },
     ]
 
     pipe = ExperimentsPipeline(jobs, results_dir)
