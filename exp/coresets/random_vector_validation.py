@@ -1,5 +1,6 @@
 """
-Compare performance of offline EM with and without the coreset.
+Verify that Greedy Iterative Geodesic Ascent finds progressively better linear
+combinations as the coreset size increases.
 """
 import numpy as np
 import functools

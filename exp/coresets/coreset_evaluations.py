@@ -1,6 +1,5 @@
 """
-Verify that Greedy Iterative Geodesic Ascent finds progressively better linear
-combinations as the coreset size increases.
+Compare performance of offline EM with and without the coreset.
 """
 from copy import deepcopy
 from src.coresets.greedy_iterative_geodesic_ascent import \
