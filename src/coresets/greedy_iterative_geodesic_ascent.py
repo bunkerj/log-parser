@@ -22,7 +22,7 @@ class GreedyIterativeGeodesicAscent:
             step_size = self._get_step_size(l, l_w, norm_projs, n)
             l_w, w = self._update_coreset(l_w, w, norm_projs, n, step_size)
 
-        return self._scale_weights(w, l_w, l, L)
+        return self._scale_weights(w, l_w, l, L).flatten()
 
     def _get_reference_vector(self):
         return functools.reduce(lambda a, b: a + b, self.projections)

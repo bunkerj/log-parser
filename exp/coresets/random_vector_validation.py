@@ -1,7 +1,7 @@
 import numpy as np
 import functools
 from math import sqrt
-from exp.coresets.greedy_iterative_geodesic_ascent import \
+from src.coresets.greedy_iterative_geodesic_ascent import \
     GreedyIterativeGeodesicAscent
 from exp.mixture_models.utils import get_num_true_clusters
 from src.coresets.random_vector_projector import RandomVectorProjector
@@ -40,10 +40,8 @@ if __name__ == '__main__':
     L = functools.reduce(lambda a, b: a + b, projections)
     for m in range(1, 21):
         geo_ascent = GreedyIterativeGeodesicAscent(projections, m)
-        w = geo_ascent.get_weights()
+        w = geo_ascent.get_weights().reshape((-1, 1))
         L_approx = matrix @ w
         diff_v = L - L_approx
         diff = sqrt(diff_v.T @ diff_v)
         print('{:<5}: {:<10}'.format(m, diff))
-
-    a = 10
