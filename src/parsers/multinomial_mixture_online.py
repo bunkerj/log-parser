@@ -46,13 +46,17 @@ class MultinomialMixtureOnline(LogParserOnline):
                 self._update_parameters()
             self._update_likelihood_hist(tokenized_logs, track_history)
 
-    def perform_offline_em(self, tokenized_logs, track_history=False):
+    def perform_offline_em(self, tokenized_logs, track_history=False,
+                           weights=None):
+        if weights is None:
+            weights = np.ones(len(tokenized_logs))
         self._init_sufficient_stats()
         self._update_likelihood_hist(tokenized_logs, track_history)
         current_ll, past_ll = None, None
         while True:
-            for tokenized_log in tokenized_logs:
-                self._update_sufficient_statistics(tokenized_log)
+            for n, tokenized_log in enumerate(tokenized_logs):
+                self._update_sufficient_statistics(tokenized_log,
+                                                   weight=weights[n])
             self._update_parameters()
             self._init_sufficient_stats()
             current_ll, past_ll = \
@@ -255,7 +259,8 @@ class MultinomialMixtureOnline(LogParserOnline):
                 likelihood += MAX_NEG_VALUE
         return float(likelihood)
 
-    def _update_sufficient_statistics(self, tokenized_log, cluster_idx=-1):
+    def _update_sufficient_statistics(self, tokenized_log, cluster_idx=-1,
+                                      weight=1):
         token_counts = get_token_counts(tokenized_log, self.v_indices)
 
         if cluster_idx == -1:
@@ -270,8 +275,8 @@ class MultinomialMixtureOnline(LogParserOnline):
             self.t_c_obs += r
             self.t_v_obs += r @ token_counts.T
 
-        self.t_c += r
-        self.t_v += r @ token_counts.T
+        self.t_c += weight * r
+        self.t_v += weight * r @ token_counts.T
 
     def _change_dominant_resp(self, c, g1, g):
         """
