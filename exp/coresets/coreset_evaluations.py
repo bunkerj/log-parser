@@ -1,3 +1,7 @@
+"""
+Verify that Greedy Iterative Geodesic Ascent finds progressively better linear
+combinations as the coreset size increases.
+"""
 from copy import deepcopy
 from src.coresets.greedy_iterative_geodesic_ascent import \
     GreedyIterativeGeodesicAscent

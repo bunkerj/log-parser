@@ -1,3 +1,6 @@
+"""
+Compare performance of offline EM with and without the coreset.
+"""
 import numpy as np
 import functools
 from math import sqrt
