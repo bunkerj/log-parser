@@ -12,7 +12,7 @@ from src.helpers.evaluator import Evaluator
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 
-def run_coreset_evaluations(proj_dim, data_config):
+def run_coreset_evaluations(proj_dim, subset_size, n_samples, data_config):
     data_manager = DataManager(data_config)
     tokenized_logs = data_manager.get_tokenized_logs()
 
@@ -22,31 +22,72 @@ def run_coreset_evaluations(proj_dim, data_config):
 
     geo_ascent = GreedyIterativeGeodesicAscent(tokenized_logs,
                                                num_clusters=num_true_clusters)
-    reduced_weights, reduced_set = geo_ascent.get_coreset(50, proj_dim)
+    reduced_weights, reduced_set = geo_ascent.get_coreset(subset_size, proj_dim)
 
-    mmo = MultinomialMixtureOnline(tokenized_logs,
-                                   num_true_clusters,
-                                   alpha=1.05,
-                                   beta=1.05)
-    mmo_coreset = deepcopy(mmo)
+    score_samples = []
+    coreset_score_samples = []
+    for _ in range(n_samples):
+        mmo = MultinomialMixtureOnline(tokenized_logs,
+                                       num_true_clusters,
+                                       alpha=1.05,
+                                       beta=1.05)
+        mmo_coreset = deepcopy(mmo)
 
-    mmo.perform_offline_em(tokenized_logs)
-    mmo_coreset.perform_offline_em(reduced_set, weights=reduced_weights)
+        mmo.perform_offline_em(tokenized_logs)
+        mmo_coreset.perform_offline_em(reduced_set, weights=reduced_weights)
 
-    mmo_clusters = mmo.get_clusters(tokenized_logs)
-    mmo_coreset_clusters = mmo_coreset.get_clusters(tokenized_logs)
+        mmo = MultinomialMixtureOnline(tokenized_logs,
+                                       num_true_clusters,
+                                       alpha=1.05,
+                                       beta=1.05)
+        mmo_coreset = deepcopy(mmo)
+
+        mmo.perform_offline_em(tokenized_logs)
+        mmo_clusters = mmo.get_clusters(tokenized_logs)
+        score = evaluator.get_impurity(mmo_clusters, [])
+
+        mmo_coreset.perform_offline_em(reduced_set, weights=reduced_weights)
+        mmo_coreset_clusters = mmo_coreset.get_clusters(tokenized_logs)
+        coreset_score = evaluator.get_impurity(mmo_coreset_clusters, [])
+
+        score_samples.append(score)
+        coreset_score_samples.append(coreset_score)
 
     return {
-        'mmo_score': evaluator.get_impurity(mmo_clusters, []),
-        'mmo_coreset_score': evaluator.get_impurity(mmo_coreset_clusters, []),
+        'score_samples': score_samples,
+        'coreset_score_samples': coreset_score_samples,
         'coreset_size': len(reduced_weights),
     }
 
 
 if __name__ == '__main__':
-    data_config = DataConfigs.HealthApp
-    proj_dim = 50
-    results = run_coreset_evaluations(proj_dim, data_config)
-    for k in results:
-        print('{:<10} {:<10}'.format(k, results[k]))
-    dump_results('coreset_evaluations.p', results)
+    proj_dim = 500
+    subset_size = 50
+    n_samples = 25
+
+    data_configs = [
+        DataConfigs.Android,
+        DataConfigs.Apache,
+        DataConfigs.BGL,
+        DataConfigs.Hadoop,
+        DataConfigs.HDFS,
+        DataConfigs.HealthApp,
+        DataConfigs.HPC,
+        DataConfigs.Linux,
+        # DataConfigs.Mac,
+        # DataConfigs.OpenSSH,
+        # DataConfigs.OpenStack,
+        # DataConfigs.Proxifier,
+        # DataConfigs.Spark,
+        # DataConfigs.Thunderbird,
+        # DataConfigs.Windows,
+        # DataConfigs.Zookeeper,
+    ]
+
+    for data_config in data_configs:
+        name = data_config['name'].lower()
+        print(name)
+        results = run_coreset_evaluations(proj_dim, subset_size, n_samples,
+                                          data_config)
+        filename = 'coreset_evaluations_{}.p'.format(name)
+        dump_results(filename, results)
