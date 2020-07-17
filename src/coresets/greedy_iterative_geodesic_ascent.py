@@ -84,16 +84,6 @@ class GreedyIterativeGeodesicAscent:
             map(lambda v: v / self._norm(v) if self._norm(v) > 0 else v,
                 projections))
 
-    # def _remove_duplicate_logs(self, tokenized_logs):
-    #     seen_logs = set()
-    #     unique_tokenized_logs = []
-    #     for tokenized_log in tokenized_logs:
-    #         log = ' '.join(tokenized_log)
-    #         if log not in seen_logs:
-    #             seen_logs.add(log)
-    #             unique_tokenized_logs.append(tokenized_log)
-    #     return unique_tokenized_logs
-
     def _norm(self, v):
         return sqrt(v.T @ v)
 

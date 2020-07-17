@@ -44,8 +44,9 @@ def run_coreset_evaluations(proj_dim, data_config):
 
 
 if __name__ == '__main__':
-    data_config = DataConfigs.Apache
+    data_config = DataConfigs.HealthApp
     proj_dim = 50
     results = run_coreset_evaluations(proj_dim, data_config)
-    print(results)
+    for k in results:
+        print('{:<10} {:<10}'.format(k, results[k]))
     dump_results('coreset_evaluations.p', results)

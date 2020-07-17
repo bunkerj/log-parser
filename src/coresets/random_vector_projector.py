@@ -5,17 +5,17 @@ from global_utils import multi
 
 
 class RandomVectorProjector:
-    def __init__(self, count_vectors, cluster_posterior,
-                 vocab_posterior, proj_vector_dim):
-        self.num_clusters = cluster_posterior.size
-        self.num_vocab = vocab_posterior.shape[1]
+    def __init__(self, count_vectors, cluster_pos, vocab_pos, proj_vector_dim):
+        self.num_clusters = cluster_pos.size
+        self.num_vocab = vocab_pos.shape[1]
         self.count_vectors = count_vectors
-        self.cluster_pos = cluster_posterior
-        self.vocab_pos = vocab_posterior
+        self.cluster_pos = cluster_pos
+        self.vocab_pos = vocab_pos
         self.J = proj_vector_dim
-        self.D = cluster_posterior.size + vocab_posterior.size
-        self.param_samples = self._get_param_samples(self.num_clusters,
-                                                     self.num_vocab, self.J)
+        self.D = cluster_pos.size + vocab_pos.size
+        self.param_samples = self._get_param_samples(self.cluster_pos,
+                                                     self.vocab_pos,
+                                                     self.J)
         self.dim_samples = self._get_dim_samples(self.D, self.J)
 
     def get_fw_projections(self):
@@ -40,18 +40,16 @@ class RandomVectorProjector:
             v_n[j] = self._get_log_likelihood_derivative(x_n, pi, theta, d)
         return sqrt(self.D / self.J) * v_n
 
-    def _get_param_samples(self, num_clusters, num_vocab, J):
-        return [self._sample_parameters(num_clusters, num_vocab) for _ in
+    def _get_param_samples(self, cluster_pos, vocab_pos, J):
+        return [self._sample_parameters(cluster_pos, vocab_pos) for _ in
                 range(J)]
 
     def _get_dim_samples(self, D, J):
         return [np.random.randint(D) for _ in range(J)]
 
-    def _sample_parameters(self, num_clusters, num_vocab):
-        # TODO: add more specific posterior
-        pi = np.random.dirichlet(np.ones(num_clusters))
-        theta = np.random.dirichlet(np.ones(num_vocab),
-                                    size=num_clusters)
+    def _sample_parameters(self, cluster_pos, vocab_pos):
+        pi = np.random.dirichlet(cluster_pos)
+        theta = np.vstack([np.random.dirichlet(vp) for vp in vocab_pos])
         return pi, theta
 
     def _get_log_likelihood_derivative(self, x_n, pi, theta, d):
