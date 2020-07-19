@@ -51,18 +51,19 @@ class GreedyIterativeGeodesicAscent:
         1) Specified posterior distribution
         2) Specified number of clusters
         """
-        is_valid_posterior = None not in [cluster_pos, vocab_pos]
+        is_valid_posterior = cluster_pos is not None and vocab_pos is not None
         is_valid_num_clusters = num_clusters is not None
         assert is_valid_posterior or is_valid_num_clusters
 
     def _get_num_clusters(self, cluster_pos, num_clusters):
-        return num_clusters or cluster_pos.size
+        return cluster_pos.size if num_clusters is None else num_clusters
 
     def _get_cluster_pos(self, cluster_pos, num_clusters):
-        return cluster_pos or np.ones(num_clusters)
+        return np.ones(num_clusters) if cluster_pos is None else cluster_pos
 
     def _get_vocab_pos(self, vocab_pos, num_clusters, num_vocab):
-        return vocab_pos or np.ones((num_clusters, num_vocab))
+        return np.ones((num_clusters, num_vocab)) \
+            if vocab_pos is None else vocab_pos
 
     def _get_count_vectors(self):
         return [get_token_counts(log, self.v_indices) for log in
