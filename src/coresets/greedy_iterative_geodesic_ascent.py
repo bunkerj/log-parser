@@ -24,7 +24,7 @@ class GreedyIterativeGeodesicAscent:
                                                  self.cluster_pos,
                                                  self.vocab_pos,
                                                  proj_dim)
-        projections = vector_projector.get_fw_projections()
+        projections = vector_projector.get_projections()
         weights = self.get_weights(projections, subset_size)
         reduced_weights = self._get_reduced_weights(weights)
         reduced_set = self._get_reduced_set(weights)

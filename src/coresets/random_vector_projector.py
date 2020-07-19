@@ -18,7 +18,7 @@ class RandomVectorProjector:
                                                      self.J)
         self.dim_samples = self._get_dim_samples(self.D, self.J)
 
-    def get_fw_projections(self):
+    def get_projections(self):
         history = {}
         projections = []
         for n, x_n in enumerate(self.count_vectors):
@@ -26,19 +26,25 @@ class RandomVectorProjector:
             if x_n_str in history:
                 projections.append(history[x_n_str])
             else:
-                v_n = self._get_fw_projection(x_n)
+                v_n = self._get_likelihood_projection(x_n)
                 projections.append(v_n)
                 history[x_n_str] = v_n
-
         return projections
 
-    def _get_fw_projection(self, x_n):
+    def _get_derivative_projection(self, x_n):
         v_n = np.zeros((self.J, 1))
         for j in range(self.J):
             pi, theta = self.param_samples[j]
             d = self.dim_samples[j]
             v_n[j] = self._get_log_likelihood_derivative(x_n, pi, theta, d)
         return sqrt(self.D / self.J) * v_n
+
+    def _get_likelihood_projection(self, x_n):
+        v_n = np.zeros((self.J, 1))
+        for j in range(self.J):
+            pi, theta = self.param_samples[j]
+            v_n[j] = self._get_log_likelihood(x_n, pi, theta)
+        return sqrt(1 / self.J) * v_n
 
     def _get_param_samples(self, cluster_pos, vocab_pos, J):
         return [self._sample_parameters(cluster_pos, vocab_pos) for _ in
@@ -53,15 +59,29 @@ class RandomVectorProjector:
         return pi, theta
 
     def _get_log_likelihood_derivative(self, x_n, pi, theta, d):
-        multi_values = np.zeros((self.num_clusters, 1))
-        for g in range(self.num_clusters):
-            multi_values[g] = multi(x_n, theta[g, :])
-        denom = (pi.reshape((-1, 1)) * multi_values.sum()).sum()
         if d < self.num_clusters:
-            idx = d
-            return multi_values[idx] / denom
+            multi_values = self._get_multi_values(theta, x_n)
+            denom = self._get_denominator(multi_values, pi)
+            return multi_values[d] / denom
         else:
             idx = d - self.num_clusters
             g = idx % self.num_clusters
             v = idx - (idx // self.num_clusters) * self.num_clusters
+            if x_n[v] == 0:
+                return 0.0
+            multi_values = self._get_multi_values(theta, x_n)
+            denom = self._get_denominator(multi_values, pi)
             return pi[g] * multi_values[g] * x_n[v] / (theta[g, v] * denom)
+
+    def _get_log_likelihood(self, x_n, pi, theta):
+        multi_values = self._get_multi_values(theta, x_n)
+        return np.log((pi * multi_values).sum())
+
+    def _get_denominator(self, multi_values, pi):
+        return (pi.reshape((-1, 1)) * multi_values.sum()).sum()
+
+    def _get_multi_values(self, theta, x_n):
+        multi_values = np.zeros((self.num_clusters, 1))
+        for g in range(self.num_clusters):
+            multi_values[g] = multi(x_n, theta[g, :])
+        return multi_values
