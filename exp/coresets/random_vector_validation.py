@@ -33,7 +33,7 @@ def run_random_vector_validation(proj_vector_dim, data_config):
     vector_projector = RandomVectorProjector(count_vectors, cluster_posterior,
                                              vocab_posterior, proj_vector_dim)
 
-    projections = vector_projector.get_fw_projections()
+    projections = vector_projector.get_projections()
     matrix = np.stack([v_n.flatten() for v_n in projections], axis=1)
 
     L = functools.reduce(lambda a, b: a + b, projections)
