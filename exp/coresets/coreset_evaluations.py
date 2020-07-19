@@ -30,8 +30,8 @@ def run_coreset_evaluations(proj_dim, subset_size, n_samples, data_config):
     vocab_pos = np.array(mmo_pos_init.t_v)
 
     geo_ascent = GreedyIterativeGeodesicAscent(tokenized_logs,
-                                               # cluster_pos=cluster_pos,
-                                               # vocab_pos=vocab_pos,
+                                               cluster_pos=cluster_pos,
+                                               vocab_pos=vocab_pos,
                                                num_clusters=num_true_clusters)
     reduced_weights, reduced_set = geo_ascent.get_coreset(subset_size, proj_dim)
 
