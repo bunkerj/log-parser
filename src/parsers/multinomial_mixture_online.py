@@ -4,7 +4,7 @@ from copy import deepcopy
 from scipy.optimize import root_scalar
 from src.utils import get_vocabulary_indices, get_token_counts, \
     get_responsibilities
-from global_utils import multi, get_top_k_args
+from global_utils import multi, get_top_k_args, get_multi_values
 from src.parsers.base.log_parser_online import LogParserOnline
 from global_constants import MAX_NEG_VALUE, CANNOT_LINK, ZERO_THRESHOLD, \
     MUST_LINK
@@ -250,9 +250,8 @@ class MultinomialMixtureOnline(LogParserOnline):
     def _get_classical_log_likelihood(self, token_count_list):
         likelihood = 0
         for token_counts in token_count_list:
-            sum_term = 0
-            for g in range(self.num_clusters):
-                sum_term += self.pi[g] * multi(token_counts, self.theta[g, :])
+            multi_values = get_multi_values(token_counts, self.theta)
+            sum_term = (self.pi.flatten() * multi_values).sum()
             if sum_term > 0:
                 likelihood += np.log(sum_term)
             else:
