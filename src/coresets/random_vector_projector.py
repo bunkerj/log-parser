@@ -75,7 +75,7 @@ class RandomVectorProjector:
 
     def _get_log_likelihood(self, x_n, pi, theta):
         multi_values = self._get_multi_values(theta, x_n)
-        return np.log((pi * multi_values).sum())
+        return np.log((pi * multi_values.flatten()).sum())
 
     def _get_denominator(self, multi_values, pi):
         return (pi.reshape((-1, 1)) * multi_values.sum()).sum()
