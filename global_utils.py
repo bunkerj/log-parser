@@ -30,15 +30,34 @@ def shuffle_same_order(*arrays):
     return list(zip(*c))
 
 
+def log_multi_coeff(x_flat):
+    return gammaln(x_flat.sum() + 1) - np.sum(gammaln(x_flat + 1))
+
+
+def unnorm_log_multi(x_flat, params):
+    params_flat = np.maximum(params, 0).flatten()
+    return (x_flat * np.log(params_flat)).sum()
+
+
 def log_multi(x, params):
     x_flat = x.flatten()
     params_flat = np.maximum(params, 0).flatten()
-    coeff = gammaln(x_flat.sum() + 1) - np.sum(gammaln(x_flat + 1))
-    return coeff + (x_flat * np.log(params_flat)).sum()
+    return log_multi_coeff(x_flat) + (x_flat * np.log(params_flat)).sum()
 
 
 def multi(x, params):
     return np.exp(log_multi(x, params))
+
+
+def get_multi_values(x, theta):
+    x_n_flat = x.flatten()
+    num_clusters = theta.shape[0]
+    multi_values = np.zeros(num_clusters)
+    log_coeff = log_multi_coeff(x_n_flat)
+    for g in range(num_clusters):
+        log_multi_g = log_coeff + unnorm_log_multi(x_n_flat, theta[g, :])
+        multi_values[g] = np.exp(log_multi_g)
+    return multi_values
 
 
 def get_top_k_args(arr, k):
