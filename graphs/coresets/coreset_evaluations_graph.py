@@ -31,7 +31,7 @@ for idx, data_config in enumerate(data_configs, start=1):
     results = load_results(
         'coreset_evaluations_{}_nmi_pos.p'.format(name))
     score_samples_offline = results['score_samples_offline']
-    score_samples_online = results['score_samples_offline']
+    score_samples_online = results['score_samples_online']
     score_samples_coreset = results['score_samples_coreset']
     coreset_size = results['coreset_size']
 
