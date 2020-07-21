@@ -1,3 +1,7 @@
+"""
+Compute the scores as a function of projection dimension over the specified
+datasets.
+"""
 from global_utils import dump_results
 from src.data_config import DataConfigs
 from exp.coresets.utils import run_coreset_exp
