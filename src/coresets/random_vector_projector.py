@@ -1,7 +1,6 @@
 import numpy as np
 from math import sqrt
-
-from global_utils import multi
+from global_utils import get_multi_values
 
 
 class RandomVectorProjector:
@@ -60,7 +59,7 @@ class RandomVectorProjector:
 
     def _get_log_likelihood_derivative(self, x_n, pi, theta, d):
         if d < self.num_clusters:
-            multi_values = self._get_multi_values(theta, x_n)
+            multi_values = get_multi_values(x_n, theta)
             denom = self._get_denominator(multi_values, pi)
             return multi_values[d] / denom
         else:
@@ -69,19 +68,13 @@ class RandomVectorProjector:
             v = idx - (idx // self.num_clusters) * self.num_clusters
             if x_n[v] == 0:
                 return 0.0
-            multi_values = self._get_multi_values(theta, x_n)
+            multi_values = get_multi_values(x_n, theta)
             denom = self._get_denominator(multi_values, pi)
             return pi[g] * multi_values[g] * x_n[v] / (theta[g, v] * denom)
 
     def _get_log_likelihood(self, x_n, pi, theta):
-        multi_values = self._get_multi_values(theta, x_n)
-        return np.log((pi * multi_values.flatten()).sum())
+        multi_values = get_multi_values(x_n, theta)
+        return np.log((pi * multi_values).sum())
 
     def _get_denominator(self, multi_values, pi):
-        return (pi.reshape((-1, 1)) * multi_values.sum()).sum()
-
-    def _get_multi_values(self, theta, x_n):
-        multi_values = np.zeros((self.num_clusters, 1))
-        for g in range(self.num_clusters):
-            multi_values[g] = multi(x_n, theta[g, :])
-        return multi_values
+        return (pi * multi_values).sum()
