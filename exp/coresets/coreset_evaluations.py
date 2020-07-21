@@ -21,7 +21,9 @@ def run_coreset_evaluations(proj_dim, subset_size, n_samples, data_config):
     evaluator = Evaluator(true_assignments)
     num_true_clusters = get_num_true_clusters(true_assignments)
 
-    mmo_pos_init = MultinomialMixtureOnline(tokenized_logs, num_true_clusters,
+    mmo_pos_init = MultinomialMixtureOnline(tokenized_logs,
+                                            num_true_clusters,
+                                            is_classification=False,
                                             alpha=1.05,
                                             beta=1.05)
     mmo_pos_init.perform_online_batch_em(tokenized_logs)
@@ -39,7 +41,9 @@ def run_coreset_evaluations(proj_dim, subset_size, n_samples, data_config):
     score_samples_coreset = []
     score_samples_online = []
     for _ in range(n_samples):
-        mmo = MultinomialMixtureOnline(tokenized_logs, num_true_clusters,
+        mmo = MultinomialMixtureOnline(tokenized_logs,
+                                       num_true_clusters,
+                                       is_classification=False,
                                        alpha=1.05,
                                        beta=1.05)
         mmo_coreset = deepcopy(mmo)
