@@ -76,7 +76,7 @@ def run_coreset_evaluations(proj_dim, subset_size, n_samples, data_config):
 if __name__ == '__main__':
     proj_dim = 500
     subset_size = 50
-    n_samples = 25
+    n_samples = 100
 
     data_configs = [
         DataConfigs.Android,
@@ -87,14 +87,6 @@ if __name__ == '__main__':
         DataConfigs.HealthApp,
         DataConfigs.HPC,
         DataConfigs.Linux,
-        # DataConfigs.Mac,
-        # DataConfigs.OpenSSH,
-        # DataConfigs.OpenStack,
-        # DataConfigs.Proxifier,
-        # DataConfigs.Spark,
-        # DataConfigs.Thunderbird,
-        # DataConfigs.Windows,
-        # DataConfigs.Zookeeper,
     ]
 
     for data_config in data_configs:
