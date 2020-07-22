@@ -4,7 +4,7 @@ datasets.
 """
 from global_utils import dump_results
 from src.data_config import DataConfigs
-from exp.coresets.utils import run_coreset_exp
+from exp.coresets.utils import run_coreset_exp_mp
 
 if __name__ == '__main__':
     data_configs = [
@@ -21,12 +21,13 @@ if __name__ == '__main__':
     results = {}
     for data_config in data_configs:
         name = data_config['name'].lower()
+        print(name)
         results[name] = {}
         for dim in range(10, 600, 50):
-            results[name][dim] = run_coreset_exp(proj_dim=dim,
-                                                 subset_size=50,
-                                                 n_samples=25,
-                                                 data_config=data_config)
+            results[name][dim] = run_coreset_exp_mp(proj_dim=dim,
+                                                    subset_size=50,
+                                                    n_samples=100,
+                                                    data_config=data_config)
 
     filename = 'coreset_performance_vs_dim.p'
     dump_results(filename, results)
