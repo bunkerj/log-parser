@@ -13,14 +13,6 @@ data_configs = [
     DataConfigs.HealthApp,
     DataConfigs.HPC,
     DataConfigs.Linux,
-    # DataConfigs.Mac,
-    # DataConfigs.OpenSSH,
-    # DataConfigs.OpenStack,
-    # DataConfigs.Proxifier,
-    # DataConfigs.Spark,
-    # DataConfigs.Thunderbird,
-    # DataConfigs.Windows,
-    # DataConfigs.Zookeeper,
 ]
 
 labels = []
@@ -37,9 +29,9 @@ for idx, data_config in enumerate(data_configs, start=1):
 
     plt.title('{} ($n_c={}$)'.format(name, coreset_size))
     plt.boxplot([score_samples_offline,
-                 score_samples_online,
-                 score_samples_coreset],
-                labels=['offline', 'online', 'coreset'])
+                 score_samples_coreset,
+                 score_samples_online],
+                labels=['offline', 'coreset', 'online'])
     plt.grid()
 
 plt.show()
