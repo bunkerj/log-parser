@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from src.data_config import DataConfigs
+from src.helpers.data_manager import DataManager
+
 
 def plot_dataset_comparison_graph(title, benchmark_accuracies,
                                   final_best_accuracies, annotate=True):
@@ -73,3 +76,37 @@ def plot_mean_with_ci(t, mu1, mu2, s1, s2):
     plt.fill_between(t, mu2 + 2 * s2, mu2 - 2 * s2, facecolor='green',
                      alpha=0.5)
     plt.grid()
+
+
+def get_num_unique_log_mapping():
+    data_configs = [
+        DataConfigs.Android,
+        DataConfigs.Apache,
+        DataConfigs.BGL,
+        DataConfigs.Hadoop,
+        DataConfigs.HDFS,
+        DataConfigs.HealthApp,
+        DataConfigs.HPC,
+        DataConfigs.Linux,
+        DataConfigs.Mac,
+        DataConfigs.OpenSSH,
+        DataConfigs.OpenStack,
+        DataConfigs.Proxifier,
+        DataConfigs.Spark,
+        DataConfigs.Thunderbird,
+        DataConfigs.Windows,
+        DataConfigs.Zookeeper,
+    ]
+
+    num_unique_log_mapping = {}
+    for data_config in data_configs:
+        name = data_config['name'].lower()
+        data_manager = DataManager(data_config)
+        tokenized_logs = data_manager.get_tokenized_logs()
+        unique_log_set = set()
+        for log in tokenized_logs:
+            log_str = ' '.join(log)
+            unique_log_set.add(log_str)
+            num_unique_log_mapping[name] = len(unique_log_set)
+
+    return num_unique_log_mapping
