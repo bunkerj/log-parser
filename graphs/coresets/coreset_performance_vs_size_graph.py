@@ -22,7 +22,9 @@ for idx, name in enumerate(results, start=1):
     plt.title(name)
     plt.plot(coreset_upper_bound, mean_scores_online)
     plt.plot(coreset_upper_bound, mean_scores_coreset)
-    plt.legend(['Mean Impurity Online', 'Mean Impurity Coreset'])
     plt.grid()
+
+    if idx == (SUBPLOT_DIM[0] * SUBPLOT_DIM[1]):
+        plt.legend(['Mean Impurity Online', 'Mean Impurity Coreset'])
 
 plt.show()
