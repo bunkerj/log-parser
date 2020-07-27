@@ -25,6 +25,6 @@ for idx, name in enumerate(results, start=1):
     plt.grid()
 
     if idx == (SUBPLOT_DIM[0] * SUBPLOT_DIM[1]):
-        plt.legend(['Mean Impurity Online', 'Mean Impurity Coreset'])
+        plt.legend(['Mean NMI Online', 'Mean NMI Coreset'])
 
 plt.show()
