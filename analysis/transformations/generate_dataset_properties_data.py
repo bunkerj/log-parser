@@ -30,14 +30,14 @@ data_configs = [
     DataConfigs.HealthApp,
     DataConfigs.HPC,
     DataConfigs.Linux,
-    # DataConfigs.Mac,
-    # DataConfigs.OpenSSH,
-    # DataConfigs.OpenStack,
-    # DataConfigs.Proxifier,
-    # DataConfigs.Spark,
-    # DataConfigs.Thunderbird,
-    # DataConfigs.Windows,
-    # DataConfigs.Zookeeper,
+    DataConfigs.Mac,
+    DataConfigs.OpenSSH,
+    DataConfigs.OpenStack,
+    DataConfigs.Proxifier,
+    DataConfigs.Spark,
+    DataConfigs.Thunderbird,
+    DataConfigs.Windows,
+    DataConfigs.Zookeeper,
 ]
 
 data = {

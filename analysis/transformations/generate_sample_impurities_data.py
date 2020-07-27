@@ -21,14 +21,14 @@ data_configs = [
     DataConfigs.HealthApp,
     DataConfigs.HPC,
     DataConfigs.Linux,
-    # DataConfigs.Mac,
-    # DataConfigs.OpenSSH,
-    # DataConfigs.OpenStack,
-    # DataConfigs.Proxifier,
-    # DataConfigs.Spark,
-    # DataConfigs.Thunderbird,
-    # DataConfigs.Windows,
-    # DataConfigs.Zookeeper,
+    DataConfigs.Mac,
+    DataConfigs.OpenSSH,
+    DataConfigs.OpenStack,
+    DataConfigs.Proxifier,
+    DataConfigs.Spark,
+    DataConfigs.Thunderbird,
+    DataConfigs.Windows,
+    DataConfigs.Zookeeper,
 ]
 
 data = {
@@ -40,7 +40,7 @@ data = {
 
 for data_config in data_configs:
     name = data_config['name']
-    results = load_results('feedback_evaluation_mp.p')
+    results = load_results('run_feedback_evaluation_mp_largescale.p')
     dataset_results = results[name]
 
     n_logs = dataset_results[N_LOGS]
