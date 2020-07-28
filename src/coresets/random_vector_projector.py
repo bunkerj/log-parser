@@ -53,7 +53,7 @@ class RandomVectorProjector:
         return [np.random.randint(D) for _ in range(J)]
 
     def _sample_parameters(self, cluster_pos, vocab_pos):
-        pi = np.random.dirichlet(cluster_pos)
+        pi = np.random.dirichlet(cluster_pos.flatten())
         theta = np.vstack([np.random.dirichlet(vp) for vp in vocab_pos])
         return pi, theta
 
