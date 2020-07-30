@@ -36,8 +36,8 @@ def perform_single_experiment(num_label, passed_data_config):
     lab_parser.label_logs(log_labels, logs)
     labeled_indices = lab_parser.labeled_indices
 
-    lab_parser.perform_online_batch_em(log_labels)
-    unlab_parser.perform_online_batch_em(log_labels)
+    lab_parser.perform_online_batch_em(logs)
+    unlab_parser.perform_online_batch_em(logs)
 
     lab_clusters = lab_parser.get_clusters(logs)
     unlab_clusters = unlab_parser.get_clusters(logs)
