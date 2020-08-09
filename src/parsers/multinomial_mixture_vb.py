@@ -19,8 +19,11 @@ class MultinomialMixtureVB(LogParser):
         self.ex_ln_theta = np.zeros((self.G, self.V))
         self.n_iter = n_iter
         self.cluster_templates = {}
-        self.alpha = 1 / self.G
-        self.beta = 1 / self.V
+        self.alpha_0 = 1 / self.G
+        self.beta_0 = 1 / self.V
+        self.alpha = self.alpha_0 + np.zeros(self.G)
+        self.beta = self.beta_0 + np.zeros((self.G, self.V))
+        self.labeled_indices = []
 
     def parse(self):
         self._initialize_procedure()
@@ -28,6 +31,20 @@ class MultinomialMixtureVB(LogParser):
             self._variational_e_step()
             self._variational_m_step()
         self._update_clusters()
+
+    def label_logs(self, log_labels):
+        """
+        log_labels: dictionary where each key is a true cluster and the values
+                    are log indices.
+        tokenized_logs: list of tokenized logs where the log_labels keys are a
+                        subset.
+        """
+        for g, log_indices in enumerate(log_labels.values()):
+            for log_idx in log_indices:
+                x = self.C[log_idx]
+                self.alpha[g] += 1
+                self.beta[g, :] += x
+                self.labeled_indices.append(log_idx)
 
     def _update_clusters(self):
         cluster_templates = {}
@@ -55,13 +72,13 @@ class MultinomialMixtureVB(LogParser):
         self.ex_ln_pi = self._get_ex_ln(self.pi_v)
         for g in range(self.G):
             r_g = self.R[:, g][:, np.newaxis]
-            self.theta_v[g, :] = (self.C * r_g).sum(axis=0) + self.beta
+            self.theta_v[g, :] = (self.C * r_g).sum(axis=0) + self.beta[g]
             self.ex_ln_theta[g] = self._get_ex_ln(self.theta_v[g, :])
 
     def _get_ex_ln(self, params):
         return digamma(params) - digamma(params.sum())
 
     def _initialize_responsibilities(self):
-        dir_params = self.alpha * np.ones(self.G)
+        dir_params = self.alpha_0 * np.ones(self.G)
         for n in range(self.N):
             self.R[n, :] = np.random.dirichlet(dir_params)
