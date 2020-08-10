@@ -29,9 +29,9 @@ class MultinomialMixtureVB(LogParser):
         self.labeled_indices = []
         self.W = defaultdict(dict)
         self.prev_ll = None
+        self._initialize_parameters()
 
     def parse(self):
-        self._initialize_procedure()
         while self._should_continue():
             self._variational_e_step()
             self._variational_m_step()
@@ -85,7 +85,7 @@ class MultinomialMixtureVB(LogParser):
             cluster_templates[max_g].append(n)
         self.cluster_templates = cluster_templates
 
-    def _initialize_procedure(self):
+    def _initialize_parameters(self):
         self._initialize_responsibilities()
         self._variational_m_step()
 
