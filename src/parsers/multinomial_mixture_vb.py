@@ -32,6 +32,7 @@ class MultinomialMixtureVB(LogParser):
         self._initialize_parameters()
 
     def parse(self):
+        self.prev_ll = None
         while self._should_continue():
             self._variational_e_step()
             self._variational_m_step()
@@ -51,7 +52,7 @@ class MultinomialMixtureVB(LogParser):
             for log_idx in log_indices:
                 x = self.C[log_idx]
                 self.alpha[g] += 1
-                self.beta[g, :] += x
+                self.beta[g] += x
                 self.labeled_indices.append(log_idx)
 
     def _should_continue(self):
@@ -69,8 +70,8 @@ class MultinomialMixtureVB(LogParser):
         """
         log_likelihood = 0
         for n in range(self.N):
-            x_n = self.C[n, :]
-            g = self.R[n, :].argmax()
+            x_n = self.C[n]
+            g = self.R[n].argmax()
             pi_g = self.ex_ln_pi[g]
             theta_g = np.exp(self.ex_ln_theta[g])
             log_likelihood += (pi_g + log_multi(x_n, theta_g))
@@ -79,7 +80,7 @@ class MultinomialMixtureVB(LogParser):
     def _update_clusters(self):
         cluster_templates = {}
         for n in range(self.N):
-            max_g = self.R[n, :].argmax()
+            max_g = self.R[n].argmax()
             if max_g not in cluster_templates:
                 cluster_templates[max_g] = []
             cluster_templates[max_g].append(n)
@@ -93,20 +94,23 @@ class MultinomialMixtureVB(LogParser):
         for g in range(self.G):
             ex_ln_pi_g = self.ex_ln_pi[g]
             ex_ln_theta_g = self.ex_ln_theta[g][np.newaxis, :]
-            weight_term = self._get_weight_term(g)
+            weight_term_g = self._get_weight_term(g)
             self.R[:, g] = (self.C * ex_ln_theta_g).sum(
-                axis=1) + ex_ln_pi_g + weight_term
-        self.R -= self.R.max(axis=1)[:, np.newaxis]
-        self.R = np.exp(self.R)
-        self.R /= self.R.sum(axis=1)[:, np.newaxis]
+                axis=1) + ex_ln_pi_g + weight_term_g
+        self._norm_reponsibilities()
 
     def _variational_m_step(self):
         self.pi_v = self.R.sum(axis=0) + self.alpha
         self.ex_ln_pi = self._get_ex_ln(self.pi_v)
         for g in range(self.G):
             r_g = self.R[:, g][:, np.newaxis]
-            self.theta_v[g, :] = (self.C * r_g).sum(axis=0) + self.beta[g]
-            self.ex_ln_theta[g] = self._get_ex_ln(self.theta_v[g, :])
+            self.theta_v[g] = (self.C * r_g).sum(axis=0) + self.beta[g]
+            self.ex_ln_theta[g] = self._get_ex_ln(self.theta_v[g])
+
+    def _norm_reponsibilities(self):
+        self.R -= self.R.max(axis=1)[:, np.newaxis]
+        self.R = np.exp(self.R)
+        self.R /= self.R.sum(axis=1)[:, np.newaxis]
 
     def _get_ex_ln(self, params):
         return digamma(params) - digamma(params.sum())
@@ -114,7 +118,7 @@ class MultinomialMixtureVB(LogParser):
     def _initialize_responsibilities(self):
         dir_params = self.alpha_0 * np.ones(self.G)
         for n in range(self.N):
-            self.R[n, :] = np.random.dirichlet(dir_params)
+            self.R[n] = np.random.dirichlet(dir_params)
 
     def _get_weight_term(self, g):
         weight_term = np.zeros(self.N)
