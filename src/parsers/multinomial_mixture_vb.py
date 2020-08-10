@@ -1,4 +1,5 @@
 import numpy as np
+from collections import defaultdict
 from scipy.special import digamma
 from src.parsers.base.log_parser import LogParser
 from src.utils import get_token_counts_batch, get_vocabulary_indices
@@ -24,6 +25,7 @@ class MultinomialMixtureVB(LogParser):
         self.alpha = self.alpha_0 + np.zeros(self.G)
         self.beta = self.beta_0 + np.zeros((self.G, self.V))
         self.labeled_indices = []
+        self.W = defaultdict(dict)
 
     def parse(self):
         self._initialize_procedure()
@@ -31,6 +33,9 @@ class MultinomialMixtureVB(LogParser):
             self._variational_e_step()
             self._variational_m_step()
         self._update_clusters()
+
+    def provide_constraints(self, W):
+        self.W = W
 
     def label_logs(self, log_labels):
         """
@@ -63,7 +68,10 @@ class MultinomialMixtureVB(LogParser):
         for g in range(self.G):
             ex_ln_pi_g = self.ex_ln_pi[g]
             ex_ln_theta_g = self.ex_ln_theta[g, :][np.newaxis, :]
-            self.R[:, g] = (self.C * ex_ln_theta_g).sum(axis=1) + ex_ln_pi_g
+            weight_term = self._get_weight_term(g)
+            self.R[:, g] = (self.C * ex_ln_theta_g).sum(
+                axis=1) + ex_ln_pi_g + weight_term
+        self.R -= self.R.max(axis=1)[:, np.newaxis]
         self.R = np.exp(self.R)
         self.R /= self.R.sum(axis=1)[:, np.newaxis]
 
@@ -82,3 +90,10 @@ class MultinomialMixtureVB(LogParser):
         dir_params = self.alpha_0 * np.ones(self.G)
         for n in range(self.N):
             self.R[n, :] = np.random.dirichlet(dir_params)
+
+    def _get_weight_term(self, g):
+        weight_term = np.zeros(self.N)
+        for n in self.W:
+            for m in self.W[n]:
+                weight_term[n] += self.W[n][m] * self.R[m, g]
+        return weight_term

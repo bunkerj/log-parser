@@ -10,20 +10,44 @@ class Oracle:
         self.true_references = []
 
     def get_constraints(self, parsed_clusters, n_constraint_samples,
-                        tokenized_logs):
+                        tokenized_logs, return_ids=False):
+        """
+        Return constraints based on current parsed clustering.
+        """
         split_parsed_clusters = self._get_split_clusters(parsed_clusters, True)
         split_true_clusters = self._get_split_clusters(parsed_clusters, False)
 
         cannot_link = self._get_links(split_parsed_clusters,
                                       n_constraint_samples,
-                                      tokenized_logs)
+                                      tokenized_logs,
+                                      return_ids)
         must_link = self._get_links(split_true_clusters,
                                     n_constraint_samples,
-                                    tokenized_logs)
+                                    tokenized_logs,
+                                    return_ids)
 
         return {CANNOT_LINK: cannot_link, MUST_LINK: must_link}
 
-    def _get_links(self, split_clusters, n_constraint_samples, tokenized_logs):
+    def get_constraints_matrix(self, parsed_clusters, n_constraint_samples,
+                               tokenized_logs, weight):
+        W = defaultdict(dict)
+        constraints = self.get_constraints(parsed_clusters,
+                                           n_constraint_samples,
+                                           tokenized_logs,
+                                           True)
+
+        for idx1, idx2 in constraints[CANNOT_LINK]:
+            W[idx1][idx2] = -weight
+            W[idx2][idx1] = -weight
+
+        for idx1, idx2 in constraints[MUST_LINK]:
+            W[idx1][idx2] = weight
+            W[idx2][idx1] = weight
+
+        return W
+
+    def _get_links(self, split_clusters, n_constraint_samples, tokenized_logs,
+                   return_ids):
         """
         Return constraints as a list of tuples where each
         tuple represents two logs that either should (true clusters split into
@@ -48,8 +72,12 @@ class Oracle:
 
             sampled_maj_idx = sample(first_indices, 1)[0]
             sampled_min_idx = sample(second_indices, 1)[0]
-            constraints.append((tokenized_logs[sampled_maj_idx],
-                                tokenized_logs[sampled_min_idx]))
+
+            if return_ids:
+                constraints.append((sampled_maj_idx, sampled_min_idx))
+            else:
+                constraints.append((tokenized_logs[sampled_maj_idx],
+                                    tokenized_logs[sampled_min_idx]))
 
         return constraints
 
