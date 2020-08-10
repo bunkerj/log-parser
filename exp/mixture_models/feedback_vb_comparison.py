@@ -50,7 +50,7 @@ def run_feedback_vb_comparison(n_label, n_constraints, n_samples, data_config):
             parsed_clusters=parser_lab.cluster_templates,
             n_constraint_samples=n_constraints,
             tokenized_logs=tokenized_logs,
-            weight=1000)
+            weight=999999)
         parser_lab_const.provide_constraints(W)
         parser_lab_const.parse()
 
