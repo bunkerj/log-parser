@@ -40,18 +40,18 @@ def run_feedback_vb_comparison(n_label, n_constraints, n_samples, data_config):
         parser_lab = deepcopy(parser)
         log_labels = get_log_labels(true_assignments, n_label)
         parser_lab.label_logs(log_labels)
-        labeled_indices = parser.labeled_indices
+        labeled_indices = parser_lab.labeled_indices
+
+        parser.parse()
+        parser_lab.parse()
 
         parser_lab_const = deepcopy(parser_lab)
         W = oracle.get_constraints_matrix(
-            parsed_clusters=parser.cluster_templates,
+            parsed_clusters=parser_lab.cluster_templates,
             n_constraint_samples=n_constraints,
             tokenized_logs=tokenized_logs,
             weight=1000)
         parser_lab_const.provide_constraints(W)
-
-        parser.parse()
-        parser_lab.parse()
         parser_lab_const.parse()
 
         c = parser.cluster_templates
