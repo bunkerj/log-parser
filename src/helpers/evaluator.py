@@ -1,5 +1,5 @@
 import math
-from sklearn.metrics import normalized_mutual_info_score
+from sklearn.metrics import adjusted_mutual_info_score
 
 
 class TemplateEvaluation:
@@ -62,7 +62,7 @@ class Evaluator:
     def get_nmi(self, parsed_clusters):
         true_references = [a[-2] for a in self.true_assignments]
         parsed_references = self._get_parsed_references(parsed_clusters)
-        return normalized_mutual_info_score(true_references, parsed_references)
+        return adjusted_mutual_info_score(true_references, parsed_references)
 
     def get_type1_error_ratio(self):
         """
