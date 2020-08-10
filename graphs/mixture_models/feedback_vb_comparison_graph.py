@@ -33,7 +33,6 @@ for idx, data_config in enumerate(data_configs, start=1):
     plt.title(name)
     plt.bar(['Base', 'Lab', 'Lab + Const'],
             [mean_score, mean_score_lab, mean_score_lab_cont])
-    plt.ylabel('Score')
     plt.grid()
 
 plt.show()
