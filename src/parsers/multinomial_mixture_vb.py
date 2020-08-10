@@ -1,13 +1,16 @@
 import numpy as np
 from collections import defaultdict
 from scipy.special import digamma
+
+from global_utils import log_multi
 from src.parsers.base.log_parser import LogParser
 from src.utils import get_token_counts_batch, get_vocabulary_indices
 
 
 class MultinomialMixtureVB(LogParser):
-    def __init__(self, tokenized_logs, num_clusters, n_iter=20):
+    def __init__(self, tokenized_logs, num_clusters, epsilon=0.01):
         super().__init__(tokenized_logs)
+        self.epsilon = epsilon
         self.v_indices = get_vocabulary_indices(tokenized_logs)
         self.C = get_token_counts_batch(tokenized_logs, self.v_indices)
         self.G = num_clusters
@@ -18,7 +21,6 @@ class MultinomialMixtureVB(LogParser):
         self.theta_v = np.zeros((self.G, self.V))
         self.ex_ln_pi = np.zeros(self.G)
         self.ex_ln_theta = np.zeros((self.G, self.V))
-        self.n_iter = n_iter
         self.cluster_templates = {}
         self.alpha_0 = 1 / self.G
         self.beta_0 = 1 / self.V
@@ -26,10 +28,11 @@ class MultinomialMixtureVB(LogParser):
         self.beta = self.beta_0 + np.zeros((self.G, self.V))
         self.labeled_indices = []
         self.W = defaultdict(dict)
+        self.prev_ll = None
 
     def parse(self):
         self._initialize_procedure()
-        for _ in range(self.n_iter):
+        while self._should_continue():
             self._variational_e_step()
             self._variational_m_step()
         self._update_clusters()
@@ -51,6 +54,28 @@ class MultinomialMixtureVB(LogParser):
                 self.beta[g, :] += x
                 self.labeled_indices.append(log_idx)
 
+    def _should_continue(self):
+        if self.prev_ll is None:
+            self.prev_ll = self._get_likelihood()
+            return True
+        ll = self._get_likelihood()
+        improvement = abs((ll - self.prev_ll) / self.prev_ll)
+        self.prev_ll = ll
+        return self.epsilon < improvement
+
+    def _get_likelihood(self):
+        """
+        Returns complete log-likelihood
+        """
+        log_likelihood = 0
+        for n in range(self.N):
+            x_n = self.C[n, :]
+            g = self.R[n, :].argmax()
+            pi_g = self.ex_ln_pi[g]
+            theta_g = np.exp(self.ex_ln_theta[g])
+            log_likelihood += (pi_g + log_multi(x_n, theta_g))
+        return log_likelihood
+
     def _update_clusters(self):
         cluster_templates = {}
         for n in range(self.N):
@@ -67,7 +92,7 @@ class MultinomialMixtureVB(LogParser):
     def _variational_e_step(self):
         for g in range(self.G):
             ex_ln_pi_g = self.ex_ln_pi[g]
-            ex_ln_theta_g = self.ex_ln_theta[g, :][np.newaxis, :]
+            ex_ln_theta_g = self.ex_ln_theta[g][np.newaxis, :]
             weight_term = self._get_weight_term(g)
             self.R[:, g] = (self.C * ex_ln_theta_g).sum(
                 axis=1) + ex_ln_pi_g + weight_term
