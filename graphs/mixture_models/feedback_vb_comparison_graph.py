@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from global_utils import load_results
-
 from src.data_config import DataConfigs
+from statistics import mean
 
 SUBPLOT_DIM = (2, 4)
 
@@ -22,14 +22,17 @@ for idx, data_config in enumerate(data_configs, start=1):
     filename = 'feedback_vb_comparison_{}.p'.format(name)
     results = load_results(filename)
 
-    reg_scores = results['regular']
-    feedback_scores = results['feedback']
+    scores = results['base']
+    scores_lab = results['labeled']
+    scores_lab_cont = results['labeled_const']
 
-    reg_score_mean = sum(reg_scores) / len(reg_scores)
-    feedback_score_mean = sum(feedback_scores) / len(feedback_scores)
+    mean_score = mean(scores)
+    mean_score_lab = mean(scores_lab)
+    mean_score_lab_cont = mean(scores_lab_cont)
 
     plt.title(name)
-    plt.bar(['Regular', 'Feedback'], [reg_score_mean, feedback_score_mean])
+    plt.bar(['Base', 'Lab', 'Lab + Const'],
+            [mean_score, mean_score_lab, mean_score_lab_cont])
     plt.ylabel('Score')
     plt.grid()
 
