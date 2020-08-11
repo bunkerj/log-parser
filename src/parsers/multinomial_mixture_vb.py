@@ -8,7 +8,7 @@ from src.utils import get_token_counts_batch, get_vocabulary_indices
 
 
 class MultinomialMixtureVB(LogParser):
-    def __init__(self, tokenized_logs, num_clusters, epsilon=0.01):
+    def __init__(self, tokenized_logs, num_clusters, epsilon=0.01, max_iter=25):
         super().__init__(tokenized_logs)
         self.epsilon = epsilon
         self.v_indices = get_vocabulary_indices(tokenized_logs)
@@ -29,9 +29,12 @@ class MultinomialMixtureVB(LogParser):
         self.labeled_indices = []
         self.W = defaultdict(dict)
         self.prev_ll = None
+        self.iter = 0
+        self.max_iter = max_iter
         self._initialize_parameters()
 
     def parse(self):
+        self.iter = 0
         self.prev_ll = None
         while self._should_continue():
             self._variational_e_step()
@@ -56,12 +59,19 @@ class MultinomialMixtureVB(LogParser):
                 self.labeled_indices.append(log_idx)
 
     def _should_continue(self):
-        if self.prev_ll is None:
+        """
+        Check if another VB iteration should be performed.
+        Update self.prev_ll and self.iter variables.
+        """
+        if self.iter > self.max_iter:
+            return False
+        elif self.prev_ll is None:
             self.prev_ll = self._get_likelihood()
             return True
         ll = self._get_likelihood()
         improvement = abs((ll - self.prev_ll) / self.prev_ll)
         self.prev_ll = ll
+        self.iter += 1
         return self.epsilon < improvement
 
     def _get_likelihood(self):
