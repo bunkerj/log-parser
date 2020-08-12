@@ -85,7 +85,16 @@ class MultinomialMixtureVB(LogParser):
         joint_term += (self.R @ self.ex_ln_pi.reshape(-1, 1)).sum()
         joint_term += ((self.alpha - 1) * self.ex_ln_pi).sum()
         joint_term += ((self.beta - 1) * self.ex_ln_theta).sum()
+        joint_term += self._get_weight_penalty_term()
         return joint_term
+
+    def _get_weight_penalty_term(self):
+        penalty_term = 0
+        for n in self.W:
+            for m in self.W[n]:
+                r = sum([self.R[n, g] * self.R[m, g] for g in range(self.G)])
+                penalty_term += r * self.W[n][m]
+        return penalty_term
 
     def _get_elbo_entropy_term(self):
         entropy_term = 0
@@ -111,11 +120,10 @@ class MultinomialMixtureVB(LogParser):
 
     def _variational_e_step(self):
         for g in range(self.G):
-            ex_ln_pi_g = self.ex_ln_pi[g]
             ex_ln_theta_g = self.ex_ln_theta[g].reshape(1, -1)
+            theta_term = (self.C * ex_ln_theta_g).sum(axis=1)
             weight_term_g = self._get_weight_term(g)
-            self.R[:, g] = (self.C * ex_ln_theta_g).sum(
-                axis=1) + ex_ln_pi_g + weight_term_g
+            self.R[:, g] = theta_term + self.ex_ln_pi[g] + weight_term_g
         self._norm_reponsibilities()
 
     def _variational_m_step(self):
