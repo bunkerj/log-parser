@@ -81,29 +81,19 @@ class MultinomialMixtureVB(LogParser):
 
     def _get_elbo_joint_term(self):
         joint_term = 0
-
-        # TODO: see if there's a way to vectorize this more efficiently.
-        for n in range(self.N):
-            x_n = self.C[n].reshape(1, -1)
-            for g in range(self.G):
-                ex_ln_theta_g = self.ex_ln_theta[g].reshape(-1, 1)
-                joint_term += self.R[n][g] * float(x_n @ ex_ln_theta_g)
-
+        joint_term += (self.C @ self.ex_ln_theta.T * self.R).sum()
         joint_term += (self.R @ self.ex_ln_pi.reshape(-1, 1)).sum()
         joint_term += ((self.alpha - 1) * self.ex_ln_pi).sum()
         joint_term += ((self.beta - 1) * self.ex_ln_theta).sum()
-
         return joint_term
 
     def _get_elbo_entropy_term(self):
         entropy_term = 0
-
         entropy_term += (xlogy(self.R, self.R)).sum()
         entropy_term += ((self.pi_v - 1) * self.ex_ln_pi).sum()
         entropy_term -= log_multi_beta(self.pi_v)
         entropy_term += ((self.theta_v - 1) * self.ex_ln_theta).sum()
         entropy_term -= log_multi_beta(self.theta_v).sum()
-
         return entropy_term
 
     def _update_clusters(self):
