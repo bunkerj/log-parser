@@ -60,6 +60,11 @@ def get_multi_values(x, theta):
     return multi_values
 
 
+def log_multi_beta(alpha):
+    sum_axis = alpha.ndim - 1
+    return gammaln(alpha).sum(axis=sum_axis) - gammaln(alpha.sum(axis=sum_axis))
+
+
 def get_top_k_args(arr, k):
     return arr.flatten().argsort()[-k:][::-1]
 

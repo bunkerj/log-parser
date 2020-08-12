@@ -1,14 +1,14 @@
 import numpy as np
 from collections import defaultdict
-from scipy.special import digamma
-
-from global_utils import log_multi
+from scipy.special import digamma, xlogy
+from global_utils import log_multi_beta
 from src.parsers.base.log_parser import LogParser
 from src.utils import get_token_counts_batch, get_vocabulary_indices
 
 
 class MultinomialMixtureVB(LogParser):
-    def __init__(self, tokenized_logs, num_clusters, epsilon=0.01, max_iter=25):
+    def __init__(self, tokenized_logs, num_clusters,
+                 epsilon=0.0001, max_iter=25):
         super().__init__(tokenized_logs)
         self.epsilon = epsilon
         self.v_indices = get_vocabulary_indices(tokenized_logs)
@@ -28,14 +28,14 @@ class MultinomialMixtureVB(LogParser):
         self.beta = self.beta_0 + np.zeros((self.G, self.V))
         self.labeled_indices = []
         self.W = defaultdict(dict)
-        self.prev_ll = None
+        self.prev_elbo = None
         self.iter = 0
         self.max_iter = max_iter
         self._initialize_parameters()
 
     def parse(self):
         self.iter = 0
-        self.prev_ll = None
+        self.prev_elbo = None
         while self._should_continue():
             self._variational_e_step()
             self._variational_m_step()
@@ -65,27 +65,46 @@ class MultinomialMixtureVB(LogParser):
         """
         if self.iter > self.max_iter:
             return False
-        elif self.prev_ll is None:
-            self.prev_ll = self._get_likelihood()
+        elif self.prev_elbo is None:
+            self.prev_elbo = self._get_elbo()
             return True
-        ll = self._get_likelihood()
-        improvement = abs((ll - self.prev_ll) / self.prev_ll)
-        self.prev_ll = ll
+        elbo = self._get_elbo()
+        improvement = abs((elbo - self.prev_elbo) / self.prev_elbo)
+        if self.prev_elbo is not None:
+            print(elbo - self.prev_elbo)
+        self.prev_elbo = elbo
         self.iter += 1
         return self.epsilon < improvement
 
-    def _get_likelihood(self):
-        """
-        Returns complete log-likelihood
-        """
-        log_likelihood = 0
+    def _get_elbo(self):
+        return self._get_elbo_joint_term() - self._get_elbo_entropy_term()
+
+    def _get_elbo_joint_term(self):
+        joint_term = 0
+
+        # TODO: see if there's a way to vectorize this more efficiently.
         for n in range(self.N):
-            x_n = self.C[n]
-            g = self.R[n].argmax()
-            pi_g = self.ex_ln_pi[g]
-            theta_g = np.exp(self.ex_ln_theta[g])
-            log_likelihood += (pi_g + log_multi(x_n, theta_g))
-        return log_likelihood
+            x_n = self.C[n].reshape(1, -1)
+            for g in range(self.G):
+                ex_ln_theta_g = self.ex_ln_theta[g].reshape(-1, 1)
+                joint_term += self.R[n][g] * float(x_n @ ex_ln_theta_g)
+
+        joint_term += (self.R @ self.ex_ln_pi.reshape(-1, 1)).sum()
+        joint_term += ((self.alpha - 1) * self.ex_ln_pi).sum()
+        joint_term += ((self.beta - 1) * self.ex_ln_theta).sum()
+
+        return joint_term
+
+    def _get_elbo_entropy_term(self):
+        entropy_term = 0
+
+        entropy_term += (xlogy(self.R, self.R)).sum()
+        entropy_term += ((self.pi_v - 1) * self.ex_ln_pi).sum()
+        entropy_term -= log_multi_beta(self.pi_v)
+        entropy_term += ((self.theta_v - 1) * self.ex_ln_theta).sum()
+        entropy_term -= log_multi_beta(self.theta_v).sum()
+
+        return entropy_term
 
     def _update_clusters(self):
         cluster_templates = {}
@@ -103,7 +122,7 @@ class MultinomialMixtureVB(LogParser):
     def _variational_e_step(self):
         for g in range(self.G):
             ex_ln_pi_g = self.ex_ln_pi[g]
-            ex_ln_theta_g = self.ex_ln_theta[g][np.newaxis, :]
+            ex_ln_theta_g = self.ex_ln_theta[g].reshape(1, -1)
             weight_term_g = self._get_weight_term(g)
             self.R[:, g] = (self.C * ex_ln_theta_g).sum(
                 axis=1) + ex_ln_pi_g + weight_term_g
@@ -113,14 +132,14 @@ class MultinomialMixtureVB(LogParser):
         self.pi_v = self.R.sum(axis=0) + self.alpha
         self.ex_ln_pi = self._get_ex_ln(self.pi_v)
         for g in range(self.G):
-            r_g = self.R[:, g][:, np.newaxis]
+            r_g = self.R[:, g].reshape(-1, 1)
             self.theta_v[g] = (self.C * r_g).sum(axis=0) + self.beta[g]
             self.ex_ln_theta[g] = self._get_ex_ln(self.theta_v[g])
 
     def _norm_reponsibilities(self):
-        self.R -= self.R.max(axis=1)[:, np.newaxis]
+        self.R -= self.R.max(axis=1).reshape(-1, 1)
         self.R = np.exp(self.R)
-        self.R /= self.R.sum(axis=1)[:, np.newaxis]
+        self.R /= self.R.sum(axis=1).reshape(-1, 1)
 
     def _get_ex_ln(self, params):
         return digamma(params) - digamma(params.sum())
