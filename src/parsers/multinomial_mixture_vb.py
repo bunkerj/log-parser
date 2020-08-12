@@ -85,10 +85,10 @@ class MultinomialMixtureVB(LogParser):
         joint_term += (self.R @ self.ex_ln_pi.reshape(-1, 1)).sum()
         joint_term += ((self.alpha - 1) * self.ex_ln_pi).sum()
         joint_term += ((self.beta - 1) * self.ex_ln_theta).sum()
-        joint_term += self._get_weight_penalty_term()
+        joint_term += self._get_elbo_weight_penalty_term()
         return joint_term
 
-    def _get_weight_penalty_term(self):
+    def _get_elbo_weight_penalty_term(self):
         penalty_term = 0
         for n in self.W:
             for m in self.W[n]:
@@ -119,37 +119,35 @@ class MultinomialMixtureVB(LogParser):
         self._variational_m_step()
 
     def _variational_e_step(self):
-        for g in range(self.G):
-            ex_ln_theta_g = self.ex_ln_theta[g].reshape(1, -1)
-            theta_term = (self.C * ex_ln_theta_g).sum(axis=1)
-            weight_term_g = self._get_weight_term(g)
-            self.R[:, g] = theta_term + self.ex_ln_pi[g] + weight_term_g
-        self._norm_reponsibilities()
+        self.R = self._get_weight_penalty(self.R)
+        self.R += self.C @ self.ex_ln_theta.T
+        self.R += self.ex_ln_pi.reshape(1, -1)
+        self._norm_responsibilities()
 
     def _variational_m_step(self):
         self.pi_v = self.R.sum(axis=0) + self.alpha
         self.ex_ln_pi = self._get_ex_ln(self.pi_v)
-        for g in range(self.G):
-            r_g = self.R[:, g].reshape(-1, 1)
-            self.theta_v[g] = (self.C * r_g).sum(axis=0) + self.beta[g]
-            self.ex_ln_theta[g] = self._get_ex_ln(self.theta_v[g])
+        self.theta_v = (self.R.T @ self.C) + self.beta
+        self.ex_ln_theta = self._get_ex_ln(self.theta_v)
 
-    def _norm_reponsibilities(self):
+    def _get_weight_penalty(self, R):
+        W_p = np.zeros(R.shape)
+        for n in self.W:
+            for g in range(self.G):
+                W_p[n, g] += sum(self.W[n][m] * R[m, g] for m in self.W[n])
+        return W_p
+
+    def _norm_responsibilities(self):
         self.R -= self.R.max(axis=1).reshape(-1, 1)
         self.R = np.exp(self.R)
         self.R /= self.R.sum(axis=1).reshape(-1, 1)
 
     def _get_ex_ln(self, params):
-        return digamma(params) - digamma(params.sum())
+        axis = params.ndim - 1
+        params_sum = params.sum(axis=axis, keepdims=True)
+        return digamma(params) - digamma(params_sum)
 
     def _initialize_responsibilities(self):
         dir_params = self.alpha_0 * np.ones(self.G)
         for n in range(self.N):
             self.R[n] = np.random.dirichlet(dir_params)
-
-    def _get_weight_term(self, g):
-        weight_term = np.zeros(self.N)
-        for n in self.W:
-            for m in self.W[n]:
-                weight_term[n] += self.W[n][m] * self.R[m, g]
-        return weight_term
