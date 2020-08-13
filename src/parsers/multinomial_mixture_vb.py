@@ -69,9 +69,7 @@ class MultinomialMixtureVB(LogParser):
             self.prev_elbo = self._get_elbo()
             return True
         elbo = self._get_elbo()
-        improvement = abs((elbo - self.prev_elbo) / self.prev_elbo)
-        if self.prev_elbo is not None:
-            print(elbo - self.prev_elbo)
+        improvement = (elbo - self.prev_elbo) / self.prev_elbo
         self.prev_elbo = elbo
         self.iter += 1
         return self.epsilon < improvement
