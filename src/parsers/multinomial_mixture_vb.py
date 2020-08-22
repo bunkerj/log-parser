@@ -1,15 +1,102 @@
 import numpy as np
 from collections import defaultdict
 from scipy.special import digamma, xlogy
-from global_utils import log_multi_beta
-from src.parsers.base.log_parser import LogParser
+from global_utils import log_multi_beta, unnorm_log_multi, multi
 from src.utils import get_token_counts_batch, get_vocabulary_indices
 
 
-class MultinomialMixtureVB(LogParser):
-    def __init__(self, tokenized_logs, num_clusters,
-                 epsilon=0.0001, max_iter=25):
-        super().__init__(tokenized_logs)
+class MultinomialMixtureVB:
+    def __init__(self):
+        self.tokenized_logs = []
+        self.epsilon = 0
+        self.v_indices = {}
+        self.C = np.array([]).reshape(-1, 1)
+        self.G = 0
+        self.N = len(self.tokenized_logs)
+        self.V = len(self.v_indices)
+        self.R = np.zeros((self.N, self.G))
+        self.pi_v = np.zeros(self.G)
+        self.theta_v = np.zeros((self.G, self.V))
+        self.ex_ln_pi = np.zeros(self.G)
+        self.ex_ln_theta = np.zeros((self.G, self.V))
+        self.alpha_0 = 1 / self.G if self.G > 0 else 0
+        self.beta_0 = 1 / self.V if self.V > 0 else 0
+        self.alpha = self.alpha_0 + np.zeros(self.G)
+        self.beta = self.beta_0 + np.zeros((self.G, self.V))
+        self.labeled_indices = []
+        self.W = defaultdict(dict)
+        self.prev_elbo = None
+        self.iter = 0
+        self.max_iter = 999
+
+    def fit(self, logs, num_clusters, log_labels=None,
+            constraints=None, epsilon=0.0001, max_iter=25):
+        """
+        Fits variational parameters with respect to the provided logs.
+        Returns the predictions for the log data used for fitting.
+        """
+        self._init_fields(logs, num_clusters, constraints, epsilon, max_iter)
+        self._label_logs(log_labels)
+        self._sample_parameters()
+        self._run_variational_bayes()
+
+    def predict(self, logs):
+        """
+        Returns the predictions for a specified set of log data that could be
+        different than what was used to fit the model.
+        """
+        C = get_token_counts_batch(logs, self.v_indices)
+        cluster_templates = defaultdict(list)
+        for n in range(len(logs)):
+            max_g = self._get_cluster_membership(C[n])
+            cluster_templates[max_g].append(n)
+        return cluster_templates
+
+    def get_labeled_indices(self):
+        return self.labeled_indices
+
+    def _predict_with_current_responsibilities(self):
+        cluster_templates = defaultdict(list)
+        for n in range(self.N):
+            max_g = self.R[n].argmax()
+            cluster_templates[max_g].append(n)
+        return cluster_templates
+
+    def _get_cluster_membership(self, x_flat):
+        r = np.array([self._get_unnorm_log_r(x_flat, g) for g in range(self.G)])
+        return np.array(r).argmax()
+
+    def _get_unnorm_log_r(self, x_flat, g):
+        vocab_dist_term = unnorm_log_multi(x_flat, self.theta_v[g])
+        cluster_dist_term = np.log(self.pi_v[g])
+        return vocab_dist_term + cluster_dist_term
+
+    def _run_variational_bayes(self):
+        self.iter = 0
+        self.prev_elbo = None
+        while self._should_continue():
+            self._variational_e_step()
+            self._variational_m_step()
+
+    def _label_logs(self, log_labels):
+        """
+        log_labels: dictionary where each key is a true cluster and the values
+                    are log indices.
+        tokenized_logs: list of tokenized logs where the log_labels keys are a
+                        subset.
+        """
+        if log_labels is None:
+            return
+        for g, log_indices in enumerate(log_labels.values()):
+            for log_idx in log_indices:
+                x = self.C[log_idx]
+                self.alpha[g] += 1
+                self.beta[g] += x
+                self.labeled_indices.append(log_idx)
+
+    def _init_fields(self, tokenized_logs, num_clusters, constraints,
+                     epsilon, max_iter):
+        self.tokenized_logs = tokenized_logs
         self.epsilon = epsilon
         self.v_indices = get_vocabulary_indices(tokenized_logs)
         self.C = get_token_counts_batch(tokenized_logs, self.v_indices)
@@ -21,42 +108,15 @@ class MultinomialMixtureVB(LogParser):
         self.theta_v = np.zeros((self.G, self.V))
         self.ex_ln_pi = np.zeros(self.G)
         self.ex_ln_theta = np.zeros((self.G, self.V))
-        self.cluster_templates = {}
         self.alpha_0 = 1 / self.G
         self.beta_0 = 1 / self.V
         self.alpha = self.alpha_0 + np.zeros(self.G)
         self.beta = self.beta_0 + np.zeros((self.G, self.V))
         self.labeled_indices = []
-        self.W = defaultdict(dict)
+        self.W = constraints or defaultdict(dict)
         self.prev_elbo = None
         self.iter = 0
         self.max_iter = max_iter
-        self._initialize_parameters()
-
-    def parse(self):
-        self.iter = 0
-        self.prev_elbo = None
-        while self._should_continue():
-            self._variational_e_step()
-            self._variational_m_step()
-        self._update_clusters()
-
-    def provide_constraints(self, W):
-        self.W = W
-
-    def label_logs(self, log_labels):
-        """
-        log_labels: dictionary where each key is a true cluster and the values
-                    are log indices.
-        tokenized_logs: list of tokenized logs where the log_labels keys are a
-                        subset.
-        """
-        for g, log_indices in enumerate(log_labels.values()):
-            for log_idx in log_indices:
-                x = self.C[log_idx]
-                self.alpha[g] += 1
-                self.beta[g] += x
-                self.labeled_indices.append(log_idx)
 
     def _should_continue(self):
         """
@@ -103,16 +163,7 @@ class MultinomialMixtureVB(LogParser):
         entropy_term -= log_multi_beta(self.theta_v).sum()
         return entropy_term
 
-    def _update_clusters(self):
-        cluster_templates = {}
-        for n in range(self.N):
-            max_g = self.R[n].argmax()
-            if max_g not in cluster_templates:
-                cluster_templates[max_g] = []
-            cluster_templates[max_g].append(n)
-        self.cluster_templates = cluster_templates
-
-    def _initialize_parameters(self):
+    def _sample_parameters(self):
         self._initialize_responsibilities()
         self._variational_m_step()
 

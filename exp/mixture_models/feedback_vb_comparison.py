@@ -2,7 +2,6 @@
 Compare MultinomialMixtureVB scores with and without pairwise constraints for
 different datasets.
 """
-from copy import deepcopy
 from global_utils import dump_results
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
@@ -35,29 +34,33 @@ def run_feedback_vb_comparison(n_label, n_constraints, n_samples, data_config):
     scores_lab_const = []
 
     for _ in range(n_samples):
-        parser = MultinomialMixtureVB(tokenized_logs, num_clusters)
-
-        parser_lab = deepcopy(parser)
         log_labels = get_log_labels(true_assignments, n_label)
-        parser_lab.label_logs(log_labels)
-        labeled_indices = parser_lab.labeled_indices
 
-        parser.parse()
-        parser_lab.parse()
+        # Baseline
+        parser = MultinomialMixtureVB()
+        parser.fit(tokenized_logs, num_clusters, log_labels=None,
+                   constraints=None, epsilon=0.0001, max_iter=25)
+        c = parser.predict(tokenized_logs)
 
-        parser_lab_const = deepcopy(parser_lab)
+        # Labeled Model
+        parser_lab = MultinomialMixtureVB()
+        parser_lab.fit(tokenized_logs, num_clusters, log_labels=log_labels,
+                       constraints=None, epsilon=0.0001, max_iter=25)
+        labeled_indices = parser_lab.get_labeled_indices()
+        c_lab = parser_lab.predict(tokenized_logs)
+
+        # Labeled + Constrained Model
+        parser_lab_const = MultinomialMixtureVB()
         W = oracle.get_constraints_matrix(
-            parsed_clusters=parser_lab.cluster_templates,
+            parsed_clusters=c_lab,
             n_constraint_samples=n_constraints,
             tokenized_logs=tokenized_logs,
-            weight=999999)
-        parser_lab_const.provide_constraints(W)
-        parser_lab_const.parse()
+            weight=1)
+        parser_lab_const.fit(tokenized_logs, num_clusters, log_labels=None,
+                             constraints=W, epsilon=0.0001, max_iter=25)
+        c_lab_const = parser_lab_const.predict(tokenized_logs)
 
-        c = parser.cluster_templates
-        c_lab = parser_lab.cluster_templates
-        c_lab_const = parser_lab_const.cluster_templates
-
+        # Calculate Scores
         score = evaluator.get_impurity(c, labeled_indices)
         score_lab = evaluator.get_impurity(c_lab, labeled_indices)
         score_lab_const = evaluator.get_impurity(c_lab_const, labeled_indices)
