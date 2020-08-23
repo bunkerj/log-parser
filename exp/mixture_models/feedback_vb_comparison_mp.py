@@ -94,9 +94,9 @@ if __name__ == '__main__':
     for data_config in data_configs:
         name = data_config['name'].lower()
         print(name)
-        results = run_feedback_vb_comparison(n_label=20,
-                                             n_constraints=50,
-                                             n_samples=50,
+        results = run_feedback_vb_comparison(n_label=50,
+                                             n_constraints=100,
+                                             n_samples=1000,
                                              data_config=data_config)
         filename = 'feedback_vb_comparison_{}.p'.format(name)
         dump_results(filename, results)
