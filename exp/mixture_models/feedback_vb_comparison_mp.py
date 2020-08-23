@@ -28,14 +28,12 @@ def run_single_sample_exp(logs, true_assignments, num_clusters, n_label,
 
     # Baseline
     parser = MultinomialMixtureVB()
-    parser.fit(logs, num_clusters, log_labels=None,
-               constraints=None, epsilon=0.0001, max_iter=25)
+    parser.fit(logs, num_clusters)
     c = parser.predict(logs)
 
     # Labeled Model
     parser_lab = MultinomialMixtureVB()
-    parser_lab.fit(logs, num_clusters, log_labels=log_labels,
-                   constraints=None, epsilon=0.0001, max_iter=25)
+    parser_lab.fit(logs, num_clusters, log_labels=log_labels)
     labeled_indices = parser_lab.get_labeled_indices()
     c_lab = parser_lab.predict(logs)
 
@@ -46,8 +44,8 @@ def run_single_sample_exp(logs, true_assignments, num_clusters, n_label,
         n_constraint_samples=n_constraints,
         tokenized_logs=logs,
         weight=1)
-    parser_lab_const.fit(logs, num_clusters, log_labels=None,
-                         constraints=W, epsilon=0.0001, max_iter=25)
+    parser_lab_const.fit(logs, num_clusters, log_labels=log_labels,
+                         constraints=W)
     c_lab_const = parser_lab_const.predict(logs)
 
     # Calculate Scores
