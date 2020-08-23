@@ -24,18 +24,19 @@ class MultinomialMixtureVB:
         self.alpha = self.alpha_0 + np.zeros(self.G)
         self.beta = self.beta_0 + np.zeros((self.G, self.V))
         self.labeled_indices = []
-        self.W = defaultdict(dict)
+        self.p_weights = defaultdict(dict)
         self.prev_elbo = None
         self.iter = 0
         self.max_iter = 999
 
-    def fit(self, logs, num_clusters, log_labels=None,
-            constraints=None, epsilon=0.0001, max_iter=25):
+    def fit(self, logs, num_clusters, log_labels=None, cs_weights=None,
+            p_weights=None, epsilon=0.0001, max_iter=25):
         """
         Fits variational parameters with respect to the provided logs.
         Returns the predictions for the log data used for fitting.
         """
-        self._init_fields(logs, num_clusters, constraints, epsilon, max_iter)
+        self._init_fields(logs, num_clusters, cs_weights,
+                          p_weights, epsilon, max_iter)
         self._label_logs(log_labels)
         self._sample_parameters()
         self._run_variational_bayes()
@@ -91,14 +92,14 @@ class MultinomialMixtureVB:
                 self.beta[g] += x
                 self.labeled_indices.append(log_idx)
 
-    def _init_fields(self, tokenized_logs, num_clusters, constraints,
-                     epsilon, max_iter):
-        self.tokenized_logs = tokenized_logs
+    def _init_fields(self, logs, num_clusters, cs_weights,
+                     p_weights, epsilon, max_iter):
+        self.tokenized_logs = logs
         self.epsilon = epsilon
-        self.v_indices = get_vocabulary_indices(tokenized_logs)
-        self.C = get_token_counts_batch(tokenized_logs, self.v_indices)
+        self.v_indices = get_vocabulary_indices(logs)
+        self.C = get_token_counts_batch(logs, self.v_indices)
         self.G = num_clusters
-        self.N = len(tokenized_logs)
+        self.N = len(logs)
         self.V = len(self.v_indices)
         self.R = np.zeros((self.N, self.G))
         self.pi_v = np.zeros(self.G)
@@ -110,10 +111,14 @@ class MultinomialMixtureVB:
         self.alpha = self.alpha_0 + np.zeros(self.G)
         self.beta = self.beta_0 + np.zeros((self.G, self.V))
         self.labeled_indices = []
-        self.W = constraints or defaultdict(dict)
+        self.cs_weights = self._init_cs_weights(cs_weights, self.N)
+        self.p_weights = p_weights or defaultdict(dict)
         self.prev_elbo = None
         self.iter = 0
         self.max_iter = max_iter
+
+    def _init_cs_weights(self, cs_weights, N):
+        return np.ones(N) if cs_weights is None else np.array(cs_weights)
 
     def _should_continue(self):
         """
@@ -145,10 +150,10 @@ class MultinomialMixtureVB:
 
     def _get_elbo_weight_penalty_term(self):
         penalty_term = 0
-        for n in self.W:
-            for m in self.W[n]:
+        for n in self.p_weights:
+            for m in self.p_weights[n]:
                 r = sum([self.R[n, g] * self.R[m, g] for g in range(self.G)])
-                penalty_term += r * self.W[n][m]
+                penalty_term += r * self.p_weights[n][m]
         return penalty_term
 
     def _get_elbo_entropy_term(self):
@@ -165,9 +170,10 @@ class MultinomialMixtureVB:
         self._variational_m_step()
 
     def _variational_e_step(self):
-        self.R = self._get_weight_penalty(self.R)
+        self.R = self._get_penalty_weight_terms(self.R)
         self.R += self.C @ self.ex_ln_theta.T
         self.R += self.ex_ln_pi.reshape(1, -1)
+        self.R *= self.cs_weights.reshape(-1, 1)
         self._norm_responsibilities()
 
     def _variational_m_step(self):
@@ -176,12 +182,15 @@ class MultinomialMixtureVB:
         self.theta_v = (self.R.T @ self.C) + self.beta
         self.ex_ln_theta = self._get_ex_ln(self.theta_v)
 
-    def _get_weight_penalty(self, R):
-        W_p = np.zeros(R.shape)
-        for n in self.W:
+    def _get_penalty_weight_terms(self, R):
+        penalty_weight_terms = np.zeros(R.shape)
+        for n in self.p_weights:
             for g in range(self.G):
-                W_p[n, g] += sum(self.W[n][m] * R[m, g] for m in self.W[n])
-        return W_p
+                penalty_weight_terms[n, g] += self._get_p_weight_term(R, n, g)
+        return penalty_weight_terms
+
+    def _get_p_weight_term(self, R, n, g):
+        return sum(self.p_weights[n][m] * R[m, g] for m in self.p_weights[n])
 
     def _norm_responsibilities(self):
         self.R -= self.R.max(axis=1).reshape(-1, 1)

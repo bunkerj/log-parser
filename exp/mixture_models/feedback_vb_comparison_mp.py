@@ -44,8 +44,7 @@ def run_single_sample_exp(logs, true_assignments, num_clusters, n_label,
         n_constraint_samples=n_constraints,
         tokenized_logs=logs,
         weight=1)
-    parser_lab_const.fit(logs, num_clusters, log_labels=log_labels,
-                         constraints=W)
+    parser_lab_const.fit(logs, num_clusters, log_labels=log_labels, p_weights=W)
     c_lab_const = parser_lab_const.predict(logs)
 
     # Calculate Scores
