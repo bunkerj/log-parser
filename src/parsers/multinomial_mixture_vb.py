@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 from scipy.special import digamma, xlogy
-from global_utils import log_multi_beta, unnorm_log_multi, multi
+from global_utils import log_multi_beta
 from src.utils import get_token_counts_batch, get_vocabulary_indices
 
 
@@ -63,13 +63,10 @@ class MultinomialMixtureVB:
         return cluster_templates
 
     def _get_cluster_membership(self, x_flat):
-        r = np.array([self._get_unnorm_log_r(x_flat, g) for g in range(self.G)])
-        return np.array(r).argmax()
-
-    def _get_unnorm_log_r(self, x_flat, g):
-        vocab_dist_term = unnorm_log_multi(x_flat, self.theta_v[g])
-        cluster_dist_term = np.log(self.pi_v[g])
-        return vocab_dist_term + cluster_dist_term
+        resps = np.zeros(self.G)
+        for g in range(self.G):
+            resps[g] = (x_flat * self.ex_ln_theta[g]).sum() + self.ex_ln_pi[g]
+        return resps.argmax()
 
     def _run_variational_bayes(self):
         self.iter = 0
