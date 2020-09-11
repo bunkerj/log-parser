@@ -99,5 +99,5 @@ if __name__ == '__main__':
         print(name)
         results = run_coreset_evaluations_mp(proj_dim, subset_size, n_samples,
                                              data_config)
-        filename = 'coreset_evaluations_{}_nmi_pos.p'.format(name)
+        filename = 'coreset_evaluations_{}_imp_pos.p'.format(name)
         dump_results(filename, results)
