@@ -78,7 +78,7 @@ if __name__ == '__main__':
     data_config = DataConfigs.BGL_FULL_FINAL
     n_samples = 5
     cs_ub_sizes = list(range(10, 101, 10))
-    cs_proj_sizes = len(list(range(600, 2501, 200)))
+    cs_proj_sizes = list(range(600, 2501, 200))
     subset_size = 50000
     def_cs_ub_size = 25
     def_cs_proj_size = 1000
