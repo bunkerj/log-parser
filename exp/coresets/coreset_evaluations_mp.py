@@ -36,7 +36,8 @@ def run_coreset_evaluations_mp(proj_dim, subset_size, n_samples, data_config):
                                                cluster_pos=cluster_pos,
                                                vocab_pos=vocab_pos,
                                                num_clusters=num_clusters)
-    reduced_weights, reduced_set = geo_ascent.get_coreset(subset_size, proj_dim)
+    reduced_weights, reduced_set, _ \
+        = geo_ascent.get_coreset(subset_size, proj_dim)
 
     with mp.Pool(mp.cpu_count()) as pool:
         argument_list = (evaluator, num_clusters, reduced_set,

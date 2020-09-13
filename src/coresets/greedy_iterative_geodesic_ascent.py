@@ -28,7 +28,8 @@ class GreedyIterativeGeodesicAscent:
         weights = self.get_weights(projections, subset_size)
         reduced_weights = self._get_reduced_weights(weights)
         reduced_set = self._get_reduced_set(weights)
-        return reduced_weights, reduced_set
+        reduced_indices = self._get_reduced_indices(weights)
+        return reduced_weights, reduced_set, reduced_indices
 
     def get_weights(self, projections, subset_size):
         L = self._get_reference_vector(projections)
@@ -79,6 +80,9 @@ class GreedyIterativeGeodesicAscent:
         N = len(self.tokenized_logs)
         return [self.tokenized_logs[idx] for idx in range(N) if
                 weights[idx] > 0]
+
+    def _get_reduced_indices(self, weights):
+        return [idx for idx, w in enumerate(weights) if w > 0]
 
     def _get_norm_projections(self, projections):
         return list(

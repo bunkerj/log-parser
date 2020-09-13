@@ -54,8 +54,9 @@ def run_single_coreset_exp(evaluator, num_clusters, proj_dim, subset_size,
                                                cluster_pos=cluster_pos,
                                                vocab_pos=vocab_pos,
                                                num_clusters=num_clusters)
-    reduced_weights, reduced_set = geo_ascent.get_coreset(subset_size,
-                                                          proj_dim)
+    reduced_weights, reduced_set, _ \
+        = geo_ascent.get_coreset(subset_size, proj_dim)
+
     coreset_size = len(reduced_weights)
     mmo_offline.perform_offline_em(tokenized_logs)
     mmo_coreset.perform_offline_em(reduced_set, weights=reduced_weights)
