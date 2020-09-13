@@ -2,7 +2,7 @@ import os
 import pickle
 import numpy as np
 from random import shuffle
-from scipy.special import gammaln
+from scipy.special import gammaln, xlogy
 from global_constants import RESULTS_DIR
 
 
@@ -42,7 +42,7 @@ def unnorm_log_multi(x_flat, params):
 def log_multi(x, params):
     x_flat = x.flatten()
     params_flat = np.maximum(params, 0).flatten()
-    return log_multi_coeff(x_flat) + (x_flat * np.log(params_flat)).sum()
+    return log_multi_coeff(x_flat) + xlogy(x_flat, params_flat).sum()
 
 
 def multi(x, params):
