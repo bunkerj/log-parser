@@ -40,8 +40,11 @@ def run_exp4_full(data_config, label_counts, cs_proj_size,
     # Coreset labels
     with mp.Pool(mp.cpu_count()) as pool:
         for n_labels in label_counts:
-            _, cs_logs, _ \
+            _, cs_logs, cs_indices \
                 = get_coreset(logs, n_clusters, n_labels, cs_proj_size)
+            cs_true_assignments = data_manager.get_reduced_assignments(
+                cs_indices)
+            log_labels = get_log_labels(cs_true_assignments, n_labels)
             results['cs_size'].append(len(cs_logs))
 
             args = (logs, n_clusters, log_labels, ev)
