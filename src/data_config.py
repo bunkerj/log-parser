@@ -144,7 +144,7 @@ class DataConfigs:
     BGL_FULL_FINAL = {
         'name': 'BGL',
         'assignments_path': 'data/full/assignments/BGL_final.csv',
-        'unstructured_path': 'data/full/unstructured/bgl_final.log',
+        'unstructured_path': 'data/full/unstructured/BGL_final.log',
         'log_format': '<Label> <Timestamp> <Date> <Node> <Time> <NodeRepeat> <Type> <Component> <Level> <Content>',
         'regex': [r'core\.\d+'],
     }
