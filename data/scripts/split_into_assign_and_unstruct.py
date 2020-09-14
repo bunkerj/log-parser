@@ -9,7 +9,16 @@ TARGET = sys.argv[1]
 ASSIGN_PATH = sys.argv[2]
 UNSTRUCT_PATH = sys.argv[3]
 
-df = pd.read_csv(TARGET, header=0, names=['LineId', 'Content', 'EventId',
-                                          'EventTemplate', 'Params'])
-df.to_csv(ASSIGN_PATH, columns=['LineId', 'EventId'], index=False)
-df.to_csv(UNSTRUCT_PATH, columns=['Content'], index=False, header=False)
+df = pd.read_csv(TARGET,
+                 header=0,
+                 names=['LineId', 'Content', 'EventId',
+                        'EventTemplate', 'Params'])
+
+df.to_csv(ASSIGN_PATH,
+          index=False,
+          columns=['LineId', 'EventId', 'EventTemplate'])
+
+df.to_csv(UNSTRUCT_PATH,
+          columns=['Content'],
+          index=False,
+          header=False)
