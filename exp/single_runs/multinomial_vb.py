@@ -18,7 +18,7 @@ def run_multinomial_vb(data_config, subset_size, n_labels):
     mm.fit(logs, n_clusters, log_labels=log_labels)
     clustering = mm.predict(logs)
 
-    return ev.get_nmi(clustering)
+    return ev.get_ami(clustering)
 
 
 if __name__ == '__main__':
