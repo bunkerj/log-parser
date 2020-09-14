@@ -1,12 +1,11 @@
 """
-This experiment will be run on the following eight 2k sample datasets: Android,
-Apache, BGL, Hadoop, HDFS, HealthApp, HPC, and Linux. For each of these
-datasets, a bar chart will display the NMI between the following algorithms:
-baseline, baseline + 5% labels (100 labels), baseline + 5% labels + 5% pairwise
-constraints (up to 100 pairwise-constraints). To get the pairwise constraints,
-the baseline + 5% labels algorithm will be used to provide clusters and the
-pairwise constraints will be randomly sampled to correct the initial clustering.
-We will average over 1000 runs with different initializations.
+This experiment will be run on the following eight 2k sample datasets. For each
+of these datasets, a bar chart will display a score between the following
+algorithms: baseline, baseline + 5% labels (100 labels), and baseline + 5%
+labels + 5% pairwise constraints (up to 100 pairwise-constraints). To get the
+pairwise constraints, the baseline + 5% labels algorithm will be used to provide
+clusters and the pairwise constraints will be randomly sampled to correct the
+initial clustering.
 """
 import multiprocessing as mp
 from time import time

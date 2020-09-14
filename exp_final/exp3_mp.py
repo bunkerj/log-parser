@@ -1,16 +1,12 @@
 """
-This experiment would be performed on the 250k log BGL dataset. We could use
-Drain as a competing baseline (which we could justify by leaning into the
-benchmarking results that seem to suggest that Drain is a superior approach).
-We could also add in our online EM mixture model. Using a suitable coreset
-upper bound size and coreset projection size from experiment 2, we would record
-NMI as a function of: labels and pairwise constraints (using pairwise
-constraints as a corrective measure as described in experiment 1). The
-performance, in NMI, would be averaged over 100 runs.
+This experiment would be performed on the 250k log BGL dataset. Drain is used as
+a competing baseline. Using a suitable coreset upper bound size and coreset
+projection size from experiment 2, we would record NMI as a function of: labels
+and pairwise constraints (using pairwise constraints as a corrective measure as
+described in experiment 1).
 """
-from time import time
 import multiprocessing as mp
-
+from time import time
 from exp_final.utils import get_coreset
 from global_utils import dump_results
 from src.data_config import DataConfigs

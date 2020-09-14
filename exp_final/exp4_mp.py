@@ -2,8 +2,7 @@
 On using the 50k log dataset from BGL and 25k logs from Linux, we would perform
 a run and compare the use of the coreset to choose logs that should be labeled
 and compare performance against the heuristic where logs are uniformly sampled.
-This would be done for different numbers of labels. The results would be
-averaged over 1000 runs.
+This would be done for different numbers of labels.
 """
 import multiprocessing as mp
 from time import time

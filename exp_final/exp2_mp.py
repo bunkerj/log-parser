@@ -2,9 +2,8 @@
 Using 50k logs from the BGL dataset, we want to compare how offline VB performs
 vs coreset + offline VB. We want to see how performance compares against the
 baseline as a function of coreset upper bound size and coreset projection size.
-Both the coreset upper bound would start at 100 and increase by increments of
-100 up to 1000 and projection dimension would start at 100 and increase by
-increments of 200 up to 2400.
+The goal is to provide two line plots: performance as a function of upper bound
+size and performance as a function of projection size.
 """
 import multiprocessing as mp
 from time import time
