@@ -74,14 +74,14 @@ def run_exp3_single(logs, cs_logs, cs_w, cs_true_assignments, n_clusters,
                     oracle, ev, n_labels, n_constraints):
     log_labels = get_log_labels(cs_true_assignments, n_labels)
 
-    # original fit
+    # Original fit
     mm = MultinomialMixtureVB()
     mm.fit(cs_logs, n_clusters,
            cs_weights=cs_w,
            log_labels=log_labels)
     c_cs = mm.predict(cs_logs)
 
-    # corrected fit
+    # Corrected fit
     W = oracle.get_constraints_matrix(
         parsed_clusters=c_cs,
         n_constraint_samples=n_constraints,

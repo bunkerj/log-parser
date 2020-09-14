@@ -22,17 +22,17 @@ def get_clustering_evaluations(logs, true_assignments, oracle,
                                n_clusters, n_labels, n_consts):
     log_labels = get_log_labels(true_assignments, n_labels)
 
-    # baseline
+    # Baseline
     mm = MultinomialMixtureVB()
     mm.fit(logs, n_clusters)
     c_base = mm.predict(logs)
 
-    # baseline + 5% labels (100 labels)
+    # Baseline + 5% labels (100 labels)
     mm_lab = MultinomialMixtureVB()
     mm_lab.fit(logs, n_clusters, log_labels=log_labels)
     c_lab = mm_lab.predict(logs)
 
-    # baseline + labels + constraints
+    # Baseline + labels + constraints
     mm_lab_const = MultinomialMixtureVB()
     W = oracle.get_constraints_matrix(
         parsed_clusters=c_lab,

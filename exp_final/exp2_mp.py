@@ -10,7 +10,7 @@ import multiprocessing as mp
 from time import time
 from exp.mixture_models.utils import get_num_true_clusters
 from exp_final.utils import get_coreset, get_log_sample
-from global_utils import dump_results, load_results
+from global_utils import dump_results
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB
@@ -19,7 +19,10 @@ from src.helpers.evaluator import Evaluator
 
 def run_exp2_full(data_config, cs_ub_sizes, cs_proj_sizes, subset_size,
                   def_cs_ub_size, def_cs_proj_size, n_samples):
-    results = {}
+    results = {
+        'cs_ub': {'scores_base': [], 'scores_cs': [], 'sizes': cs_ub_sizes},
+        'cs_proj': {'scores_base': [], 'scores_cs': [], 'sizes': cs_proj_sizes},
+    }
 
     data_manager = DataManager(data_config)
     logs, true_assignments = get_log_sample(data_manager, subset_size)
@@ -28,49 +31,45 @@ def run_exp2_full(data_config, cs_ub_sizes, cs_proj_sizes, subset_size,
 
     # Vary coreset upperbound size
     with mp.Pool(mp.cpu_count()) as pool:
-        arg_list = [
-            (logs, n_clusters, ev, cs_ub_size, def_cs_proj_size, n_samples) for
-            cs_ub_size in cs_ub_sizes]
-        mp_results = pool.starmap(run_exp2_single, arg_list)
-
-    preds = list(zip(*mp_results))
-    results['cs_ub_sizes'] = {'c_base': preds[0], 'c_cs': preds[1]}
+        for cs_ub_size in cs_ub_sizes:
+            args = (logs, n_clusters, ev, cs_ub_size, def_cs_proj_size)
+            arg_list = [args for _ in range(n_samples)]
+            mp_results = pool.starmap(run_exp2_single, arg_list)
+            scores_base, scores_cs = list(zip(*mp_results))
+            results['cs_ub']['scores_base'].append(scores_base)
+            results['cs_ub']['scores_cs'].append(scores_cs)
 
     print('Stage 1 complete...')
 
     # Vary coreset projection dimensions
     with mp.Pool(mp.cpu_count()) as pool:
-        arg_list = [
-            (logs, n_clusters, ev, def_cs_ub_size, cs_proj_size, n_samples) for
-            cs_proj_size in cs_proj_sizes]
-        mp_results = pool.starmap(run_exp2_single, arg_list)
-
-    preds = list(zip(*mp_results))
-    results['cs_proj_sizes'] = {'c_base': preds[0], 'c_cs': preds[1]}
+        for cs_proj_size in cs_proj_sizes:
+            args = (logs, n_clusters, ev, def_cs_ub_size, cs_proj_size)
+            arg_list = [args for _ in range(n_samples)]
+            mp_results = pool.starmap(run_exp2_single, arg_list)
+            scores_base, scores_cs = list(zip(*mp_results))
+            results['cs_proj']['scores_base'].append(scores_base)
+            results['cs_proj']['scores_cs'].append(scores_cs)
 
     print('Stage 2 complete...')
 
     return results
 
 
-def run_exp2_single(logs, n_clusters, ev, sub_size, proj_dim, n_samples):
-    scores_base = []
-    scores_cs = []
+def run_exp2_single(logs, n_clusters, ev, sub_size, proj_dim):
+    mm = MultinomialMixtureVB()
+    mm.fit(logs, n_clusters)
+    c_base = mm.predict(logs)
+    score_base = ev.get_nmi(c_base)
 
-    for _ in range(n_samples):
-        mm = MultinomialMixtureVB()
-        mm.fit(logs, n_clusters)
-        c_base = mm.predict(logs)
-        scores_base.append(ev.get_nmi(c_base))
+    cs_weights, cs_logs, _ \
+        = get_coreset(logs, n_clusters, sub_size, proj_dim)
+    mm_cs = MultinomialMixtureVB()
+    mm_cs.fit(cs_logs, n_clusters, cs_weights=cs_weights)
+    c_cs = mm_cs.predict(logs)
+    score_cs = ev.get_nmi(c_cs)
 
-        cs_weights, cs_logs, _ \
-            = get_coreset(logs, n_clusters, sub_size, proj_dim)
-        mm_cs = MultinomialMixtureVB()
-        mm_cs.fit(cs_logs, n_clusters, cs_weights=cs_weights)
-        c_cs = mm_cs.predict(logs)
-        scores_cs.append(ev.get_nmi(c_cs))
-
-    return scores_base, scores_cs
+    return score_base, score_cs
 
 
 if __name__ == '__main__':
