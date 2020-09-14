@@ -183,8 +183,7 @@ class Evaluator:
 
     def _get_template_truth(self, raw_truth):
         cluster_templates_truth = {}
-        for raw_log_truth in raw_truth[0:]:
-            log_id = raw_log_truth[0]
+        for log_id, raw_log_truth in enumerate(raw_truth):
             template = raw_log_truth[-1]
             if template not in cluster_templates_truth:
                 cluster_templates_truth[template] = []
