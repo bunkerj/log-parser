@@ -59,7 +59,7 @@ def run_exp4_single(logs, n_clusters, log_labels, ev):
     mm_random = MultinomialMixtureVB()
     mm_random.fit(logs, n_clusters, log_labels=log_labels)
     c_cs = mm_random.predict(logs)
-    score = ev.get_nmi(c_cs)
+    score = ev.get_ami(c_cs)
     return score
 
 

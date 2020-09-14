@@ -16,7 +16,7 @@ def run_drain_performance_nmi(data_config, parameters):
     parser = Drain(tokenized_logs, **parameters)
     parser.parse()
 
-    return evaluator.get_nmi(parser.cluster_templates)
+    return evaluator.get_ami(parser.cluster_templates)
 
 
 if __name__ == '__main__':

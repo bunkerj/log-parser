@@ -59,14 +59,14 @@ def run_exp2_single(logs, n_clusters, ev, sub_size, proj_dim):
     mm = MultinomialMixtureVB()
     mm.fit(logs, n_clusters)
     c_base = mm.predict(logs)
-    score_base = ev.get_nmi(c_base)
+    score_base = ev.get_ami(c_base)
 
     cs_weights, cs_logs, _ \
         = get_coreset(logs, n_clusters, sub_size, proj_dim)
     mm_cs = MultinomialMixtureVB()
     mm_cs.fit(cs_logs, n_clusters, cs_weights=cs_weights)
     c_cs = mm_cs.predict(logs)
-    score_cs = ev.get_nmi(c_cs)
+    score_cs = ev.get_ami(c_cs)
 
     return score_base, score_cs
 

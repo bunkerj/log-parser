@@ -59,7 +59,7 @@ class Evaluator:
             self.template_evaluations.append(template_eval)
         return self._get_ratio_of_correct_lines()
 
-    def get_nmi(self, parsed_clusters):
+    def get_ami(self, parsed_clusters):
         true_references = [a[-2] for a in self.true_assignments]
         parsed_references = self._get_parsed_references(parsed_clusters)
         return adjusted_mutual_info_score(true_references, parsed_references)

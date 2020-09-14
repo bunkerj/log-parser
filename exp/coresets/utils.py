@@ -65,8 +65,8 @@ def run_single_coreset_exp(evaluator, num_clusters, proj_dim, subset_size,
     mmo_offline_clusters = mmo_offline.get_clusters(tokenized_logs)
     mmo_coreset_clusters = mmo_coreset.get_clusters(tokenized_logs)
 
-    score_online = evaluator.get_nmi(mmo_online_clusters)
-    score_offline = evaluator.get_nmi(mmo_offline_clusters)
-    score_coreset = evaluator.get_nmi(mmo_coreset_clusters)
+    score_online = evaluator.get_ami(mmo_online_clusters)
+    score_offline = evaluator.get_ami(mmo_offline_clusters)
+    score_coreset = evaluator.get_ami(mmo_coreset_clusters)
 
     return score_online, score_offline, score_coreset, coreset_size
