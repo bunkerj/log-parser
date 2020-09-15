@@ -7,7 +7,7 @@ from global_constants import RESULTS_DIR
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.utils import get_vocabulary_indices, get_token_counts_batch
-from exp.mixture_models.utils import get_num_true_clusters
+from global_utils import get_num_true_clusters
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, \
     davies_bouldin_score
 from analysis.utils import get_intra_cluster_spread, get_inter_cluster_spread, \

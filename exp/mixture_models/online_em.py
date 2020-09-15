@@ -5,8 +5,7 @@ Online CEM.
 import numpy as np
 from time import time
 from random import sample
-from exp.mixture_models.utils import get_num_true_clusters
-from global_utils import dump_results
+from global_utils import dump_results, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator

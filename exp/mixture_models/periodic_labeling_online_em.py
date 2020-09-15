@@ -7,8 +7,8 @@ from time import time
 from copy import deepcopy
 from random import sample
 from collections import defaultdict
-from exp.mixture_models.utils import get_num_true_clusters, get_log_labels
-from global_utils import dump_results, shuffle_same_order
+from global_utils import dump_results, shuffle_same_order, get_log_labels, \
+    get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator

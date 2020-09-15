@@ -8,11 +8,10 @@ described in experiment 1).
 import multiprocessing as mp
 from time import time
 from exp_final.utils import get_coreset
-from global_utils import dump_results
+from global_utils import dump_results, get_log_labels, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
-from exp.mixture_models.utils import get_num_true_clusters, get_log_labels
 from src.helpers.oracle import Oracle
 from src.parsers.drain import Drain
 from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB

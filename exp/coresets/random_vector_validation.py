@@ -7,7 +7,7 @@ import functools
 from math import sqrt
 from src.coresets.greedy_iterative_geodesic_ascent import \
     GreedyIterativeGeodesicAscent
-from exp.mixture_models.utils import get_num_true_clusters
+from global_utils import get_num_true_clusters
 from src.coresets.random_vector_projector import RandomVectorProjector
 from src.helpers.data_manager import DataManager
 from src.data_config import DataConfigs

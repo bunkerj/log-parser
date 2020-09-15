@@ -3,10 +3,9 @@ Experiment that measures the amount of time it takes to do one pass over a
 specific dataset.
 """
 from time import time
-from global_utils import dump_results
+from global_utils import dump_results, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
-from exp.mixture_models.utils import get_num_true_clusters
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 
 

@@ -1,4 +1,4 @@
-from exp.mixture_models.utils import get_num_true_clusters, get_log_labels
+from global_utils import get_log_labels, get_num_true_clusters
 from exp_final.utils import get_log_sample
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager

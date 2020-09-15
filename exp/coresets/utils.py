@@ -3,7 +3,7 @@ import multiprocessing as mp
 from copy import deepcopy
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
-from exp.mixture_models.utils import get_num_true_clusters
+from global_utils import get_num_true_clusters
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline
 from src.coresets.greedy_iterative_geodesic_ascent import \
     GreedyIterativeGeodesicAscent

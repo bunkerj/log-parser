@@ -6,9 +6,8 @@ This would be done for different numbers of labels.
 """
 import multiprocessing as mp
 from time import time
-from exp.mixture_models.utils import get_log_labels, get_num_true_clusters
 from exp_final.utils import get_log_sample, get_coreset
-from global_utils import dump_results
+from global_utils import dump_results, get_log_labels, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator

@@ -9,12 +9,11 @@ initial clustering.
 """
 import multiprocessing as mp
 from time import time
-from global_utils import dump_results
+from global_utils import dump_results, get_log_labels, get_num_true_clusters
 from src.helpers.oracle import Oracle
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB
-from exp.mixture_models.utils import get_num_true_clusters, get_log_labels
 
 
 def get_clustering_evaluations(logs, true_assignments, oracle,

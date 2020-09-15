@@ -3,11 +3,10 @@ Compare MultinomialMixtureVB scores with and without pairwise constraints for
 different datasets.
 """
 import multiprocessing as mp
-from global_utils import dump_results
+from global_utils import dump_results, get_log_labels, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
-from exp.mixture_models.utils import get_num_true_clusters, get_log_labels
 from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB
 from src.helpers.oracle import Oracle
 

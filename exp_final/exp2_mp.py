@@ -7,9 +7,8 @@ size and performance as a function of projection size.
 """
 import multiprocessing as mp
 from time import time
-from exp.mixture_models.utils import get_num_true_clusters
 from exp_final.utils import get_coreset, get_log_sample
-from global_utils import dump_results
+from global_utils import dump_results, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB

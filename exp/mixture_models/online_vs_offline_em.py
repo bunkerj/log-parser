@@ -2,8 +2,7 @@
 Log-likelihood comparison between online and offline EM.
 """
 from copy import deepcopy
-from exp.mixture_models.utils import get_num_true_clusters
-from global_utils import dump_results
+from global_utils import dump_results, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_online import MultinomialMixtureOnline

@@ -1,10 +1,9 @@
 import numpy as np
 from time import time
-from global_utils import multi, get_multi_values
+from global_utils import multi, get_multi_values, get_num_true_clusters
 from scipy.special import gammaln
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
-from exp.mixture_models.utils import get_num_true_clusters
 from src.utils import get_vocabulary_indices, get_token_counts
 
 
