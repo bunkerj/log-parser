@@ -59,10 +59,28 @@ class Evaluator:
             self.template_evaluations.append(template_eval)
         return self._get_ratio_of_correct_lines()
 
-    def get_ami(self, parsed_clusters):
-        true_references = [a[-2] for a in self.true_assignments]
-        parsed_references = self._get_parsed_references(parsed_clusters)
-        return adjusted_mutual_info_score(true_references, parsed_references)
+    def get_ami(self, parsed_clusters, labeled_indices=None):
+        if labeled_indices is None:
+            labeled_indices = []
+        true_ref = self._get_true_ref(labeled_indices)
+        parsed_ref = self._get_parsed_ref(parsed_clusters, labeled_indices)
+        return adjusted_mutual_info_score(true_ref, parsed_ref)
+
+    def _get_true_ref(self, labeled_indices):
+        true_ref = [a[-2] for a in self.true_assignments]
+        return self._filter_labeled(true_ref, labeled_indices)
+
+    def _get_parsed_ref(self, parsed_clusters, labeled_indices):
+        parsed_ref = self._get_parsed_references(parsed_clusters)
+        return self._filter_labeled(parsed_ref, labeled_indices)
+
+    def _filter_labeled(self, ref, labeled_indices):
+        label_index_set = set(labeled_indices)
+        filtered_ref = []
+        for idx in range(len(ref)):
+            if idx not in label_index_set:
+                filtered_ref.append(ref[idx])
+        return filtered_ref
 
     def get_type1_error_ratio(self):
         """
