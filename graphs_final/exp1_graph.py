@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from global_utils import load_results
+from global_utils import load_results, get_labeled_indices
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
@@ -42,11 +42,16 @@ for idx, data_config in enumerate(data_configs, start=1):
         c_base_sample = c_base_samples[sample_idx]
         c_lab_sample = c_lab_samples[sample_idx]
         c_lab_const_sample = c_lab_const_samples[sample_idx]
-        log_labels_samples = log_labels_samples[sample_idx]
-        scores_base.append(ev.get_ami(c_base_sample, log_labels_samples))
-        scores_lab.append(ev.get_ami(c_lab_sample, log_labels_samples))
-        scores_lab_const.append(ev.get_ami(c_lab_const_sample,
-                                           log_labels_samples))
+        log_labels_sample = log_labels_samples[sample_idx]
+        labeled_indices = get_labeled_indices(log_labels_sample)
+
+        score_base = ev.get_ami(c_base_sample, labeled_indices)
+        score_lab = ev.get_ami(c_lab_sample, labeled_indices)
+        score_lob_const = ev.get_ami(c_lab_const_sample, labeled_indices)
+
+        scores_base.append(score_base)
+        scores_lab.append(score_lab)
+        scores_lab_const.append(score_lob_const)
 
     avg_score_base = mean(scores_base)
     avg_score_lab = mean(scores_lab)
