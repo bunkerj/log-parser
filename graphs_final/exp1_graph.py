@@ -43,10 +43,10 @@ for idx, data_config in enumerate(data_configs, start=1):
         c_lab_sample = c_lab_samples[sample_idx]
         c_lab_const_sample = c_lab_const_samples[sample_idx]
         log_labels_samples = log_labels_samples[sample_idx]
-        scores_base.append(ev.get_impurity(c_base_sample, log_labels_samples))
-        scores_lab.append(ev.get_impurity(c_lab_sample, log_labels_samples))
-        scores_lab_const.append(ev.get_impurity(c_lab_const_sample,
-                                                log_labels_samples))
+        scores_base.append(ev.get_ami(c_base_sample, log_labels_samples))
+        scores_lab.append(ev.get_ami(c_lab_sample, log_labels_samples))
+        scores_lab_const.append(ev.get_ami(c_lab_const_sample,
+                                           log_labels_samples))
 
     avg_score_base = mean(scores_base)
     avg_score_lab = mean(scores_lab)
@@ -60,7 +60,7 @@ for idx, data_config in enumerate(data_configs, start=1):
             [avg_score_base,
              avg_score_lab,
              avg_score_lab_const])
-    plt.ylabel('Average Impurity')
+    plt.ylabel('AMI')
     plt.grid()
 
 plt.subplots_adjust(wspace=0.3)
