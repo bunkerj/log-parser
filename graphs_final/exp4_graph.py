@@ -14,6 +14,7 @@ plt.plot(results['cs_size'], avg_cs_label_scores)
 plt.legend(['Random', 'Coreset'])
 plt.xlabel('Coreset Size')
 plt.ylabel('AMI')
+plt.title('Performance vs Coreset Size')
 plt.grid()
 plt.plot()
 

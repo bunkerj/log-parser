@@ -52,8 +52,8 @@ for idx, data_config in enumerate(data_configs, start=1):
     avg_score_lab = mean(scores_lab)
     avg_score_lab_const = mean(scores_lab_const)
 
-    plt.title(name)
     plt.subplot(*DIM, idx)
+    plt.title(name)
     plt.bar(['Base',
              'Lab',
              'Lab + Const'],
