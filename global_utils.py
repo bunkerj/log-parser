@@ -101,3 +101,42 @@ def get_log_labels(true_assignments, num_of_labels):
 
 def get_num_true_clusters(true_assignments):
     return len(set(log_data[-1] for log_data in true_assignments))
+
+
+def get_parsed_events(true_assignments, parsed_clusters):
+    parsed_reference = [0] * len(true_assignments)
+    for event_idx, event in enumerate(parsed_clusters):
+        for log_idx in parsed_clusters[event]:
+            parsed_reference[log_idx] = event_idx
+    return parsed_reference
+
+
+def get_constraints_info(logs, true_assignments, parsed_clusters, W):
+    link_constraints = {'must_link': [], 'cannot_link': []}
+    parsed_events = get_parsed_events(true_assignments, parsed_clusters)
+    for i in W:
+        log1 = ' '.join(logs[i])
+        g1_true = true_assignments[i][-2]
+        g1_parsed = parsed_events[i]
+        for j in W[i]:
+            log2 = ' '.join(logs[j])
+            g2_true = true_assignments[j][-2]
+            g2_parsed = parsed_events[j]
+            w = W[i][j]
+            v = ((i, log1, g1_true, g1_parsed),
+                 (j, log2, g2_true, g2_parsed))
+            if w > 0:
+                link_constraints['must_link'].append(v)
+            else:
+                link_constraints['cannot_link'].append(v)
+    return link_constraints
+
+
+def get_link_events(links, reference):
+    link_events = []
+    for link in links:
+        idx1, idx2 = link
+        event1 = reference[idx1]
+        event2 = reference[idx2]
+        link_events.append((event1, event2))
+    return link_events
