@@ -79,3 +79,10 @@ def get_avg(samples):
             avg_lab_impurity += samples[sample_idx][label_idx]
         averages.append(avg_lab_impurity / n_samples)
     return averages
+
+
+def get_labeled_indices(log_labels):
+    labeled_indices = []
+    for k in log_labels:
+        labeled_indices.extend(log_labels[k])
+    return labeled_indices
