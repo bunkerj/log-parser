@@ -1,4 +1,4 @@
-from random import sample
+from random import sample, randint
 from collections import defaultdict
 from global_constants import MUST_LINK, CANNOT_LINK
 
@@ -9,10 +9,11 @@ class Oracle:
         self.true_clusters = defaultdict(list)
         self.true_references = []
 
-    def get_constraints(self, parsed_clusters, n_constraint_samples,
-                        tokenized_logs, return_ids=False):
+    def get_corr_constraints(self, parsed_clusters, n_constraint_samples,
+                             tokenized_logs, return_ids=False):
         """
-        Return constraints based on current parsed clustering.
+        Return corrective constraints based on current parsed clustering.
+        There are n_constraint_samples for cannot_link and must_link.
         """
         split_parsed_clusters = self._get_split_clusters(parsed_clusters, True)
         split_true_clusters = self._get_split_clusters(parsed_clusters, False)
@@ -28,23 +29,52 @@ class Oracle:
 
         return {CANNOT_LINK: cannot_link, MUST_LINK: must_link}
 
-    def get_constraints_matrix(self, parsed_clusters, n_constraint_samples,
-                               tokenized_logs, weight):
-        W = defaultdict(dict)
-        constraints = self.get_constraints(parsed_clusters,
-                                           n_constraint_samples,
-                                           tokenized_logs,
-                                           True)
+    def get_constraints(self, n_constraint_samples):
+        """
+        Return n_constraints completely randomly sampled across all logs.
+        There are n_constraint_samples total constraints.
+        """
+        cannot_link = []
+        must_link = []
+        random_pairs = self._get_random_pairs(n_constraint_samples)
 
+        for pair in random_pairs:
+            idx1, idx2 = pair
+            g1 = self.true_assignments[idx1][-2]
+            g2 = self.true_assignments[idx2][-2]
+            if g1 != g2:
+                cannot_link.append(pair)
+            else:
+                must_link.append(pair)
+
+        return {CANNOT_LINK: cannot_link, MUST_LINK: must_link}
+
+    def get_corr_constraints_matrix(self, parsed_clusters, n_constraint_samples,
+                                    tokenized_logs, weight):
+        constraints = self.get_corr_constraints(parsed_clusters,
+                                                n_constraint_samples,
+                                                tokenized_logs,
+                                                True)
+        return self._get_weight_matrix(constraints, weight)
+
+    def get_constraints_matrix(self, n_constraint_samples, weight):
+        constraints = self.get_constraints(n_constraint_samples)
+        return self._get_weight_matrix(constraints, weight)
+
+    def _get_weight_matrix(self, constraints, weight):
+        W = defaultdict(dict)
         for idx1, idx2 in constraints[CANNOT_LINK]:
             W[idx1][idx2] = -weight
             W[idx2][idx1] = -weight
-
         for idx1, idx2 in constraints[MUST_LINK]:
             W[idx1][idx2] = weight
             W[idx2][idx1] = weight
-
         return W
+
+    def _get_random_pairs(self, n_constraint_samples):
+        N = len(self.true_assignments)
+        return [(randint(0, N - 1), randint(0, N - 1)) for _ in
+                range(n_constraint_samples)]
 
     def _get_links(self, split_clusters, n_constraint_samples, tokenized_logs,
                    return_ids):

@@ -21,7 +21,7 @@ def run_multinomial_vb(data_config, subset_size, n_labels, n_constraints):
     clustering = mm.predict(logs)
     print(ev.get_ami(clustering))
 
-    W = oracle.get_constraints_matrix(
+    W = oracle.get_corr_constraints_matrix(
         parsed_clusters=clustering,
         n_constraint_samples=n_constraints,
         tokenized_logs=logs,

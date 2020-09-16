@@ -64,7 +64,7 @@ def run_feedback_using_constraints(data_configs, drain_parameters):
 def apply_constraints(mmo, logs, true_assignments):
     mmo_clusters = mmo.get_clusters(logs)
     oracle = Oracle(true_assignments)
-    constraints = oracle.get_constraints(mmo_clusters, 10, logs)
+    constraints = oracle.get_corr_constraints(mmo_clusters, 10, logs)
     mmo.enforce_constraints(constraints)
     return constraints
 

@@ -77,7 +77,7 @@ def run_exp3_single(logs, cs_logs, cs_w, cs_true_assignments, n_clusters,
     c_cs = mm.predict(cs_logs)
 
     # Corrected fit
-    W = oracle.get_constraints_matrix(
+    W = oracle.get_corr_constraints_matrix(
         parsed_clusters=c_cs,
         n_constraint_samples=n_constraints,
         tokenized_logs=cs_logs,

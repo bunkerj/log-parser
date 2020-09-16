@@ -130,8 +130,8 @@ def perform_runs(run_config):
             t2_vals_sample.append(t2_val)
 
             if run_idx < n_cycles:
-                constraints = oracle.get_constraints(clusters,
-                                                     n_constraint_samples, logs)
+                constraints = oracle.get_corr_constraints(clusters,
+                                                          n_constraint_samples, logs)
                 mmo.enforce_constraints(constraints, constraint_type)
                 mmo.perform_online_batch_em(logs)
 

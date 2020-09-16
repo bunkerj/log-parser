@@ -38,7 +38,7 @@ def run_single_sample_exp(logs, true_assignments, num_clusters, n_label,
 
     # Labeled + Constrained Model
     parser_lab_const = MultinomialMixtureVB()
-    W = oracle.get_constraints_matrix(
+    W = oracle.get_corr_constraints_matrix(
         parsed_clusters=c_lab,
         n_constraint_samples=n_constraints,
         tokenized_logs=logs,

@@ -32,7 +32,7 @@ def get_clustering_evaluations(logs, true_assignments, oracle,
 
     # Baseline + labels + constraints
     mm_lab_const = MultinomialMixtureVB()
-    W = oracle.get_constraints_matrix(
+    W = oracle.get_corr_constraints_matrix(
         parsed_clusters=c_lab,
         n_constraint_samples=n_consts,
         tokenized_logs=logs,
