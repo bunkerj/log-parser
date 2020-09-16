@@ -5,6 +5,7 @@ projection size from experiment 2, we would record NMI as a function of: labels
 and pairwise constraints (using pairwise constraints as a corrective measure as
 described in experiment 1).
 """
+import numpy as np
 import multiprocessing as mp
 from time import time
 from exp_final.utils import get_coreset
@@ -76,6 +77,8 @@ def run_exp3_full(data_config, label_counts, constraint_counts,
 
 def run_exp3_single(logs, cs_logs, cs_w, cs_true_assignments, n_clusters,
                     oracle, ev, n_labels, n_constraints):
+    np.random.seed()
+
     log_labels = get_log_labels(cs_true_assignments, n_labels)
 
     # Original fit

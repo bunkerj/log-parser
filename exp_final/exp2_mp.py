@@ -5,6 +5,7 @@ baseline as a function of coreset upper bound size and coreset projection size.
 The goal is to provide two line plots: performance as a function of upper bound
 size and performance as a function of projection size.
 """
+import numpy as np
 import multiprocessing as mp
 from time import time
 from exp_final.utils import get_coreset, get_log_sample
@@ -69,6 +70,8 @@ def run_exp2_full(data_config, cs_ub_sizes, cs_proj_sizes, subset_size,
 
 
 def run_exp2_single(logs, n_clusters, ev, sub_size, proj_dim):
+    np.random.seed()
+
     mm = MultinomialMixtureVB()
     mm.fit(logs, n_clusters)
     c_base = mm.predict(logs)

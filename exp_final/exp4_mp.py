@@ -4,6 +4,7 @@ a run and compare the use of the coreset to choose logs that should be labeled
 and compare performance against the heuristic where logs are uniformly sampled.
 This would be done for different numbers of labels.
 """
+import numpy as np
 import multiprocessing as mp
 from time import time
 from exp_final.utils import get_log_sample, get_coreset
@@ -63,6 +64,8 @@ def run_exp4_full(data_config, label_counts, cs_proj_size,
 
 
 def run_exp4_single(logs, n_clusters, log_labels, ev):
+    np.random.seed()
+
     mm_random = MultinomialMixtureVB()
     mm_random.fit(logs, n_clusters, log_labels=log_labels)
     c_cs = mm_random.predict(logs)

@@ -7,6 +7,7 @@ pairwise constraints, the baseline + 5% labels algorithm will be used to provide
 clusters and the pairwise constraints will be randomly sampled to correct the
 initial clustering.
 """
+import numpy as np
 import multiprocessing as mp
 from time import time
 from global_utils import dump_results, get_log_labels, get_num_true_clusters
@@ -18,6 +19,8 @@ from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB
 
 def get_clustering_evaluations(logs, true_assignments, oracle,
                                n_clusters, n_labels, n_consts):
+    np.random.seed()
+
     log_labels = get_log_labels(true_assignments, n_labels)
 
     # Baseline
