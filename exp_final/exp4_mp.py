@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
     data_config = DataConfigs.BGL_FULL_FINAL
     subset_size = 50000
-    n_samples = 100
+    n_samples = 1000
     label_counts = list(range(0, 250, 50))
     def_cs_proj_size = 1000
 

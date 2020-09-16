@@ -109,7 +109,7 @@ if __name__ == '__main__':
     start_time = time()
 
     data_config = DataConfigs.BGL_FULL_FINAL
-    n_samples = 5
+    n_samples = 100
     label_counts = list(range(0, 250, 50))
     constraint_counts = list(range(0, 250, 50))
     def_cs_ub_size = 25
