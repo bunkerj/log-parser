@@ -17,8 +17,10 @@ from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB
 def run_exp4_full(data_config, label_counts, cs_proj_size,
                   subset_size, n_samples):
     results = {
-        'random_label_scores': [],
-        'coreset_label_scores': [],
+        'cs_label_ami_samples': [],
+        'cs_label_acc_samples': [],
+        'rand_label_ami_samples': [],
+        'rand_label_acc_samples': [],
         'cs_size': [],
     }
 
@@ -34,7 +36,10 @@ def run_exp4_full(data_config, label_counts, cs_proj_size,
             args = (logs, n_clusters, log_labels, ev)
             arg_list = [args for _ in range(n_samples)]
             mp_results = pool.starmap(run_exp4_single, arg_list)
-            results['random_label_scores'].append(mp_results)
+            ami_samples, acc_samples = list(zip(*mp_results))
+
+            results['rand_label_ami_samples'].append(ami_samples)
+            results['rand_label_acc_samples'].append(acc_samples)
 
     # Coreset labels
     with mp.Pool(mp.cpu_count()) as pool:
@@ -49,7 +54,10 @@ def run_exp4_full(data_config, label_counts, cs_proj_size,
             args = (logs, n_clusters, log_labels, ev)
             arg_list = [args for _ in range(n_samples)]
             mp_results = pool.starmap(run_exp4_single, arg_list)
-            results['coreset_label_scores'].append(mp_results)
+            ami_samples, acc_samples = list(zip(*mp_results))
+
+            results['cs_label_ami_samples'].append(ami_samples)
+            results['cs_label_acc_samples'].append(acc_samples)
 
     return results
 
@@ -58,8 +66,9 @@ def run_exp4_single(logs, n_clusters, log_labels, ev):
     mm_random = MultinomialMixtureVB()
     mm_random.fit(logs, n_clusters, log_labels=log_labels)
     c_cs = mm_random.predict(logs)
-    score = ev.get_ami(c_cs)
-    return score
+    ami = ev.get_ami(c_cs)
+    acc = ev.get_accuracy(c_cs)
+    return ami, acc
 
 
 if __name__ == '__main__':

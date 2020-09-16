@@ -21,9 +21,13 @@ def run_exp3_full(data_config, label_counts, constraint_counts,
                   cs_ub_size, cs_proj_size, n_samples):
     results = {
         'label_counts': label_counts,
-        'label_score_samples': [],
+        'label_ami_samples': [],
+        'label_acc_samples': [],
         'constraint_counts': constraint_counts,
-        'constraint_score_samples': [],
+        'constraint_ami_samples': [],
+        'constraint_acc_samples': [],
+        'drain_ami': None,
+        'drain_acc': None,
     }
 
     data_manager = DataManager(data_config)
@@ -42,7 +46,8 @@ def run_exp3_full(data_config, label_counts, constraint_counts,
     parser = Drain(logs, 5, 100, 0.54)
     parser.parse()
     c_drain = parser.cluster_templates
-    results['drain_score'] = ev.get_ami(c_drain)
+    results['drain_ami'] = ev.get_ami(c_drain)
+    results['drain_acc'] = ev.get_accuracy(c_drain)
 
     # MM_VB labels only
     with mp.Pool(mp.cpu_count()) as pool:
@@ -51,7 +56,9 @@ def run_exp3_full(data_config, label_counts, constraint_counts,
                     oracle, ev, n_labels, 0)
             arg_list = [args for _ in range(n_samples)]
             mp_results = pool.starmap(run_exp3_single, arg_list)
-            results['label_score_samples'].append(mp_results)
+            ami_samples, acc_samples = list(zip(*mp_results))
+            results['label_ami_samples'].append(ami_samples)
+            results['label_acc_samples'].append(acc_samples)
 
     # MM_VB constraints only
     with mp.Pool(mp.cpu_count()) as pool:
@@ -60,7 +67,9 @@ def run_exp3_full(data_config, label_counts, constraint_counts,
                     oracle, ev, 0, n_constraints)
             arg_list = [args for _ in range(n_samples)]
             mp_results = pool.starmap(run_exp3_single, arg_list)
-            results['constraint_score_samples'].append(mp_results)
+            ami_samples, acc_samples = list(zip(*mp_results))
+            results['constraint_ami_samples'].append(ami_samples)
+            results['constraint_acc_samples'].append(acc_samples)
 
     return results
 
@@ -87,9 +96,10 @@ def run_exp3_single(logs, cs_logs, cs_w, cs_true_assignments, n_clusters,
            log_labels=log_labels,
            p_weights=W)
     c_cs = mm.predict(logs)
-    score = ev.get_ami(c_cs)
+    ami = ev.get_ami(c_cs)
+    acc = ev.get_accuracy(c_cs)
 
-    return score
+    return ami, acc
 
 
 if __name__ == '__main__':

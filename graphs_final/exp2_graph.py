@@ -7,8 +7,8 @@ results = load_results('exp2_results.p')
 
 def plot_metric(subplot_args, feature, title, ylabel, xlabel):
     cs_ub_sizes = results[feature]['sizes']
-    avg_scores_base = get_sample_avg(results[feature]['scores_base'])
-    avg_scores_cs = get_sample_avg(results[feature]['scores_cs'])
+    avg_scores_base = get_sample_avg(results[feature]['ami_base_samples'])
+    avg_scores_cs = get_sample_avg(results[feature]['ami_cs_samples'])
 
     plt.subplot(*subplot_args)
     plt.plot(cs_ub_sizes, avg_scores_base)
