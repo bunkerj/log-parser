@@ -5,7 +5,7 @@ from graphs_final.utils import get_sample_avg
 results = load_results('exp3_results.p')
 
 N = len(results['label_counts'])
-drain_scores = N * [results['drain_score']]
+drain_scores = N * [results['drain_ami']]
 
 plt.subplot(1, 2, 1)
 avg_label_scores = get_sample_avg(results['label_ami_samples'])
