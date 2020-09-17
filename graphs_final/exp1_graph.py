@@ -3,7 +3,7 @@ from global_utils import load_results, get_labeled_indices
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
-from statistics import mean
+from statistics import mean, stdev
 
 DIM = (2, 4)
 
@@ -22,6 +22,8 @@ data_configs = [
 
 for idx, data_config in enumerate(data_configs, start=1):
     name = data_config['name']
+    print(name)
+
     data_manager = DataManager(data_config)
     logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
@@ -57,6 +59,16 @@ for idx, data_config in enumerate(data_configs, start=1):
     avg_score_lab = mean(scores_lab)
     avg_score_lab_const = mean(scores_lab_const)
 
+    std_score_base = stdev(scores_base)
+    std_score_lab = stdev(scores_lab)
+    std_score_lab_const = stdev(scores_lab_const)
+    y_axis_ub = max(avg_score_base + std_score_base,
+                    avg_score_lab + std_score_lab,
+                    avg_score_lab_const + std_score_lab_const)
+    y_axis_lb = min(avg_score_base - std_score_base,
+                    avg_score_lab - std_score_lab,
+                    avg_score_lab_const - std_score_lab_const)
+
     plt.subplot(*DIM, idx)
     plt.title(name)
     plt.bar(['Base',
@@ -66,6 +78,7 @@ for idx, data_config in enumerate(data_configs, start=1):
              avg_score_lab,
              avg_score_lab_const])
     plt.ylabel('AMI')
+    plt.ylim([y_axis_lb, y_axis_ub])
     plt.grid()
 
 plt.subplots_adjust(wspace=0.3)
