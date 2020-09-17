@@ -1,17 +1,20 @@
 import matplotlib.pyplot as plt
 from global_utils import load_results
 from graphs_final.utils import get_sample_avg
+from statistics import mean
 
 results = load_results('exp2_results.p')
 
 
 def plot_metric(subplot_args, feature, title, ylabel, xlabel):
     cs_ub_sizes = results[feature]['sizes']
-    avg_scores_base = get_sample_avg(results[feature]['ami_base_samples'])
+    N = len(cs_ub_sizes)
     avg_scores_cs = get_sample_avg(results[feature]['ami_cs_samples'])
+    avg_scores_base = get_sample_avg(results[feature]['ami_base_samples'])
+    const_avg_score_base = N * [mean(avg_scores_base)]
 
     plt.subplot(*subplot_args)
-    plt.plot(cs_ub_sizes, avg_scores_base)
+    plt.plot(cs_ub_sizes, const_avg_score_base)
     plt.plot(cs_ub_sizes, avg_scores_cs)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
