@@ -27,10 +27,10 @@ def get_posterior_approx(logs, n_clusters):
 
 
 def get_coreset(logs, n_clusters, subset_size, proj_dim):
-    # cluster_pos, vocab_pos = get_posterior_approx(logs, n_clusters)
-    geo_ascent = GreedyIterativeGeodesicAscent(logs, num_clusters=n_clusters)
-                                               # cluster_pos=cluster_pos,
-                                               # vocab_pos=vocab_pos)
+    cluster_pos, vocab_pos = get_posterior_approx(logs, n_clusters)
+    geo_ascent = GreedyIterativeGeodesicAscent(logs,
+                                               cluster_pos=cluster_pos,
+                                               vocab_pos=vocab_pos)
     return geo_ascent.get_coreset(subset_size, proj_dim)
 
 
