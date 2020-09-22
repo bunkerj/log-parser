@@ -44,7 +44,7 @@ def run_exp3_full(data_config, label_counts, constraint_counts,
     results['cs_size'] = len(cs_logs)
 
     # Drain performance
-    parser = Drain(logs, 5, 100, 0.54)
+    parser = Drain(logs, 4, 60, 0.22)
     parser.parse()
     c_drain = parser.cluster_templates
     results['drain_ami'] = ev.get_ami(c_drain)
