@@ -39,7 +39,7 @@ def get_clustering_evaluations(logs, true_assignments, oracle,
         parsed_clusters=c_lab,
         n_constraint_samples=n_consts,
         tokenized_logs=logs,
-        weight=1)
+        weight=10)
     mm_lab_const.fit(logs, n_clusters, log_labels=log_labels, p_weights=W)
     c_lab_const = mm_lab_const.predict(logs)
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
         DataConfigs.Linux,
     ]
 
-    n_labels = 100
+    n_labels = 0
     n_consts = 100
     n_samples = 1000
 
