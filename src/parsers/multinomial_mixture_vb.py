@@ -19,8 +19,8 @@ class MultinomialMixtureVB:
         self.theta_v = np.zeros((self.G, self.V))
         self.ex_ln_pi = np.zeros(self.G)
         self.ex_ln_theta = np.zeros((self.G, self.V))
-        self.alpha_0 = 1
-        self.beta_0 = 1
+        self.alpha_0 = 1 / self.G if self.G > 0 else 0
+        self.beta_0 = 1 / self.V if self.V > 0 else 0
         self.alpha = self.alpha_0 + np.zeros(self.G)
         self.beta = self.beta_0 + np.zeros((self.G, self.V))
         self.labeled_indices = []
