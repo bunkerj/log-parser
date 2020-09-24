@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 
 class ClusterTracker:
@@ -19,6 +20,40 @@ class ClusterTracker:
             cluster_ref = self._get_cluster_ref(clusters)
             self.cluster_refs.append(cluster_ref)
 
+    def show(self):
+        cluster_ref_arr = np.array(self.cluster_refs)
+        cluster_set = list(set(cluster_ref_arr.flatten()))
+        colormap = self._get_colormap(cluster_set)
+        ytick_locs = [10 * idx + 15 for idx in range(cluster_ref_arr.shape[1])]
+
+        ax = self._construct_bars(cluster_ref_arr, colormap)
+        ax.set_yticks(ytick_locs)
+        ax.set_yticklabels(self.log_indices_track)
+        ax.set_xlabel('Iteration')
+        ax.set_ylabel('Log Index')
+        ax.set_title('Cluster Membership Trajectories')
+        ax.legend(handles=self._get_handles(cluster_set, colormap))
+        ax.grid()
+
+        plt.show()
+
+    def _construct_bars(self, cluster_ref_arr, colormap):
+        fig, ax = plt.subplots()
+        for idx in range(cluster_ref_arr.shape[1]):
+            track = [(i, 1) for i in range(cluster_ref_arr.shape[0])]
+            facecolors = [colormap[g] for g in cluster_ref_arr[:, idx]]
+            ax.broken_barh(track, (10 * (idx + 1), 9),
+                           facecolors=facecolors)
+        return ax
+
+    def _get_handles(self, cluster_set, colormap):
+        handles = []
+        for g in cluster_set:
+            color = colormap[g]
+            patch = mpatches.Patch(color=color, label=str(g))
+            handles.append(patch)
+        return handles
+
     def _get_tracked_logs(self, logs, log_indices):
         return [logs[idx] for idx in log_indices]
 
@@ -29,24 +64,6 @@ class ClusterTracker:
                 cluster_ref[idx] = int(k)
         return cluster_ref
 
-    def show(self):
+    def _get_colormap(self, cluster_set):
         cm = plt.get_cmap('gist_rainbow')
-        colormap = [cm(1. * i / self.n_clusters) for i in
-                    range(self.n_clusters)]
-        cluster_ref_arr = np.array(self.cluster_refs)
-        ytick_locs = [10 * idx + 15 for idx in range(cluster_ref_arr.shape[1])]
-
-        fig, ax = plt.subplots()
-        for idx in range(cluster_ref_arr.shape[1]):
-            facecolors = [colormap[g] for g in cluster_ref_arr[:, idx]]
-            track = [(i, 1) for i in range(cluster_ref_arr.shape[0])]
-            ax.broken_barh(track, (10 * (idx + 1), 9),
-                           facecolors=facecolors)
-
-        ax.set_yticks(ytick_locs)
-        ax.set_yticklabels(self.log_indices_track)
-        ax.set_xlabel('Iteration')
-        ax.set_ylabel('Log Index')
-        ax.set_title('Cluster Membership Trajectories')
-        ax.grid()
-        plt.show()
+        return {g: cm(1. * g / self.n_clusters) for g in cluster_set}
