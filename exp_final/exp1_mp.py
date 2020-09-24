@@ -40,7 +40,10 @@ def get_clustering_evaluations(logs, true_assignments, oracle,
         n_constraint_samples=n_consts,
         tokenized_logs=logs,
         weight=500)
-    mm_lab_const.fit(logs, n_clusters, log_labels=log_labels, p_weights=W)
+    mm_lab_const.fit(logs, n_clusters,
+                     log_labels=log_labels,
+                     p_weights=W,
+                     max_iter=25)
     c_lab_const = mm_lab_const.predict(logs)
 
     return c_base, c_lab, c_lab_const, log_labels
