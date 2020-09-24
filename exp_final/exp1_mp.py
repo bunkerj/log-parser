@@ -39,7 +39,7 @@ def get_clustering_evaluations(logs, true_assignments, oracle,
         parsed_clusters=c_lab,
         n_constraint_samples=n_consts,
         tokenized_logs=logs,
-        weight=10)
+        weight=500)
     mm_lab_const.fit(logs, n_clusters, log_labels=log_labels, p_weights=W)
     c_lab_const = mm_lab_const.predict(logs)
 
@@ -91,10 +91,18 @@ if __name__ == '__main__':
         DataConfigs.HealthApp,
         DataConfigs.HPC,
         DataConfigs.Linux,
+        DataConfigs.Mac,
+        DataConfigs.OpenSSH,
+        DataConfigs.OpenStack,
+        DataConfigs.Proxifier,
+        DataConfigs.Spark,
+        DataConfigs.Thunderbird,
+        DataConfigs.Windows,
+        DataConfigs.Zookeeper,
     ]
 
     n_labels = 0
-    n_consts = 100
+    n_consts = 1000
     n_samples = 1000
 
     filename = 'exp1_results.p'
