@@ -48,7 +48,7 @@ class ClusterTracker:
 
     def _get_handles(self, cluster_set, colormap):
         handles = []
-        for g in cluster_set:
+        for g in sorted(cluster_set):
             color = colormap[g]
             patch = mpatches.Patch(color=color, label=str(g))
             handles.append(patch)
