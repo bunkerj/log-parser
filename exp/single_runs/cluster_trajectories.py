@@ -18,7 +18,7 @@ def run_cluster_trajectories(data_config, subset_size, n_labels, n_constraints):
     oracle = Oracle(true_assignments)
 
     mm = MultinomialMixtureVB()
-    mm.init(logs, n_clusters)
+    mm.fit(logs, n_clusters)
 
     clustering = mm.predict(logs)
     print(ev.get_ami(clustering))
@@ -28,7 +28,7 @@ def run_cluster_trajectories(data_config, subset_size, n_labels, n_constraints):
         n_constraint_samples=n_constraints,
         tokenized_logs=logs,
         weight=1000)
-    mm.fit(logs, n_clusters, log_labels=log_labels, p_weights=W)
+    mm.init(logs, n_clusters, log_labels=log_labels, p_weights=W)
 
     tracker = ClusterTracker(logs, mm, n_clusters, list(range(25)))
     tracker.run(10)
