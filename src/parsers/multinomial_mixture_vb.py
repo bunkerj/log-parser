@@ -4,6 +4,12 @@ from scipy.special import digamma, xlogy
 from global_utils import log_multi_beta
 from src.utils import get_token_counts_batch, get_vocabulary_indices
 
+LOG_LABELS_DEF = None
+CS_WEIGHTS_DEF = None
+P_WEIGHTS_DEF = None
+EPSILON_DEF = 0.0001
+MAX_ITER_DEF = 50
+
 
 class MultinomialMixtureVB:
     def __init__(self):
@@ -29,17 +35,28 @@ class MultinomialMixtureVB:
         self.iter = 0
         self.max_iter = 999
 
-    def fit(self, logs, num_clusters, log_labels=None, cs_weights=None,
-            p_weights=None, epsilon=0.0001, max_iter=25):
+    def fit(self, logs, num_clusters, log_labels=LOG_LABELS_DEF,
+            cs_weights=CS_WEIGHTS_DEF, p_weights=P_WEIGHTS_DEF,
+            epsilon=EPSILON_DEF, max_iter=MAX_ITER_DEF):
         """
         Fits variational parameters with respect to the provided logs.
         Returns the predictions for the log data used for fitting.
         """
+        self.init(logs, num_clusters, log_labels, cs_weights,
+                  p_weights, epsilon, max_iter)
+        self._run_variational_bayes()
+
+    def fit_single_iter(self):
+        self._variational_e_step()
+        self._variational_m_step()
+
+    def init(self, logs, num_clusters, log_labels=LOG_LABELS_DEF,
+             cs_weights=CS_WEIGHTS_DEF, p_weights=P_WEIGHTS_DEF,
+             epsilon=EPSILON_DEF, max_iter=MAX_ITER_DEF):
         self._init_fields(logs, num_clusters, cs_weights,
                           p_weights, epsilon, max_iter)
         self._label_logs(log_labels)
         self._sample_parameters()
-        self._run_variational_bayes()
 
     def predict(self, logs):
         """
@@ -73,8 +90,7 @@ class MultinomialMixtureVB:
         self.iter = 0
         self.prev_elbo = None
         while self._should_continue():
-            self._variational_e_step()
-            self._variational_m_step()
+            self.fit_single_iter()
 
     def _label_logs(self, log_labels):
         """
