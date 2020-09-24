@@ -4,7 +4,7 @@ from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
 
-DIM = (2, 4)
+DIM = (4, 4)
 
 results = load_results('exp1_results.p')
 
@@ -17,6 +17,14 @@ data_configs = [
     DataConfigs.HealthApp,
     DataConfigs.HPC,
     DataConfigs.Linux,
+    DataConfigs.Mac,
+    DataConfigs.OpenSSH,
+    DataConfigs.OpenStack,
+    DataConfigs.Proxifier,
+    DataConfigs.Spark,
+    DataConfigs.Thunderbird,
+    DataConfigs.Windows,
+    DataConfigs.Zookeeper,
 ]
 
 for idx, data_config in enumerate(data_configs, start=1):
@@ -29,40 +37,20 @@ for idx, data_config in enumerate(data_configs, start=1):
     ev = Evaluator(true_assignments)
 
     dataset_results = results[name]
-    c_base_samples = dataset_results['clustering_base_samples']
-    c_lab_samples = dataset_results['clustering_lab_samples']
-    c_lab_const_samples \
-        = dataset_results['clustering_lab_const_samples']
-    log_labels_samples = dataset_results['log_labels_samples']
-
-    n_samples = len(c_base_samples)
-    scores_base = []
-    scores_lab = []
-    scores_lab_const = []
-    for sample_idx in range(n_samples):
-        c_base_sample = c_base_samples[sample_idx]
-        c_lab_sample = c_lab_samples[sample_idx]
-        c_lab_const_sample = c_lab_const_samples[sample_idx]
-        log_labels_sample = log_labels_samples[sample_idx]
-        labeled_indices = get_labeled_indices(log_labels_sample)
-
-        score_base = ev.get_ami(c_base_sample, labeled_indices)
-        score_lab = ev.get_ami(c_lab_sample, labeled_indices)
-        score_lob_const = ev.get_ami(c_lab_const_sample, labeled_indices)
-
-        scores_base.append(score_base)
-        scores_lab.append(score_lab)
-        scores_lab_const.append(score_lob_const)
+    score_base_samples = dataset_results['score_base_samples']
+    score_lab_samples = dataset_results['score_lab_samples']
+    score_lob_const_samples \
+        = dataset_results['score_lab_const_samples']
 
     plt.subplot(*DIM, idx)
     plt.title(name)
-    plt.boxplot([scores_base,
-                 scores_lab,
-                 scores_lab_const],
+    plt.boxplot([score_base_samples,
+                 score_lab_samples,
+                 score_lob_const_samples],
                 labels=['Base', 'Lab', 'Lab + Const'],
                 showfliers=False)
     plt.ylabel('AMI')
     plt.grid()
 
-plt.subplots_adjust(wspace=0.3)
+plt.subplots_adjust(wspace=0.3, hspace=0.5)
 plt.show()

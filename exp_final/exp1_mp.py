@@ -10,25 +10,28 @@ initial clustering.
 import numpy as np
 import multiprocessing as mp
 from time import time
-from global_utils import dump_results, get_log_labels, get_num_true_clusters
+from global_utils import dump_results, get_log_labels, get_num_true_clusters, \
+    get_labeled_indices
 from src.helpers.oracle import Oracle
 from src.data_config import DataConfigs
+from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB
 
 
-def get_clustering_evaluations(logs, true_assignments, oracle,
+def get_clustering_evaluations(logs, true_assignments, ev, oracle,
                                n_clusters, n_labels, n_consts):
     np.random.seed()
 
     log_labels = get_log_labels(true_assignments, n_labels)
+    labeled_indices = get_labeled_indices(log_labels)
 
     # Baseline
     mm = MultinomialMixtureVB()
     mm.fit(logs, n_clusters)
     c_base = mm.predict(logs)
 
-    # Baseline + 5% labels (100 labels)
+    # Baseline + labels
     mm_lab = MultinomialMixtureVB()
     mm_lab.fit(logs, n_clusters, log_labels=log_labels)
     c_lab = mm_lab.predict(logs)
@@ -46,7 +49,11 @@ def get_clustering_evaluations(logs, true_assignments, oracle,
                      max_iter=25)
     c_lab_const = mm_lab_const.predict(logs)
 
-    return c_base, c_lab, c_lab_const, log_labels
+    score_base = ev.get_ami(c_base, labeled_indices)
+    score_lab = ev.get_ami(c_lab, labeled_indices)
+    score_lab_const = ev.get_ami(c_lab_const, labeled_indices)
+
+    return score_base, score_lab, score_lab_const
 
 
 def run_exp1_single_dataset_mp(data_config, n_labels, n_consts, n_samples):
@@ -55,9 +62,10 @@ def run_exp1_single_dataset_mp(data_config, n_labels, n_consts, n_samples):
     true_assignments = data_manager.get_true_assignments()
     oracle = Oracle(true_assignments)
     n_clusters = get_num_true_clusters(true_assignments)
+    ev = Evaluator(true_assignments)
 
     with mp.Pool(mp.cpu_count()) as pool:
-        args = (logs, true_assignments, oracle,
+        args = (logs, true_assignments, ev, oracle,
                 n_clusters, n_labels, n_consts)
         arg_list = [args for _ in range(n_samples)]
         mp_results = pool.starmap(get_clustering_evaluations, arg_list)
@@ -65,10 +73,9 @@ def run_exp1_single_dataset_mp(data_config, n_labels, n_consts, n_samples):
     clustering_results = list(zip(*mp_results))
 
     return {
-        'clustering_base_samples': clustering_results[0],
-        'clustering_lab_samples': clustering_results[1],
-        'clustering_lab_const_samples': clustering_results[2],
-        'log_labels_samples': clustering_results[3],
+        'score_base_samples': clustering_results[0],
+        'score_lab_samples': clustering_results[1],
+        'score_lab_const_samples': clustering_results[2],
     }
 
 
