@@ -7,6 +7,7 @@ from src.utils import get_token_counts_batch, get_vocabulary_indices
 LOG_LABELS_DEF = None
 CS_WEIGHTS_DEF = None
 P_WEIGHTS_DEF = None
+SAMPLE_RESP_DEF = True
 EPSILON_DEF = 0.0001
 MAX_ITER_DEF = 50
 
@@ -37,13 +38,14 @@ class MultinomialMixtureVB:
 
     def fit(self, logs, num_clusters, log_labels=LOG_LABELS_DEF,
             cs_weights=CS_WEIGHTS_DEF, p_weights=P_WEIGHTS_DEF,
-            epsilon=EPSILON_DEF, max_iter=MAX_ITER_DEF):
+            epsilon=EPSILON_DEF, max_iter=MAX_ITER_DEF,
+            sample_resp=SAMPLE_RESP_DEF):
         """
         Fits variational parameters with respect to the provided logs.
         Returns the predictions for the log data used for fitting.
         """
         self.init(logs, num_clusters, log_labels, cs_weights,
-                  p_weights, epsilon, max_iter)
+                  p_weights, epsilon, max_iter, sample_resp)
         self._run_variational_bayes()
 
     def fit_single_iter(self):
@@ -52,11 +54,12 @@ class MultinomialMixtureVB:
 
     def init(self, logs, num_clusters, log_labels=LOG_LABELS_DEF,
              cs_weights=CS_WEIGHTS_DEF, p_weights=P_WEIGHTS_DEF,
-             epsilon=EPSILON_DEF, max_iter=MAX_ITER_DEF):
+             epsilon=EPSILON_DEF, max_iter=MAX_ITER_DEF,
+             sample_resp=SAMPLE_RESP_DEF):
         self._init_fields(logs, num_clusters, cs_weights,
                           p_weights, epsilon, max_iter)
         self._label_logs(log_labels)
-        self._sample_parameters()
+        self._sample_parameters(sample_resp)
 
     def predict(self, logs):
         """
@@ -117,7 +120,6 @@ class MultinomialMixtureVB:
         self.G = num_clusters
         self.N = len(logs)
         self.V = len(self.v_indices)
-        self.R = np.zeros((self.N, self.G))
         self.pi_v = np.zeros(self.G)
         self.theta_v = np.zeros((self.G, self.V))
         self.ex_ln_pi = np.zeros(self.G)
@@ -141,6 +143,9 @@ class MultinomialMixtureVB:
         Check if another VB iteration should be performed.
         Update self.prev_ll and self.iter variables.
         """
+        # should_continue = self.iter < 20
+        # self.iter += 1
+        # return should_continue
         if self.iter > self.max_iter:
             return False
         elif self.prev_elbo is None:
@@ -181,8 +186,9 @@ class MultinomialMixtureVB:
         entropy_term -= log_multi_beta(self.theta_v).sum()
         return entropy_term
 
-    def _sample_parameters(self):
-        self._initialize_responsibilities()
+    def _sample_parameters(self, sample_resp):
+        if sample_resp:
+            self._initialize_responsibilities()
         self._variational_m_step()
 
     def _variational_e_step(self):
@@ -220,5 +226,6 @@ class MultinomialMixtureVB:
 
     def _initialize_responsibilities(self):
         dir_params = self.alpha_0 * np.ones(self.G)
+        self.R = np.zeros((self.N, self.G))
         for n in range(self.N):
             self.R[n] = np.random.dirichlet(dir_params)
