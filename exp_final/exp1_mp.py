@@ -37,18 +37,17 @@ def get_clustering_evaluations(logs, true_assignments, ev, oracle,
     c_lab = mm_lab.predict(logs)
 
     # Baseline + labels + constraints
-    mm_lab_const = MultinomialMixtureVB()
     W = oracle.get_corr_constraints_matrix(
         parsed_clusters=c_lab,
         n_constraint_samples=n_consts,
         tokenized_logs=logs,
         weight=1e7)
-    mm_lab_const.fit(logs, n_clusters,
-                     log_labels=log_labels,
-                     p_weights=W,
-                     max_iter=25,
-                     sample_resp=False)
-    c_lab_const = mm_lab_const.predict(logs)
+    mm_lab.fit(logs, n_clusters,
+               log_labels=log_labels,
+               p_weights=W,
+               max_iter=25,
+               sample_resp=False)
+    c_lab_const = mm_lab.predict(logs)
 
     score_base = ev.get_ami(c_base, labeled_indices)
     score_lab = ev.get_ami(c_lab, labeled_indices)
