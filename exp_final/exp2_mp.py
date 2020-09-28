@@ -93,7 +93,7 @@ if __name__ == '__main__':
     start_time = time()
 
     data_config = DataConfigs.BGL_FULL_FINAL
-    n_samples = 100
+    n_samples = 1000
     cs_ub_sizes = list(range(10, 101, 10))
     cs_proj_sizes = list(range(100, 1001, 100))
     subset_size = 50000

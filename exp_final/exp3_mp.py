@@ -93,11 +93,12 @@ def run_exp3_single(logs, cs_logs, cs_w, cs_true_assignments, n_clusters,
         parsed_clusters=c_cs,
         n_constraint_samples=n_constraints,
         tokenized_logs=cs_logs,
-        weight=10)
+        weight=1e7)
     mm.fit(cs_logs, n_clusters,
            cs_weights=cs_w,
            log_labels=log_labels,
-           p_weights=W)
+           p_weights=W,
+           sample_resp=False)
     c_cs = mm.predict(logs)
     ami = ev.get_ami(c_cs)
     acc = ev.get_accuracy(c_cs)
@@ -108,8 +109,8 @@ def run_exp3_single(logs, cs_logs, cs_w, cs_true_assignments, n_clusters,
 if __name__ == '__main__':
     start_time = time()
 
-    data_config = DataConfigs.Proxifier
-    n_samples = 100
+    data_config = DataConfigs.BGL
+    n_samples = 1000
     label_counts = list(range(0, 500, 10))
     constraint_counts = list(range(0, 500, 10))
     def_cs_ub_size = 25
