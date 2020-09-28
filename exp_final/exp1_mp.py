@@ -42,11 +42,12 @@ def get_clustering_evaluations(logs, true_assignments, ev, oracle,
         parsed_clusters=c_lab,
         n_constraint_samples=n_consts,
         tokenized_logs=logs,
-        weight=500)
+        weight=1e7)
     mm_lab_const.fit(logs, n_clusters,
                      log_labels=log_labels,
                      p_weights=W,
-                     max_iter=25)
+                     max_iter=25,
+                     sample_resp=False)
     c_lab_const = mm_lab_const.predict(logs)
 
     score_base = ev.get_ami(c_base, labeled_indices)
@@ -111,8 +112,8 @@ if __name__ == '__main__':
         DataConfigs.Zookeeper,
     ]
 
-    n_labels = 0
-    n_consts = 1000
+    n_labels = 200
+    n_consts = 200
     n_samples = 1000
 
     filename = 'exp1_results.p'
