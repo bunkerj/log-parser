@@ -9,7 +9,7 @@ import numpy as np
 import multiprocessing as mp
 from time import time
 from exp_final.utils import get_coreset
-from global_utils import dump_results, get_log_labels, get_num_true_clusters
+from global_utils import dump_results, sample_log_labels, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
@@ -79,7 +79,7 @@ def run_exp3_single(logs, cs_logs, cs_w, cs_true_assignments, n_clusters,
                     oracle, ev, n_labels, n_constraints):
     np.random.seed()
 
-    log_labels = get_log_labels(cs_true_assignments, n_labels)
+    log_labels = sample_log_labels(cs_true_assignments, n_labels)
 
     # Original fit
     mm = MultinomialMixtureVB()

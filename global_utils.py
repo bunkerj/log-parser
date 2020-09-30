@@ -88,7 +88,7 @@ def get_labeled_indices(log_labels):
     return labeled_indices
 
 
-def get_log_labels(true_assignments, num_of_labels):
+def sample_log_labels(true_assignments, num_of_labels):
     log_labels = {}
     labeled_indices = choices(range(len(true_assignments)), k=num_of_labels)
     for log_idx in labeled_indices:

@@ -3,7 +3,7 @@ Compare MultinomialMixtureVB scores with and without pairwise constraints for
 different datasets.
 """
 import multiprocessing as mp
-from global_utils import dump_results, get_log_labels, get_num_true_clusters
+from global_utils import dump_results, sample_log_labels, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
@@ -23,7 +23,7 @@ def get_mappings(cluster_templates, tokenized_logs):
 
 def run_single_sample_exp(logs, true_assignments, num_clusters, n_label,
                           evaluator, oracle, n_constraints):
-    log_labels = get_log_labels(true_assignments, n_label)
+    log_labels = sample_log_labels(true_assignments, n_label)
 
     # Baseline
     parser = MultinomialMixtureVB()

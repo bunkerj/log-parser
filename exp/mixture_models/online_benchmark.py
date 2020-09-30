@@ -3,7 +3,7 @@ Compare unlabeled (baseline) impurities against labeled impurities for the
 online mixture model.
 """
 from copy import deepcopy
-from global_utils import dump_results, get_log_labels, get_num_true_clusters
+from global_utils import dump_results, sample_log_labels, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
@@ -41,7 +41,7 @@ def run_online_benchmark(n_labels):
         ev = Evaluator(true_assignments)
 
         n_true_clusters = get_num_true_clusters(true_assignments)
-        log_labels = get_log_labels(true_assignments, n_labels)
+        log_labels = sample_log_labels(true_assignments, n_labels)
 
         parser_lab = MultinomialMixtureOnline(logs,
                                               n_true_clusters,

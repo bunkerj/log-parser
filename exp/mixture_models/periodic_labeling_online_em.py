@@ -7,7 +7,7 @@ from time import time
 from copy import deepcopy
 from random import sample
 from collections import defaultdict
-from global_utils import dump_results, shuffle_same_order, get_log_labels, \
+from global_utils import dump_results, shuffle_same_order, sample_log_labels, \
     get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
@@ -60,7 +60,7 @@ def run_periodic_labeling_online_em(data_config, n_init, n_restarts, n_samples,
             lab_on_cem_parser.perform_online_em(tokenized_log)
 
             if log_idx_1 == 1 or log_idx_1 % label_interval == 0:
-                log_labels = get_log_labels(true_assignments, n_labels)
+                log_labels = sample_log_labels(true_assignments, n_labels)
                 lab_on_em_parser.label_logs(log_labels, logs)
                 lab_on_cem_parser.label_logs(log_labels, logs)
 

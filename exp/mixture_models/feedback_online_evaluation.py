@@ -3,7 +3,7 @@ Evaluate how different initializations have an impact on impurity when using
 the online multinomial mixture model.
 """
 from time import time
-from global_utils import dump_results, get_avg, get_log_labels, \
+from global_utils import dump_results, get_avg, sample_log_labels, \
     get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
@@ -58,7 +58,7 @@ def run_feedback_online_evaluation(data_config, n_samples, is_class, is_online,
                                                     beta=1.05)
             unlab_parser.set_parameters(lab_parser.get_parameters())
 
-            log_labels = get_log_labels(true_assignments, label_count)
+            log_labels = sample_log_labels(true_assignments, label_count)
             lab_parser.label_logs(log_labels, tokenized_logs)
             labeled_indices = lab_parser.labeled_indices
 

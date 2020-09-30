@@ -1,4 +1,4 @@
-from global_utils import get_log_labels, get_num_true_clusters
+from global_utils import sample_log_labels, get_num_true_clusters
 from exp_final.utils import get_log_sample
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
@@ -14,7 +14,7 @@ def run_cluster_trajectories(data_config, subset_size, n_labels, n_constraints):
 
     n_clusters = get_num_true_clusters(true_assignments)
     ev = Evaluator(true_assignments)
-    log_labels = get_log_labels(true_assignments, n_labels)
+    log_labels = sample_log_labels(true_assignments, n_labels)
     oracle = Oracle(true_assignments)
 
     mm = MultinomialMixtureVB()

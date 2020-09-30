@@ -5,7 +5,7 @@ the online multinomial mixture model. [Using multiprocessing]
 from time import time
 from copy import deepcopy
 import multiprocessing as mp
-from global_utils import dump_results, get_avg, get_log_labels, \
+from global_utils import dump_results, get_avg, sample_log_labels, \
     get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
@@ -32,7 +32,7 @@ def perform_single_experiment(num_label, passed_data_config):
                                           beta=1.05)
     unlab_parser = deepcopy(lab_parser)
 
-    log_labels = get_log_labels(true_assignments, num_label)
+    log_labels = sample_log_labels(true_assignments, num_label)
     lab_parser.label_logs(log_labels, logs)
     labeled_indices = lab_parser.labeled_indices
 

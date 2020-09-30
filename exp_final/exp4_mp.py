@@ -8,7 +8,7 @@ import numpy as np
 import multiprocessing as mp
 from time import time
 from exp_final.utils import get_log_sample, get_coreset
-from global_utils import dump_results, get_log_labels, get_num_true_clusters
+from global_utils import dump_results, sample_log_labels, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
@@ -33,7 +33,7 @@ def run_exp4_full(data_config, label_counts, cs_proj_size,
     # Random labels
     with mp.Pool(mp.cpu_count()) as pool:
         for n_labels in label_counts:
-            log_labels = get_log_labels(true_assignments, n_labels)
+            log_labels = sample_log_labels(true_assignments, n_labels)
             args = (logs, n_clusters, log_labels, ev)
             arg_list = [args for _ in range(n_samples)]
             mp_results = pool.starmap(run_exp4_single, arg_list)
@@ -49,7 +49,7 @@ def run_exp4_full(data_config, label_counts, cs_proj_size,
                 = get_coreset(logs, n_clusters, n_labels, cs_proj_size)
             cs_true_assignments = data_manager.get_reduced_assignments(
                 cs_indices)
-            log_labels = get_log_labels(cs_true_assignments, n_labels)
+            log_labels = sample_log_labels(cs_true_assignments, n_labels)
             results['cs_size'].append(len(cs_logs))
 
             args = (logs, n_clusters, log_labels, ev)

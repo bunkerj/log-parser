@@ -10,7 +10,7 @@ initial clustering.
 import numpy as np
 import multiprocessing as mp
 from time import time
-from global_utils import dump_results, get_log_labels, get_num_true_clusters, \
+from global_utils import dump_results, sample_log_labels, get_num_true_clusters, \
     get_labeled_indices
 from src.helpers.oracle import Oracle
 from src.data_config import DataConfigs
@@ -23,7 +23,7 @@ def get_clustering_evaluations(logs, true_assignments, ev, oracle,
                                n_clusters, n_labels, n_consts):
     np.random.seed()
 
-    log_labels = get_log_labels(true_assignments, n_labels)
+    log_labels = sample_log_labels(true_assignments, n_labels)
     labeled_indices = get_labeled_indices(log_labels)
 
     # Baseline
