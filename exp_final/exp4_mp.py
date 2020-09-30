@@ -8,14 +8,15 @@ import numpy as np
 import multiprocessing as mp
 from time import time
 from exp_final.utils import get_log_sample, get_coreset
-from global_utils import dump_results, sample_log_labels, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
 from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB
+from global_utils import dump_results, get_log_labels, sample_log_labels, \
+    get_num_true_clusters
 
 
-def run_exp4_full(data_config, label_counts, cs_proj_size,
+def run_exp4_full(data_config, upper_bound_sizes, cs_proj_size,
                   subset_size, n_samples):
     results = {
         'cs_label_ami_samples': [],
@@ -23,6 +24,8 @@ def run_exp4_full(data_config, label_counts, cs_proj_size,
         'rand_label_ami_samples': [],
         'rand_label_acc_samples': [],
         'cs_size': [],
+        'cs_labels': [],
+        'rand_labels': [],
     }
 
     data_manager = DataManager(data_config)
@@ -30,26 +33,15 @@ def run_exp4_full(data_config, label_counts, cs_proj_size,
     n_clusters = get_num_true_clusters(true_assignments)
     ev = Evaluator(true_assignments)
 
-    # Random labels
-    with mp.Pool(mp.cpu_count()) as pool:
-        for n_labels in label_counts:
-            log_labels = sample_log_labels(true_assignments, n_labels)
-            args = (logs, n_clusters, log_labels, ev)
-            arg_list = [args for _ in range(n_samples)]
-            mp_results = pool.starmap(run_exp4_single, arg_list)
-            ami_samples, acc_samples = list(zip(*mp_results))
-
-            results['rand_label_ami_samples'].append(ami_samples)
-            results['rand_label_acc_samples'].append(acc_samples)
-
     # Coreset labels
     with mp.Pool(mp.cpu_count()) as pool:
-        for n_labels in label_counts:
+        for n_labels in upper_bound_sizes:
             _, cs_logs, cs_indices \
                 = get_coreset(logs, n_clusters, n_labels, cs_proj_size)
             cs_true_assignments = data_manager.get_reduced_assignments(
                 cs_indices)
-            log_labels = sample_log_labels(cs_true_assignments, n_labels)
+            log_labels = get_log_labels(cs_true_assignments)
+            results['cs_labels'].append(log_labels)
             results['cs_size'].append(len(cs_logs))
 
             args = (logs, n_clusters, log_labels, ev)
@@ -59,6 +51,19 @@ def run_exp4_full(data_config, label_counts, cs_proj_size,
 
             results['cs_label_ami_samples'].append(ami_samples)
             results['cs_label_acc_samples'].append(acc_samples)
+
+    # Random labels
+    with mp.Pool(mp.cpu_count()) as pool:
+        for n_labels in results['cs_size']:
+            log_labels = sample_log_labels(true_assignments, n_labels)
+            args = (logs, n_clusters, log_labels, ev)
+            arg_list = [args for _ in range(n_samples)]
+            mp_results = pool.starmap(run_exp4_single, arg_list)
+            ami_samples, acc_samples = list(zip(*mp_results))
+
+            results['rand_labels'].append(log_labels)
+            results['rand_label_ami_samples'].append(ami_samples)
+            results['rand_label_acc_samples'].append(acc_samples)
 
     return results
 
@@ -80,11 +85,11 @@ if __name__ == '__main__':
     data_config = DataConfigs.BGL_FULL_FINAL
     subset_size = 50000
     n_samples = 1000
-    label_counts = list(range(0, 250, 50))
+    upper_bound_sizes = list(range(0, 1000, 100))
     def_cs_proj_size = 1000
 
     filename = 'exp4_results.p'
-    results = run_exp4_full(data_config, label_counts, def_cs_proj_size,
+    results = run_exp4_full(data_config, upper_bound_sizes, def_cs_proj_size,
                             subset_size, n_samples)
     dump_results(filename, results)
 

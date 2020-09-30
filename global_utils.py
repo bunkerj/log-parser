@@ -1,6 +1,7 @@
 import os
 import pickle
 import numpy as np
+from collections import defaultdict
 from random import shuffle, choices
 from scipy.special import gammaln, xlogy
 from global_constants import RESULTS_DIR
@@ -86,6 +87,15 @@ def get_labeled_indices(log_labels):
     for k in log_labels:
         labeled_indices.extend(log_labels[k])
     return labeled_indices
+
+
+def get_log_labels(true_assignments):
+    log_labels = defaultdict(list)
+    for assignment in true_assignments:
+        log_idx = int(assignment[0])
+        event = assignment[12]
+        log_labels[event].append(log_idx)
+    return log_labels
 
 
 def sample_log_labels(true_assignments, num_of_labels):
