@@ -44,7 +44,7 @@ def run_exp3_full(data_config, label_counts, constraint_counts,
     results['cs_size'] = len(cs_logs)
 
     # Drain performance
-    parser = Drain(logs, 4, 100, 0.4)
+    parser = Drain(logs, 4, 100, 0.5)
     parser.parse()
     c_drain = parser.cluster_templates
     results['drain_ami'] = ev.get_ami(c_drain)
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     def_cs_ub_size = 2000
     def_cs_proj_size = 1000
 
-    filename = 'exp3_results_test.p'
+    filename = 'exp3_results.p'
     results = run_exp3_full(data_config, label_counts, constraint_counts,
                             def_cs_ub_size, def_cs_proj_size, n_samples)
     dump_results(filename, results)
