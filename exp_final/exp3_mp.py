@@ -44,7 +44,7 @@ def run_exp3_full(data_config, label_counts, constraint_counts,
     results['cs_size'] = len(cs_logs)
 
     # Drain performance
-    parser = Drain(logs, 4, 60, 0.22)
+    parser = Drain(logs, 4, 100, 0.4)
     parser.parse()
     c_drain = parser.cluster_templates
     results['drain_ami'] = ev.get_ami(c_drain)
@@ -65,7 +65,7 @@ def run_exp3_full(data_config, label_counts, constraint_counts,
     with mp.Pool(mp.cpu_count()) as pool:
         for n_constraints in constraint_counts:
             args = (logs, cs_logs, cs_w, cs_true_assignments, n_clusters,
-                    oracle, ev, 0, n_constraints)
+                    oracle, ev, 300, n_constraints)
             arg_list = [args for _ in range(n_samples)]
             mp_results = pool.starmap(run_exp3_single, arg_list)
             ami_samples, acc_samples = list(zip(*mp_results))
@@ -109,14 +109,14 @@ def run_exp3_single(logs, cs_logs, cs_w, cs_true_assignments, n_clusters,
 if __name__ == '__main__':
     start_time = time()
 
-    data_config = DataConfigs.BGL
+    data_config = DataConfigs.BGL_FULL_FINAL
     n_samples = 1000
-    label_counts = list(range(0, 500, 10))
-    constraint_counts = list(range(0, 500, 10))
-    def_cs_ub_size = 25
+    label_counts = list(range(0, 2001, 400))
+    constraint_counts = list(range(0, 2001, 400))
+    def_cs_ub_size = 2000
     def_cs_proj_size = 1000
 
-    filename = 'exp3_results.p'
+    filename = 'exp3_results_test.p'
     results = run_exp3_full(data_config, label_counts, constraint_counts,
                             def_cs_ub_size, def_cs_proj_size, n_samples)
     dump_results(filename, results)
