@@ -36,20 +36,20 @@ def run_exp2_full(data_config, cs_ub_sizes, cs_proj_sizes, subset_size,
     n_clusters = get_num_true_clusters(true_assignments)
     ev = Evaluator(true_assignments)
 
-    # Vary coreset upperbound size
-    with mp.Pool(mp.cpu_count()) as pool:
-        for cs_ub_size in cs_ub_sizes:
-            args = (logs, n_clusters, ev, cs_ub_size, def_cs_proj_size)
-            arg_list = [args for _ in range(n_samples)]
-            mp_results = pool.starmap(run_exp2_single, arg_list)
-            ami_base_samples, acc_base_samples, \
-            ami_cs_samples, acc_cs_samples = list(zip(*mp_results))
-            results['cs_ub']['ami_base_samples'].append(ami_base_samples)
-            results['cs_ub']['acc_base_samples'].append(acc_base_samples)
-            results['cs_ub']['ami_cs_samples'].append(ami_cs_samples)
-            results['cs_ub']['acc_cs_samples'].append(acc_cs_samples)
-
-    print('Stage 1 complete...')
+    # # Vary coreset upperbound size
+    # with mp.Pool(mp.cpu_count()) as pool:
+    #     for cs_ub_size in cs_ub_sizes:
+    #         args = (logs, n_clusters, ev, cs_ub_size, def_cs_proj_size)
+    #         arg_list = [args for _ in range(n_samples)]
+    #         mp_results = pool.starmap(run_exp2_single, arg_list)
+    #         ami_base_samples, acc_base_samples, \
+    #         ami_cs_samples, acc_cs_samples = list(zip(*mp_results))
+    #         results['cs_ub']['ami_base_samples'].append(ami_base_samples)
+    #         results['cs_ub']['acc_base_samples'].append(acc_base_samples)
+    #         results['cs_ub']['ami_cs_samples'].append(ami_cs_samples)
+    #         results['cs_ub']['acc_cs_samples'].append(acc_cs_samples)
+    #
+    # print('Stage 1 complete...')
 
     # Vary coreset projection dimensions
     with mp.Pool(mp.cpu_count()) as pool:
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     cs_ub_sizes = list(range(10, 101, 10))
     cs_proj_sizes = list(range(100, 1001, 100))
     subset_size = 50000
-    def_cs_ub_size = 25
+    def_cs_ub_size = 50
     def_cs_proj_size = 1000
 
     filename = 'exp2_results.p'
