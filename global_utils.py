@@ -93,7 +93,7 @@ def get_log_labels(true_assignments):
     log_labels = defaultdict(list)
     for assignment in true_assignments:
         log_idx = int(assignment[0])
-        event = assignment[12]
+        event = assignment[-1]
         log_labels[event].append(log_idx)
     return log_labels
 
