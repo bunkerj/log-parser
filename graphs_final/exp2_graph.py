@@ -7,15 +7,15 @@ results = load_results('exp2_results.p')
 
 
 def plot_metric(subplot_args, feature, title, ylabel, xlabel):
-    cs_ub_sizes = results[feature]['sizes']
-    N = len(cs_ub_sizes)
+    varying_sizes = results[feature]['varying_sizes']
+    N = len(varying_sizes)
     avg_scores_cs = get_sample_avg(results[feature]['ami_cs_samples'])
     avg_scores_base = get_sample_avg(results[feature]['ami_base_samples'])
     const_avg_score_base = N * [mean(avg_scores_base)]
 
     plt.subplot(*subplot_args)
-    plt.plot(cs_ub_sizes, const_avg_score_base)
-    plt.plot(cs_ub_sizes, avg_scores_cs)
+    plt.plot(varying_sizes, const_avg_score_base)
+    plt.plot(varying_sizes, avg_scores_cs)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
     if subplot_args[2] == 1:
