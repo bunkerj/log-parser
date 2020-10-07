@@ -24,7 +24,7 @@ Z_arr = np.array(Z)
 
 ax.plot_surface(X_arr, Y_arr, Z_arr)
 ax.set_xlabel('Label Counts')
-ax.set_ylabel('Constraints Counts')
+ax.set_ylabel('Constraint Counts')
 ax.set_zlabel('AMI')
 
 plt.title('Performance Evaluation of Labels and Constraints')
