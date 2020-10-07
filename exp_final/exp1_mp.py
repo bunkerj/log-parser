@@ -10,13 +10,13 @@ initial clustering.
 import numpy as np
 import multiprocessing as mp
 from time import time
-from global_utils import dump_results, sample_log_labels, get_num_true_clusters, \
-    get_labeled_indices
 from src.helpers.oracle import Oracle
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB
+from global_utils import dump_results, sample_log_labels, \
+    get_num_true_clusters, get_labeled_indices
 
 
 def get_clustering_evaluations(logs, true_assignments, ev, oracle,
@@ -31,29 +31,42 @@ def get_clustering_evaluations(logs, true_assignments, ev, oracle,
     mm.fit(logs, n_clusters)
     c_base = mm.predict(logs)
 
+    # Baseline + constraints
+    W_const = oracle.get_corr_constraints_matrix(
+        parsed_clusters=c_base,
+        n_constraint_samples=n_consts,
+        tokenized_logs=logs,
+        weight=1e7)
+    mm.fit(logs, n_clusters,
+           p_weights=W_const,
+           max_iter=25,
+           sample_resp=False)
+    c_const = mm.predict(logs)
+
     # Baseline + labels
     mm_lab = MultinomialMixtureVB()
     mm_lab.fit(logs, n_clusters, log_labels=log_labels)
     c_lab = mm_lab.predict(logs)
 
     # Baseline + labels + constraints
-    W = oracle.get_corr_constraints_matrix(
+    W_lab_const = oracle.get_corr_constraints_matrix(
         parsed_clusters=c_lab,
         n_constraint_samples=n_consts,
         tokenized_logs=logs,
         weight=1e7)
     mm_lab.fit(logs, n_clusters,
                log_labels=log_labels,
-               p_weights=W,
+               p_weights=W_lab_const,
                max_iter=25,
                sample_resp=False)
     c_lab_const = mm_lab.predict(logs)
 
     score_base = ev.get_ami(c_base, labeled_indices)
+    score_const = ev.get_ami(c_const, labeled_indices)
     score_lab = ev.get_ami(c_lab, labeled_indices)
     score_lab_const = ev.get_ami(c_lab_const, labeled_indices)
 
-    return score_base, score_lab, score_lab_const
+    return score_base, score_const, score_lab, score_lab_const
 
 
 def run_exp1_single_dataset_mp(data_config, n_labels, n_consts, n_samples):
@@ -74,8 +87,9 @@ def run_exp1_single_dataset_mp(data_config, n_labels, n_consts, n_samples):
 
     return {
         'score_base_samples': clustering_results[0],
-        'score_lab_samples': clustering_results[1],
-        'score_lab_const_samples': clustering_results[2],
+        'score_const_samples': clustering_results[1],
+        'score_lab_samples': clustering_results[2],
+        'score_lab_const_samples': clustering_results[3],
     }
 
 

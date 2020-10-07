@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from global_utils import load_results, get_labeled_indices
+from global_utils import load_results
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
@@ -38,6 +38,7 @@ for idx, data_config in enumerate(data_configs, start=1):
 
     dataset_results = results[name]
     score_base_samples = dataset_results['score_base_samples']
+    score_const_samples = dataset_results['score_const_samples']
     score_lab_samples = dataset_results['score_lab_samples']
     score_lob_const_samples \
         = dataset_results['score_lab_const_samples']
@@ -45,9 +46,10 @@ for idx, data_config in enumerate(data_configs, start=1):
     plt.subplot(*DIM, idx)
     plt.title(name)
     plt.boxplot([score_base_samples,
+                 score_const_samples,
                  score_lab_samples,
                  score_lob_const_samples],
-                labels=['Base', 'Lab', 'Lab + Const'],
+                labels=['Base', 'C', 'L', 'L/C'],
                 showfliers=False)
     plt.ylabel('AMI')
     plt.grid()
