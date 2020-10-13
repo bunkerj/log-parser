@@ -1,6 +1,7 @@
 from global_utils import get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.data_manager import DataManager
+from src.utils import get_vocabulary_indices
 
 data_configs = [
     DataConfigs.Android,
@@ -11,6 +12,14 @@ data_configs = [
     DataConfigs.HealthApp,
     DataConfigs.HPC,
     DataConfigs.Linux,
+    DataConfigs.Mac,
+    DataConfigs.OpenSSH,
+    DataConfigs.OpenStack,
+    DataConfigs.Proxifier,
+    DataConfigs.Spark,
+    DataConfigs.Thunderbird,
+    DataConfigs.Windows,
+    DataConfigs.Zookeeper,
     DataConfigs.BGL_FULL_FINAL,
 ]
 
@@ -26,7 +35,11 @@ for data_config in data_configs:
     event_set = set([' '.join(log) for log in logs])
     n_unique_logs = len(event_set)
 
+    v_indices = get_vocabulary_indices(logs)
+    n_vocab = len(v_indices)
+
     print(name)
     print('Number of clusters: {}'.format(n_clusters))
     print('Number of unique logs: {}'.format(n_unique_logs))
+    print('Number of unique tokens: {}'.format(n_vocab))
     print('Number of logs: {}\n'.format(n_logs))
