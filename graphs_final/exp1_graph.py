@@ -6,7 +6,7 @@ from src.helpers.evaluator import Evaluator
 
 DIM = (4, 4)
 
-results = load_results('exp1_results_oct14.p')
+results = load_results('exp1_results.p')
 
 data_configs = [
     DataConfigs.Android,
