@@ -6,7 +6,7 @@ from src.helpers.evaluator import Evaluator
 
 DIM = (4, 4)
 
-results = load_results('exp1_results.p')
+results = load_results('exp1_results_oct14.p')
 
 data_configs = [
     DataConfigs.Android,
@@ -49,7 +49,7 @@ for idx, data_config in enumerate(data_configs, start=1):
                  score_const_samples,
                  score_lab_samples,
                  score_lob_const_samples],
-                labels=['Base', 'C', 'L', 'L/C'],
+                labels=['B', 'C', 'L', 'C/L'],
                 showfliers=False)
     plt.ylabel('AMI')
     plt.grid()
