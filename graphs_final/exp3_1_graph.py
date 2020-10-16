@@ -11,16 +11,14 @@ ax = fig.gca(projection='3d')
 
 x_lin = results['label_counts']
 y_lin = results['constraint_counts']
-X_arr, Y_arr = np.meshgrid(x_lin, y_lin)
+X_arr, Y_arr = np.meshgrid(x_lin, y_lin, indexing='ij')
+Z_arr = np.zeros(X_arr.shape)
 
-Z = []
-for i, y in enumerate(y_lin):
-    Z.append([])
-    for j, x in enumerate(x_lin):
-        average_ami = mean(ami_samples[x][y])
-        Z[i].append(average_ami)
-
-Z_arr = np.array(Z)
+for i in range(len(x_lin)):
+    for j in range(len(y_lin)):
+        x = X_arr[i, j]
+        y = Y_arr[i, j]
+        Z_arr[i, j] = mean(ami_samples[x][y])
 
 ax.plot_surface(X_arr, Y_arr, Z_arr)
 ax.set_xlabel('Label Counts')
