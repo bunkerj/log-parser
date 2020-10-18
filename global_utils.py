@@ -150,3 +150,7 @@ def get_link_events(links, reference):
         event2 = reference[idx2]
         link_events.append((event1, event2))
     return link_events
+
+
+def get_reduced_assignments(indices, true_assignments):
+    return [true_assignments[idx] for idx in indices]

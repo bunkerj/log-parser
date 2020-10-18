@@ -13,7 +13,7 @@ from src.helpers.data_manager import DataManager
 from src.helpers.evaluator import Evaluator
 from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB
 from global_utils import dump_results, get_log_labels, sample_log_labels, \
-    get_num_true_clusters
+    get_num_true_clusters, get_reduced_assignments
 
 
 def run_exp4_full(data_config, upper_bound_sizes, cs_proj_size,
@@ -38,8 +38,8 @@ def run_exp4_full(data_config, upper_bound_sizes, cs_proj_size,
         for n_labels in upper_bound_sizes:
             _, cs_logs, cs_indices \
                 = get_coreset(logs, n_clusters, n_labels, cs_proj_size)
-            cs_true_assignments = data_manager.get_reduced_assignments(
-                cs_indices)
+            cs_true_assignments = get_reduced_assignments(cs_indices,
+                                                          true_assignments)
             log_labels = get_log_labels(cs_true_assignments)
             results['cs_labels'].append(log_labels)
             results['cs_size'].append(len(cs_logs))

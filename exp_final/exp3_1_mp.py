@@ -9,13 +9,14 @@ import numpy as np
 import multiprocessing as mp
 from time import time
 from exp_final.utils import get_coreset
-from global_utils import dump_results, sample_log_labels, get_num_true_clusters
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from src.helpers.oracle import Oracle
 from src.parsers.drain import Drain
 from src.parsers.multinomial_mixture_vb import MultinomialMixtureVB
+from global_utils import dump_results, sample_log_labels, \
+    get_num_true_clusters, get_reduced_assignments
 
 
 def run_exp3_2_full(data_config, label_counts, constraint_counts,
@@ -35,7 +36,7 @@ def run_exp3_2_full(data_config, label_counts, constraint_counts,
 
     cs_w, cs_logs, cs_indices \
         = get_coreset(logs, n_clusters, cs_ub_size, cs_proj_size)
-    cs_true_assignments = data_manager.get_reduced_assignments(cs_indices)
+    cs_true_assignments = get_reduced_assignments(cs_indices, true_assignments)
     oracle = Oracle(cs_true_assignments)
     results['cs_size'] = len(cs_logs)
 

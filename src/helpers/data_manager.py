@@ -77,12 +77,6 @@ class DataManager:
         assignments_path = self.data_config['assignments_path']
         return read_csv(assignments_path)[1:]
 
-    def get_reduced_assignments(self, indices):
-        true_assignments = self.get_true_assignments()
-        N = len(true_assignments)
-        idx_set = set(indices)
-        return [true_assignments[idx] for idx in range(N) if idx in idx_set]
-
     def _get_tokenized_no_num_log(self, tokenized_log):
         tokenized_no_num_log = []
         for token in tokenized_log:
