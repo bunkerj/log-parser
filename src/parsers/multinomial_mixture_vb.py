@@ -192,11 +192,12 @@ class MultinomialMixtureVB:
         self._variational_m_step()
 
     def _variational_e_step(self):
-        self.R = self._get_penalty_weight_terms(self.R)
-        self.R += self.C @ self.ex_ln_theta.T
-        self.R += self.ex_ln_pi.reshape(1, -1)
-        self.R *= self.cs_weights.reshape(-1, 1)
-        self._norm_responsibilities()
+        for n in range(self.N):
+            r_n = self.C[n].reshape(1, -1) @ self.ex_ln_theta.T
+            r_n *= self.cs_weights[n]
+            r_n += self.ex_ln_pi.reshape(1, -1)
+            r_n += self._get_p_weight_terms(n)
+            self.R[n] = self._norm_resp(r_n)
 
     def _variational_m_step(self):
         self.pi_v = self.R.sum(axis=0) + self.alpha
@@ -204,20 +205,21 @@ class MultinomialMixtureVB:
         self.theta_v = (self.R.T @ self.C) + self.beta
         self.ex_ln_theta = self._get_ex_ln(self.theta_v)
 
-    def _get_penalty_weight_terms(self, R):
-        penalty_weight_terms = np.zeros(R.shape)
-        for n in self.p_weights:
-            for g in range(self.G):
-                penalty_weight_terms[n, g] += self._get_p_weight_term(R, n, g)
+    def _get_p_weight_terms(self, n):
+        penalty_weight_terms = np.zeros((1, self.G))
+        for g in range(self.G):
+            penalty_weight_terms[0, g] += self._get_p_weight_single_term(n, g)
         return penalty_weight_terms
 
-    def _get_p_weight_term(self, R, n, g):
-        return sum(self.p_weights[n][m] * R[m, g] for m in self.p_weights[n])
+    def _get_p_weight_single_term(self, n, g):
+        return sum(self.p_weights[n][m] *
+                   self.R[m, g] for m in self.p_weights[n])
 
-    def _norm_responsibilities(self):
-        self.R -= self.R.max(axis=1).reshape(-1, 1)
-        self.R = np.exp(self.R)
-        self.R /= self.R.sum(axis=1).reshape(-1, 1)
+    def _norm_resp(self, r_n):
+        r_n -= r_n.max()
+        r_n = np.exp(r_n)
+        r_n /= r_n.sum()
+        return r_n
 
     def _get_ex_ln(self, params):
         axis = params.ndim - 1
