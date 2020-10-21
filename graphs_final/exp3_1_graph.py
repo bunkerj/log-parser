@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from statistics import mean
 from global_utils import load_results
 
-results = load_results('exp3_1_results.p')
+results = load_results('exp3_1_results_oct16.p')
 ami_samples = results['ami_samples']
 
 fig = plt.figure()
@@ -20,7 +21,7 @@ for i in range(len(x_lin)):
         y = Y_arr[i, j]
         Z_arr[i, j] = mean(ami_samples[x][y])
 
-ax.plot_surface(X_arr, Y_arr, Z_arr)
+ax.plot_surface(X_arr, Y_arr, Z_arr, cmap=cm.coolwarm)
 ax.set_xlabel('Label Counts')
 ax.set_ylabel('Constraint Counts')
 ax.set_zlabel('AMI')
