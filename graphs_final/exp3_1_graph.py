@@ -4,7 +4,7 @@ from matplotlib import cm
 from statistics import mean
 from global_utils import load_results
 
-results = load_results('exp3_1_results_oct16.p')
+results = load_results('exp3_1_results.p')
 ami_samples = results['ami_samples']
 
 fig = plt.figure()
