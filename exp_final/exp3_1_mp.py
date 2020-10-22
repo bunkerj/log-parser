@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
     data_config = DataConfigs.BGL_FULL_FINAL
     n_samples = 1000
-    label_counts = list(range(0, 2001, 400))
+    label_counts = list(range(0, 201, 40))
     constraint_counts = list(range(0, 2001, 400))
     def_cs_ub_size = 2000
     def_cs_proj_size = 1000
