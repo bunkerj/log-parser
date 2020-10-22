@@ -2,11 +2,10 @@ import matplotlib.pyplot as plt
 from statistics import mean, stdev
 from global_utils import load_results
 from src.data_config import DataConfigs
-from graphs.utils import plot_mean_with_ci
 from src.helpers.evaluator import Evaluator
 from src.helpers.data_manager import DataManager
 from graphs_final.utils import get_sample_avg, get_sample_std, \
-    plot_mean_with_ci_ami
+    plot_mean_with_std
 
 DIM = (4, 4)
 FEEDBACK_TYPE = 'labels'
@@ -56,10 +55,10 @@ for idx, data_config in enumerate(data_configs, start=1):
 
     plt.subplot(*DIM, idx)
     plt.title(name)
-    plot_mean_with_ci_ami(feedback_count, mean_base, std_base, 'blue',
-                          label='No Feedback')
-    plot_mean_with_ci_ami(feedback_count, mean_feedback, std_feedback, 'green',
-                          label=feedback_type)
+    plot_mean_with_std(feedback_count, mean_base, std_base, 'blue',
+                       label='No Feedback')
+    plot_mean_with_std(feedback_count, mean_feedback, std_feedback, 'green',
+                       label=feedback_type)
     if idx == 1:
         plt.legend(loc='upper left')
         plt.ylabel('AMI')
