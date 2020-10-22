@@ -125,7 +125,7 @@ if __name__ == '__main__':
 
     label_counts = list(range(0, 201, 40))
     constraint_counts = list(range(0, 201, 40))
-    n_samples = 5
+    n_samples = 1000
 
     filename = 'exp1_2_results.p'
     results = run_exp1_2_full(data_configs, label_counts,
