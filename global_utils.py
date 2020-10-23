@@ -35,6 +35,13 @@ def log_multi_coeff(x_flat):
     return gammaln(x_flat.sum() + 1) - np.sum(gammaln(x_flat + 1))
 
 
+def log_multi_coeff_vec(C):
+    """
+    Return N coefficients for the NxV matrix of counts C.
+    """
+    return gammaln(C.sum(axis=1) + 1) - np.sum(gammaln(C + 1), axis=1)
+
+
 def unnorm_log_multi(x_flat, params):
     params_flat = np.maximum(params, 0).flatten()
     return (x_flat * np.log(params_flat)).sum()

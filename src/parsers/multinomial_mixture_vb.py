@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 from scipy.special import digamma, xlogy
-from global_utils import log_multi_beta
+from global_utils import log_multi_beta, log_multi_coeff_vec
 from src.utils import get_token_counts_batch, get_vocabulary_indices
 
 LOG_LABELS_DEF = None
@@ -75,6 +75,14 @@ class MultinomialMixtureVB:
 
     def get_labeled_indices(self):
         return self.labeled_indices
+
+    def _get_log_likelihood(self):
+        log_multi_coeff = log_multi_coeff_vec(self.C)
+        exp_term = self.C @ self.ex_ln_theta.T + \
+                   self.ex_ln_pi.reshape(1, -1) + \
+                   log_multi_coeff.reshape(-1, 1)
+        log_likelihood = np.log(np.exp(exp_term).sum(axis=1)).sum()
+        return log_likelihood
 
     def _predict_with_current_responsibilities(self):
         cluster_templates = defaultdict(list)
