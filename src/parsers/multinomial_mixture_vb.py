@@ -10,6 +10,7 @@ P_WEIGHTS_DEF = None
 SAMPLE_RESP_DEF = True
 EPSILON_DEF = 0.005
 MAX_ITER_DEF = 50
+N_RESTART_DEF = 0
 
 
 class MultinomialMixtureVB:
@@ -39,13 +40,13 @@ class MultinomialMixtureVB:
     def fit(self, logs, num_clusters, log_labels=LOG_LABELS_DEF,
             cs_weights=CS_WEIGHTS_DEF, p_weights=P_WEIGHTS_DEF,
             epsilon=EPSILON_DEF, max_iter=MAX_ITER_DEF,
-            sample_resp=SAMPLE_RESP_DEF):
+            sample_resp=SAMPLE_RESP_DEF, n_restarts=N_RESTART_DEF):
         """
         Fits variational parameters with respect to the provided logs.
         Returns the predictions for the log data used for fitting.
         """
         self.init(logs, num_clusters, log_labels, cs_weights,
-                  p_weights, epsilon, max_iter, sample_resp)
+                  p_weights, epsilon, max_iter, sample_resp, n_restarts)
         self._run_variational_bayes()
 
     def fit_single_iter(self):
@@ -55,11 +56,12 @@ class MultinomialMixtureVB:
     def init(self, logs, num_clusters, log_labels=LOG_LABELS_DEF,
              cs_weights=CS_WEIGHTS_DEF, p_weights=P_WEIGHTS_DEF,
              epsilon=EPSILON_DEF, max_iter=MAX_ITER_DEF,
-             sample_resp=SAMPLE_RESP_DEF):
+             sample_resp=SAMPLE_RESP_DEF, n_restarts=N_RESTART_DEF):
         self._init_fields(logs, num_clusters, cs_weights,
                           p_weights, epsilon, max_iter)
         self._label_logs(log_labels)
         self._sample_parameters(sample_resp)
+        self._perform_random_restarts(n_restarts)
 
     def predict(self, logs):
         """
@@ -83,6 +85,21 @@ class MultinomialMixtureVB:
                    log_multi_coeff.reshape(-1, 1)
         log_likelihood = np.log(np.exp(exp_term).sum(axis=1)).sum()
         return log_likelihood
+
+    def _perform_random_restarts(self, n_restarts):
+        if n_restarts == 0:
+            return
+        best_R = self.R
+        best_ll = self._get_log_likelihood()
+        for _ in range(n_restarts):
+            self._sample_responsibilities()
+            self._variational_m_step()
+            ll = self._get_log_likelihood()
+            if ll > best_ll:
+                best_R = self.R
+                best_ll = ll
+        self.R = best_R
+        self._variational_m_step()
 
     def _predict_with_current_responsibilities(self):
         cluster_templates = defaultdict(list)
@@ -196,7 +213,7 @@ class MultinomialMixtureVB:
 
     def _sample_parameters(self, sample_resp):
         if sample_resp:
-            self._initialize_responsibilities()
+            self._sample_responsibilities()
         self._variational_m_step()
 
     def _variational_e_step(self):
@@ -234,7 +251,7 @@ class MultinomialMixtureVB:
         params_sum = params.sum(axis=axis, keepdims=True)
         return digamma(params) - digamma(params_sum)
 
-    def _initialize_responsibilities(self):
+    def _sample_responsibilities(self):
         dir_params = self.alpha_0 * np.ones(self.G)
         self.R = np.zeros((self.N, self.G))
         for n in range(self.N):
