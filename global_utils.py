@@ -2,7 +2,7 @@ import os
 import pickle
 import numpy as np
 from collections import defaultdict
-from random import shuffle, choices
+from random import shuffle, choices, sample
 from scipy.special import gammaln, xlogy
 from global_constants import RESULTS_DIR
 
@@ -99,7 +99,7 @@ def get_labeled_indices(log_labels):
 def get_log_labels(true_assignments):
     log_labels = defaultdict(list)
     for assignment in true_assignments:
-        log_idx = int(assignment[0])
+        log_idx = int(assignment[0]) - 1
         event = assignment[-1]
         log_labels[event].append(log_idx)
     return log_labels
@@ -113,6 +113,21 @@ def sample_log_labels(true_assignments, num_of_labels):
         if cluster not in log_labels:
             log_labels[cluster] = []
         log_labels[cluster].append(log_idx)
+    return log_labels
+
+
+def sample_log_labels_unique(logs, true_assignments, num_of_labels):
+    unique_logs = {}
+    for log_idx, log in enumerate(logs):
+        log_str = ' '.join(log)
+        unique_logs[log_str] = log_idx
+    n_samples = min(len(unique_logs), num_of_labels)
+    unique_log_strings = sample(list(unique_logs), k=n_samples)
+    log_labels = {}
+    for log_str in unique_log_strings:
+        log_idx = unique_logs[log_str]
+        cluster = true_assignments[log_idx][-1]
+        log_labels[cluster] = [log_idx]
     return log_labels
 
 
