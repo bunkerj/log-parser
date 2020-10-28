@@ -7,7 +7,7 @@ from src.helpers.data_manager import DataManager
 
 DIM = (4, 4)
 
-results = load_results('exp1_3_results_new.p')
+results = load_results('exp1_3_results.p')
 
 data_configs = [
     DataConfigs.Android,

@@ -112,7 +112,7 @@ if __name__ == '__main__':
     n_constraints = 200
     n_samples = 10
 
-    filename = 'exp1_3_results_new.p'
+    filename = 'exp1_3_results.p'
     results = run_exp1_3_full(data_configs, n_constraints, n_samples)
     dump_results(filename, results)
 
