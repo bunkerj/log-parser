@@ -20,6 +20,6 @@ def plot_mean_with_std(x_axis, mu, s, n, color, label):
     s_arr = np.array(s)
     plt.plot(x_axis, mu_arr, lw=2, label=label, color=color)
     s_norm = s_arr / np.sqrt(n)
-    ub = mu_arr + s_norm
-    lb = mu_arr - s_norm
+    ub = mu_arr + 2 * s_norm
+    lb = mu_arr - 2 * s_norm
     plt.fill_between(x_axis, lb, ub, facecolor=color, alpha=0.5)
