@@ -26,9 +26,9 @@ def plot_metric(feature, title, ylabel, xlabel):
     n_cs = len(results[feature]['ami_cs_samples'][0])
 
     plot_mean_with_std(varying_sizes, mean_base_vector, std_base_vector,
-                       n_base, 'blue', label='Base')
+                       n_base, 'blue', 'Base')
     plot_mean_with_std(varying_sizes, avg_scores_cs, std_scores_cs,
-                       n_cs, 'green', label='Coreset')
+                       n_cs, 'green', 'Coreset')
 
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
