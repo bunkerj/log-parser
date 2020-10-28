@@ -2,6 +2,7 @@ PLACEHOLDER = '<*>'
 RESULTS_DIR = 'results'
 # SPLIT_REGEX = r'[\s=:,]'  # For IPLoM consistency
 SPLIT_REGEX = r'[\s]'  # For Drain consistency
+RAW_DELIMITERS = '\.|\\\\|\+|\*|\?|\[|\^|\]|\$|\(|\)|\{|\}|\=|\!|\||\:|\-| |/'
 
 MAX_NEG_VALUE = -99999999999
 ZERO_THRESHOLD = 0.0000001

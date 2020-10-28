@@ -1,6 +1,6 @@
 import re
 from src.utils import read_csv
-from global_constants import SPLIT_REGEX, PLACEHOLDER
+from global_constants import SPLIT_REGEX, PLACEHOLDER, RAW_DELIMITERS
 
 
 def tokenize(template):
@@ -35,6 +35,14 @@ class DataManager:
             if is_no_num:
                 tokenized_log = self._get_tokenized_no_num_log(tokenized_log)
             tokenized_logs.append(tokenized_log)
+        return tokenized_logs
+
+    def get_tokenized_raw_logs(self):
+        tokenized_logs = []
+        for raw_log in self._get_full_raw_lines_from_unstructured():
+            tokenized_log = re.split(RAW_DELIMITERS, raw_log)
+            tokenized_log_no_num = self._get_tokenized_no_num_log(tokenized_log)
+            tokenized_logs.append(tokenized_log_no_num)
         return tokenized_logs
 
     def get_tokenized_log(self, raw_log_full_line, is_no_num=True):
@@ -122,3 +130,13 @@ class DataManager:
                 if raw_content is not None:
                     log_contents.append(raw_content)
         return log_contents
+
+    def _get_full_raw_lines_from_unstructured(self):
+        full_raw_lines = []
+        log_file = self.data_config['unstructured_path']
+        with open(log_file, 'r', encoding='utf-8') as f:
+            for full_raw_log in f:
+                full_raw_log = full_raw_log.strip()
+                if full_raw_log is not None:
+                    full_raw_lines.append(full_raw_log)
+        return full_raw_lines

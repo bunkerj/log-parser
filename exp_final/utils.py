@@ -16,6 +16,18 @@ def get_log_sample(data_manager, n_samples):
     return sample_logs, samples_true_assign
 
 
+def permute_logs(logs, true_assignments):
+    n = len(logs)
+    logs_permuted = []
+    true_assignments_permuted = []
+    for idx in np.random.permutation(n):
+        log = logs[idx]
+        true_assignment = true_assignments[idx]
+        logs_permuted.append(log)
+        true_assignments_permuted.append(true_assignment)
+    return logs_permuted, true_assignments_permuted
+
+
 def get_posterior_approx(logs, n_clusters):
     mm = MultinomialMixtureVB()
     mm.fit(logs, n_clusters, max_iter=1)
