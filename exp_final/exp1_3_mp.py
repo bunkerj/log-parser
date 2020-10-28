@@ -1,6 +1,8 @@
 """
 This experiment will be run on 2k sample datasets. For each of these datasets,
-we plot performance as function of the amount of feedback.
+we plot performance for Drain as well as our MultinomialVB initialized by Drain.
+The goal is to evaluate whether MultinomialVB could be used to enhanced
+deterministic approaches.
 """
 import numpy as np
 import multiprocessing as mp
