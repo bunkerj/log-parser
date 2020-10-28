@@ -54,5 +54,6 @@ for idx, data_config in enumerate(data_configs, start=1):
     plt.ylabel('AMI')
     plt.grid()
 
-plt.subplots_adjust(wspace=0.3, hspace=0.5)
+plt.subplots_adjust(left=0.05, bottom=0.06, right=0.99,
+                    top=0.96, wspace=0.3, hspace=0.5)
 plt.show()
