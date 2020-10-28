@@ -25,6 +25,7 @@ ax.plot_surface(X_arr, Y_arr, Z_arr, cmap=cm.coolwarm)
 ax.set_xlabel('Label Counts')
 ax.set_ylabel('Constraint Counts')
 ax.set_zlabel('AMI')
-
 plt.title('Performance Evaluation of Labels and Constraints')
+plt.subplots_adjust(left=0.05, bottom=0.06, right=0.99,
+                    top=0.96, wspace=0.3, hspace=0.5)
 plt.show()
