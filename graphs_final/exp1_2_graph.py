@@ -55,16 +55,22 @@ for idx, data_config in enumerate(data_configs, start=1):
 
     plt.subplot(*DIM, idx)
     plt.title(name)
-    plot_mean_with_std(feedback_count, mean_base, std_base, 'blue',
-                       label='No Feedback')
-    plot_mean_with_std(feedback_count, mean_feedback, std_feedback, 'green',
-                       label=feedback_type)
-    if idx == 1:
+
+    n_base = len(ds_results['samples']['base'])
+    plot_mean_with_std(feedback_count, mean_base, std_base, n_base,
+                       'blue', 'No Feedback')
+
+    n_samples = len(ds_results['samples'][FEEDBACK_TYPE][0])
+    plot_mean_with_std(feedback_count, mean_feedback, std_feedback, n_samples,
+                       'green', feedback_type)
+
+    if idx == 13:
         plt.legend(loc='upper left')
         plt.ylabel('AMI')
         plt.xlabel(feedback_type)
-    # plt.tight_layout(w_pad=3.0)
+
     plt.grid()
 
-plt.subplots_adjust(wspace=0.3, hspace=0.5)
+plt.subplots_adjust(left=0.05, bottom=0.06, right=0.99,
+                    top=0.96, wspace=0.3, hspace=0.5)
 plt.show()
