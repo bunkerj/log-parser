@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from statistics import mean
 from global_utils import load_results
 from src.data_config import DataConfigs
 from src.helpers.evaluator import Evaluator
@@ -39,7 +40,11 @@ for idx, data_config in enumerate(data_configs, start=1):
     drain_score_samples = results[name]['drain_score_samples']
     mm_score_samples = results[name]['mm_score_samples']
 
-    plt.subplot(*DIM, idx)
+    color = 'lightgreen' \
+        if mean(mm_score_samples) > mean(drain_score_samples) \
+        else 'mistyrose'
+
+    plt.subplot(*DIM, idx, facecolor=color)
     plt.title(name)
     plt.boxplot([drain_score_samples,
                  mm_score_samples],
