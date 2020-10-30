@@ -104,7 +104,7 @@ if __name__ == '__main__':
 
     n_labels = 50
     n_consts = 100
-    n_samples = 25
+    n_samples = 1000
 
     filename = 'exp1_4_results.p'
     results = run_exp1_4_full(data_configs, n_labels, n_consts, n_samples)
