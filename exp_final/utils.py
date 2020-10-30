@@ -5,15 +5,14 @@ from src.coresets.greedy_iterative_geodesic_ascent import \
 
 
 def get_log_sample(data_manager, n_samples):
-    p_indices = np.random.permutation(n_samples)
-
     logs = data_manager.get_tokenized_logs()
     true_assignments = data_manager.get_true_assignments()
+    p_indices = np.random.permutation(len(logs))
 
-    sample_logs = [logs[idx] for idx in p_indices]
-    samples_true_assign = [true_assignments[idx] for idx in p_indices]
+    p_logs = [logs[idx] for idx in p_indices]
+    p_true_assign = [true_assignments[idx] for idx in p_indices]
 
-    return sample_logs, samples_true_assign
+    return p_logs[:n_samples], p_true_assign[:n_samples]
 
 
 def permute_logs(logs, true_assignments):
