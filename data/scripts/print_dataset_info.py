@@ -35,8 +35,8 @@ for data_config in data_configs:
     n_clusters = get_num_true_clusters(true_assignments)
     labels = [ta[-1] for ta in true_assignments]
 
-    event_set = set([' '.join(log) for log in logs])
-    n_unique_logs = len(event_set)
+    unique_log_set = set([' '.join(log) for log in logs])
+    n_unique_logs = len(unique_log_set)
 
     v_indices = get_vocabulary_indices(logs)
     v_indices_raw = get_vocabulary_indices(logs_raw)
