@@ -14,7 +14,7 @@ def plot_metric(feature, title, ylabel, xlabel):
     score_base_key = '{}_base_samples'.format(METRIC)
     varying_sizes = results[feature]['varying_sizes']
 
-    avg_scores_cs = get_sample_avg(results[feature][score_cs_key])
+    mean_scores_cs = get_sample_avg(results[feature][score_cs_key])
     std_scores_cs = get_sample_std(results[feature][score_cs_key])
 
     base_samples = []
@@ -32,7 +32,7 @@ def plot_metric(feature, title, ylabel, xlabel):
 
     plot_mean_with_std(varying_sizes, mean_base_vector, std_base_vector,
                        n_base, 'blue', 'Base')
-    plot_mean_with_std(varying_sizes, avg_scores_cs, std_scores_cs,
+    plot_mean_with_std(varying_sizes, mean_scores_cs, std_scores_cs,
                        n_cs, 'green', 'Coreset')
 
     plt.ylabel(ylabel)
